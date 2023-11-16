@@ -1,24 +1,24 @@
 # gui.py, Charles Jordan, 11/15/2023
 # main code for mocking up a gui for the super tool program
 
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 
 ### Base window setup
-root = Tk()
+root = tk.Tk()
 root.title("Super Tool")
 
 # remove the tear off option from the top menu bar
-root.option_add('*tearOff', FALSE)
+root.option_add('*tearOff', tk.FALSE)
 
 # Allows the main frame to be resizeable with the window
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
 
 ### Top bar menu setup
-menubar = Menu(root)
+menubar = tk.Menu(root)
 root.config(menu=menubar)
-file_menu = Menu(menubar)
+file_menu = tk.Menu(menubar)
 
 file_menu.add_command(label='Exit', command=root.destroy)
 menubar.add_cascade(label="File", menu=file_menu)
@@ -35,9 +35,9 @@ main_frame.grid_columnconfigure(1,  minsize=250, weight=1)
 proj_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge",
                        height=500, width=300)
 test_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge",
-                       padding="5", height=100, width=300)
+                       height=100, width=300)
 plot_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge",
-                       padding="5", height=100, width=300)
+                       height=100, width=300)
 
 # place the frames in their grids, main_frame inside root and the rest
 # inside main_fram
