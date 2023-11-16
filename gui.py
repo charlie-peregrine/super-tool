@@ -3,6 +3,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+from superbackend import *
 
 ### Base window setup
 root = tk.Tk()
@@ -35,20 +36,21 @@ menubar.add_cascade(label="About", menu=about_menu)
 ### Frame creation
 # main frame setup, row and column configure for initial size and resizeability
 main_frame = ttk.Frame(root, height=600, width=600)
-main_frame.grid_rowconfigure(0, minsize=200, weight=1)
-main_frame.grid_columnconfigure(0, minsize=180, weight=1)
-main_frame.grid_rowconfigure(1, minsize=200, weight=1)
-main_frame.grid_columnconfigure(1,  minsize=250, weight=1)
+main_frame.grid_rowconfigure(0, minsize=150, weight=1)
+main_frame.grid_columnconfigure(0, minsize=50, weight=1)
+main_frame.grid_rowconfigure(1, minsize=150, weight=1)
+main_frame.grid_columnconfigure(1, minsize=50, weight=1)
+main_frame.grid_columnconfigure(2, minsize=50, weight=1)
 
 # set up the sub-frames
 proj_frame = ttk.Frame(main_frame, borderwidth=5, relief='groove',
                        height=300, width=300)
 test_frame = ttk.Frame(main_frame, borderwidth=5, relief='groove',
-                       height=100, width=300)
+                       height=100, width=100)
 param_frame = ttk.Frame(main_frame, borderwidth=5, relief='groove',
-                       height=100, width=300)
+                       height=100, width=100)
 plot_frame = ttk.Frame(main_frame, borderwidth=5, relief='groove',
-                       height=300, width=500)
+                       height=300, width=400)
 statusbar_frame = ttk.Frame(main_frame, borderwidth=2, relief='groove') # nothing else so it's just a popup sort of deal
 
 # place the frames in their grids, main_frame inside root and the rest
@@ -90,7 +92,15 @@ for i in range(num_tests):
 
 ### Test Parameters Box details
 test_header = ttk.Label(test_frame, text="Test Parameters:") # @TODO font size up 
-test_header.grid(row=0, column=0, columnspan=2, sticky="w")
+test_header.grid(row=0, column=0, columnspan=1, sticky="w")
+
+def run_simulation(*args):
+    blah = ' '.join([i.get() for i in strings])
+    print(blah)
+    statusbar_text.config(text="Status Bar: " + blah)
+
+img = tk.PhotoImage(file="icons/supertoolplay.png")
+ttk.Button(test_frame, image=img, command=run_simulation).grid(row=0, column=2)
 
 # example input field to show that the entries work
 strings = [tk.StringVar() for i in range(4)]
@@ -103,16 +113,9 @@ for i in range(len(lines)):
     test_input = ttk.Entry(test_frame, textvariable=lines[i][1], width=6)
     test_unit = ttk.Label(test_frame, text=lines[i][2])
     test_name.grid(row=2+i, column=0, sticky='w')
-    test_input.grid(row=2+i, column=1, padx=5)
+    test_input.grid(row=2+i, column=1)
     test_unit.grid(row=2+i, column=2)
 
-def run_simulation(*args):
-    blah = ' '.join([i.get() for i in strings])
-    print(blah)
-    statusbar_text.config(text="Status Bar: " + blah)
-
-img = tk.PhotoImage(file="icons/supertoolplay.png")
-ttk.Button(test_frame, image=img, command=run_simulation).grid(row=0, column=4)
 
 
 
