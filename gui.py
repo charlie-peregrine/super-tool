@@ -38,21 +38,25 @@ test_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge",
                        height=100, width=300)
 plot_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge",
                        height=100, width=300)
+error_frame = ttk.Frame(main_frame) # nothing else so it's just a popup sort of deal
 
 # place the frames in their grids, main_frame inside root and the rest
-# inside main_fram
+# inside main_frame
 main_frame.grid(row=0,column=0, sticky="nesw")
 proj_frame.grid(row=0,column=0,columnspan=1, rowspan=2, sticky="nesw")
 test_frame.grid(row=0,column=1,columnspan=1, rowspan=1, sticky="nesw")
 plot_frame.grid(row=1,column=1,columnspan=1, rowspan=1, sticky="nesw")
+error_frame.grid(row=2, column=0, columnspan=2, sticky="nesw")
 
 # example text inside the frames
 proj_text = ttk.Label(proj_frame, text="project")
-proj_text.grid(row=1,column=1, sticky="ne")
+proj_text.grid(row=0,column=0)
 test_text = ttk.Label(test_frame, text="test")
-test_text.grid(row=1,column=1, sticky="ne")
+test_text.grid(row=0,column=0)
 plot_text = ttk.Label(plot_frame, text="plot")
-plot_text.grid(row=1,column=1, sticky="ne")
+plot_text.grid(row=0,column=0)
+error_text = ttk.Label(error_frame, text="Error Bar")
+error_text.grid(row=0, column=0)
 
 
 # # example button
