@@ -4,10 +4,18 @@
 from tkinter import *
 from tkinter import ttk
 
+### Base window setup
 root = Tk()
-root.title('Wahoo!')
-root.option_add('*tearOff', FALSE) # remove the tear off option from the top menu bar
+root.title("Super Tool")
 
+# remove the tear off option from the top menu bar
+root.option_add('*tearOff', FALSE)
+
+# Allows the main frame to be resizeable with the window
+root.rowconfigure(0, weight=1)
+root.columnconfigure(0, weight=1)
+
+### Top bar menu setup
 menubar = Menu(root)
 root.config(menu=menubar)
 file_menu = Menu(menubar)
@@ -15,34 +23,36 @@ file_menu = Menu(menubar)
 file_menu.add_command(label='Exit', command=root.destroy)
 menubar.add_cascade(label="File", menu=file_menu)
 
+### Frame creation
+# main frame setup, row and column configure for initial size and resizeability
 main_frame = ttk.Frame(root, height=600, width=600)
 main_frame.grid_rowconfigure(0, minsize=200, weight=1)
 main_frame.grid_columnconfigure(0, minsize=180, weight=1)
 main_frame.grid_rowconfigure(1, minsize=200, weight=1)
 main_frame.grid_columnconfigure(1,  minsize=250, weight=1)
 
-proj_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge", height=500, width=300)
-test_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge", padding="5", height=100, width=300)
-plot_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge", padding="5", height=100, width=300)
+# set up the sub-frames
+proj_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge",
+                       height=500, width=300)
+test_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge",
+                       padding="5", height=100, width=300)
+plot_frame = ttk.Frame(main_frame, borderwidth=5, relief="ridge",
+                       padding="5", height=100, width=300)
 
-main_frame.grid(row=0,column=0)
+# place the frames in their grids, main_frame inside root and the rest
+# inside main_fram
+main_frame.grid(row=0,column=0, sticky="nesw")
 proj_frame.grid(row=0,column=0,columnspan=1, rowspan=2, sticky="nesw")
 test_frame.grid(row=0,column=1,columnspan=1, rowspan=1, sticky="nesw")
 plot_frame.grid(row=1,column=1,columnspan=1, rowspan=1, sticky="nesw")
 
+# example text inside the frames
 proj_text = ttk.Label(proj_frame, text="project")
 proj_text.grid(row=1,column=1, sticky="ne")
 test_text = ttk.Label(test_frame, text="test")
 test_text.grid(row=1,column=1, sticky="ne")
 plot_text = ttk.Label(plot_frame, text="plot")
 plot_text.grid(row=1,column=1, sticky="ne")
-
-
-# # main frame setup
-# mainframe = ttk.Frame(root, padding="5")
-# mainframe.grid(column=0, row=0)
-
-
 
 
 # # example button
@@ -56,6 +66,10 @@ plot_text.grid(row=1,column=1, sticky="ne")
 # username = StringVar()
 # name = ttk.Entry(mainframe, textvariable=username)
 
+# these 2 lines set the minimum size of the window to its initial size
+# @TODO may need to mess with this later but it's fine for now
+root.update()
+root.minsize(root.winfo_width(), root.winfo_height())
 
 root.mainloop()
 
