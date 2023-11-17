@@ -5,8 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename, askdirectory, asksaveasfilename
 
-# file picking:
-# https://stackoverflow.com/questions/3579568/choosing-a-file-in-python-with-simple-dialog
+
 
 def open_project():
     # filetypes section to pick a specific extension!
