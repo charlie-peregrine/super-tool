@@ -5,8 +5,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename, askdirectory, asksaveasfilename
 
-
-
 def open_project():
     # filetypes section to pick a specific extension!
     filename = askopenfilename(filetypes=[("Python", "*.py")])

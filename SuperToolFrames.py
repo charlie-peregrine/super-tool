@@ -11,21 +11,27 @@ class ProjectView(ttk.Frame):
                     height=300, width=300)
         self.grid(row=0,column=0, columnspan=1, rowspan=2, sticky="nesw")
 
-        proj_header = ttk.Label(self, text="Project Name") # @TODO font size up
-        proj_header.grid(row=0, column=0, columnspan=3)
-        project_title = tk.StringVar()
-        proj_header_entry = ttk.Entry(self, textvariable=project_title)
-        proj_header_entry.grid(row=0,column=3, columnspan=2)
 
+
+        proj_header = ttk.Label(self, text="Project Name") # @TODO font size up
+        proj_header.grid(row=0, column=0, columnspan=3, sticky='w')
+        
+        num_units = 3
         num_tests = 4
-        project_test_entries = [tk.StringVar() for i in range(num_tests)]
-        for i in range(num_tests):
-            ttk.Label(self, text="Test %d\n  Test type" % (i+1)).grid(
-                row=1+i, column=0, columnspan=2
-            )
-            ttk.Entry(self, textvariable=project_test_entries[i]).grid(
-                row=1+i, column=2, columnspan=3
-            )
+        line = 0
+        for i in range(num_units):
+            a = ttk.Label(self, text=("Unit " + str(i)))
+            a.grid(row=1+line, column=0, padx=7, sticky='w')
+            
+            line += 1
+            for j in range(num_tests):
+                b = ttk.Label(self, text=("Test " + str(j)))
+                b.grid(row=1+line, column=0, padx=14, sticky='w')
+                line += 1
+                
+                c = ttk.Label(self, text=("load ref"))
+                c.grid(row=1+line, column=0, padx=21, sticky='w')
+                line += 1
 
 class TestView(ttk.Frame):
     def __init__(self, parent):
@@ -58,7 +64,7 @@ class TestView(ttk.Frame):
     def run_simulation(self, *args):
         blah = ' '.join([i.get() for i in self.strings])
         print(blah)
-        self.parent.statusbar_frame.main_text.config(text="Status Bar: " + blah)
+        self.parent.statusbar_frame.set_text("Status Bar: " + blah)
 
 class ParamView(ttk.Frame):
     def __init__(self, parent):
@@ -86,4 +92,7 @@ class StatusBar(ttk.Frame):
         
         self.main_text = ttk.Label(self, text="Status Bar")
         self.main_text.grid(row=0, column=0)
+
+    def set_text(self, text):
+        self.main_text.config(text=text)
 

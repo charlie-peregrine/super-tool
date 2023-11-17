@@ -19,6 +19,11 @@ class SuperToolGUI(tk.Tk):
 
         self.widgets()
         self.keybinds()
+        
+        # these 2 lines set the minimum size of the window to its initial size
+        # @TODO may need to mess with this later but it's fine for now
+        self.update()
+        self.minsize(self.winfo_width(), self.winfo_height())
 
     def widgets(self):
 
@@ -56,10 +61,6 @@ class SuperToolGUI(tk.Tk):
         self.plot_frame = PlotView(self)
         self.statusbar_frame = StatusBar(self)
 
-        # these 2 lines set the minimum size of the window to its initial size
-        # @TODO may need to mess with this later but it's fine for now
-        self.update()
-        self.minsize(self.winfo_width(), self.winfo_height())
 
     def keybinds(self):
         self.bind("<F5>", self.test_frame.run_simulation)
