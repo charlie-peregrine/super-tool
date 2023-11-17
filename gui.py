@@ -6,7 +6,12 @@ from tkinter import ttk
 from superbackend import *
 
 ### Base window setup
-root = tk.Tk()
+class SuperToolMain:
+    def __init__(self, parent):
+        self.parent = parent
+
+
+
 root.title("Super Tool")
 
 # remove the tear off option from the top menu bar
@@ -126,7 +131,11 @@ for i in range(len(lines)):
 root.update()
 root.minsize(root.winfo_width(), root.winfo_height())
 
-root.mainloop()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    blah = SuperToolMain(root)
+    root.mainloop()
 
 
 # def calculate(*args):
