@@ -6,7 +6,7 @@ from tkinter import ttk
 from superbackend import *
 
 
-class SuperToolMain(tk.Tk):
+class SuperTool(tk.Tk):
     def __init__(self):
         super().__init__()
         ### setup root window options
@@ -148,7 +148,7 @@ class StatusBar(ttk.Frame):
         self.main_text.grid(row=0, column=0)
 
 if __name__ == "__main__":
-    gui = SuperToolMain()
+    gui = SuperTool()
     gui.mainloop()
 
 
