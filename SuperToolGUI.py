@@ -1,4 +1,4 @@
-# gui.py, Charles Jordan, 11/15/2023
+# SuperToolGUI.py, Charlie Jordan, 11/15/2023
 # main code for mocking up a gui for the super tool program
 
 import tkinter as tk
@@ -6,7 +6,7 @@ from tkinter import ttk
 from superbackend import *
 
 
-class SuperTool(tk.Tk):
+class SuperToolGUI(tk.Tk):
     def __init__(self):
         super().__init__()
         ### setup root window options
@@ -148,7 +148,7 @@ class StatusBar(ttk.Frame):
         self.main_text.grid(row=0, column=0)
 
 if __name__ == "__main__":
-    gui = SuperTool()
+    gui = SuperToolGUI()
     gui.mainloop()
 
 
