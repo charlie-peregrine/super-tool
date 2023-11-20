@@ -16,6 +16,8 @@ class ProjectView(ttk.Frame):
         proj_header = ttk.Label(self, text="Project Name") # @TODO font size up
         proj_header.grid(row=0, column=0, columnspan=3, sticky='w')
         
+        # example project tree text
+        # would look a lot better with frames to hold the trees
         num_units = 3
         num_tests = 4
         line = 0
