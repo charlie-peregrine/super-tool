@@ -37,7 +37,7 @@ class SuperToolGUI(tk.Tk):
         about_menu = tk.Menu(menubar)
 
         file_menu.add_command(label="New", accelerator="ctrl+n") #@TODO make the accelerators do something
-        file_menu.add_command(label="Save", accelerator="ctrl+s")
+        file_menu.add_command(label="Save", command=self.project.write_to_file, accelerator="ctrl+s")
         file_menu.add_command(label="Save As", command=save_as_project, accelerator="ctrl+shift+s")
         file_menu.add_command(label="Open Project File", command=open_project)
         file_menu.add_command(label="Open Workspace", command=open_workspace)
@@ -67,6 +67,7 @@ class SuperToolGUI(tk.Tk):
 
     def keybinds(self):
         self.bind("<F5>", self.test_frame.run_simulation)
+        self.bind("<Control-s>", self.project.write_to_file)
 
 
 if __name__ == "__main__":

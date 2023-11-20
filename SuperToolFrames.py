@@ -24,8 +24,8 @@ class ProjectView(ttk.Frame):
         
         a = stp.Unit()
         b = stp.Unit()
-        a.test_list = [stp.Test(), stp.Test()]
-        b.test_list = [stp.Test(), stp.Test(), stp.Test()]
+        a.test_dict = {-1 : stp.Test(), 1 : stp.Test()}
+        b.test_dict = {3 : stp.Test(), 2 : stp.Test(), 4 : stp.Test()}
         b.name = "Unit AAAAAAAAAAAAAAAAAAA"
         proj.unit_list = [a,b, stp.Unit(), b, a, a]
         
@@ -42,8 +42,8 @@ class ProjectView(ttk.Frame):
                 a.grid(row=line, column=0, padx=10, sticky='w')
                 
                 line += 1
-                if unit.test_list:
-                    for test in unit.test_list:
+                if unit.test_dict:
+                    for num,test in unit.test_dict.items():
                         # print(test.number, test.type)
 
                         b = ttk.Label(frame, text="Test " + str(test.number))
