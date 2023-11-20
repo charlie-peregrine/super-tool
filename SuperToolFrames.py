@@ -3,6 +3,8 @@
 
 import tkinter as tk
 from tkinter import ttk
+from superbackend import *
+import SuperToolProject as stp
 
 class ProjectView(ttk.Frame):
     def __init__(self, parent):
@@ -11,29 +13,61 @@ class ProjectView(ttk.Frame):
                     height=300, width=300)
         self.grid(row=0,column=0, columnspan=1, rowspan=2, sticky="nesw")
 
-
-
-        proj_header = ttk.Label(self, text="Project Name") # @TODO font size up
+        proj = parent.project
+        
+        # @TODO font size up of header
+        proj_header = ttk.Label(self, text=proj.title)
         proj_header.grid(row=0, column=0, columnspan=3, sticky='w')
         
+        a = stp.Unit()
+        b = stp.Unit()
+        a.test_list = [stp.Test(), stp.Test()]
+        b.test_list = [stp.Test(), stp.Test(), stp.Test()]
+        proj.unit_list = [a,b, stp.Unit()]
+        
+        line = 1
+        if proj.unit_list:
+            for unit in proj.unit_list:
+                print(unit.name)
+                a = ttk.Label(self, text=unit.name)
+                a.grid(row=line, column=0, padx=7, sticky='w')
+                
+                line += 1
+                if unit.test_list:
+                    for test in unit.test_list:
+                        print(test.number, test.type)
+
+                        b = ttk.Label(self, text="Test " + str(test.number))
+                        b.grid(row=line, column=0, padx=14, sticky='w')
+                        line += 1
+                        
+                        c = ttk.Label(self, text=test.type)
+                        c.grid(row=line, column=0, padx=21, sticky='w')
+                        line += 1
+                else:
+                    print("no tests")
+                    line += 1
+        else:
+            print("empty")
+
         # example project tree text
         # would look a lot better with frames to hold the trees
-        num_units = 3
-        num_tests = 4
-        line = 0
-        for i in range(num_units):
-            a = ttk.Label(self, text=("Unit " + str(i)))
-            a.grid(row=1+line, column=0, padx=7, sticky='w')
+        # num_units = 3
+        # num_tests = 4
+        # line = 0
+        # for i in range(num_units):
+        #     a = ttk.Label(self, text=("Unit " + str(i)))
+        #     a.grid(row=1+line, column=0, padx=7, sticky='w')
             
-            line += 1
-            for j in range(num_tests):
-                b = ttk.Label(self, text=("Test " + str(j)))
-                b.grid(row=1+line, column=0, padx=14, sticky='w')
-                line += 1
+        #     line += 1
+        #     for j in range(num_tests):
+        #         b = ttk.Label(self, text=("Test " + str(j)))
+        #         b.grid(row=1+line, column=0, padx=14, sticky='w')
+        #         line += 1
                 
-                c = ttk.Label(self, text=("load ref"))
-                c.grid(row=1+line, column=0, padx=21, sticky='w')
-                line += 1
+        #         c = ttk.Label(self, text=("load ref"))
+        #         c.grid(row=1+line, column=0, padx=21, sticky='w')
+        #         line += 1
 
 class TestView(ttk.Frame):
     def __init__(self, parent):

@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 from superbackend import *
 from SuperToolFrames import *
+import SuperToolProject as stp
 
 class SuperToolGUI(tk.Tk):
     def __init__(self):
@@ -17,6 +18,7 @@ class SuperToolGUI(tk.Tk):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
+        self.project = stp.Project()
         self.widgets()
         self.keybinds()
         
@@ -24,6 +26,7 @@ class SuperToolGUI(tk.Tk):
         # @TODO may need to mess with this later but it's fine for now
         self.update()
         self.minsize(self.winfo_width(), self.winfo_height())
+        
 
     def widgets(self):
 

@@ -3,6 +3,26 @@
 # Super Tool Project. Handles reading and writing to save
 # files and storing test, unit, and plot data
 
-class SuperToolProject:
+
+class Project:
+    def __init__(self, filename=''):
+        self.title = "Untitled Project"
+        self.file_name = "default-project.sprtl"
+        self.unit_list = []
+    
+    def write_to_file(self):
+        pass
+    
+    def read_from_file(self):
+        pass
+
+class Unit:
     def __init__(self):
-        pass 
+        self.name = "Untitled Unit"
+        self.test_list = []
+        
+class Test:
+    def __init__(self):
+        self.number = -1
+        self.type = "default type"
+        self.attribute_list = []
