@@ -19,55 +19,47 @@ class ProjectView(ttk.Frame):
         proj_header = ttk.Label(self, text=proj.title)
         proj_header.grid(row=0, column=0, columnspan=3, sticky='w')
         
+        self.scroller = ScrollFrame(self)
+        self.scroller.grid(row=1, column=0, sticky='nesw')
+        
         a = stp.Unit()
         b = stp.Unit()
         a.test_list = [stp.Test(), stp.Test()]
         b.test_list = [stp.Test(), stp.Test(), stp.Test()]
-        proj.unit_list = [a,b, stp.Unit()]
+        b.name = "Unit AAAAAAAAAAAAAAAAAAA"
+        proj.unit_list = [a,b, stp.Unit(), b, a, a]
         
         line = 1
+        frame = self.scroller.frame
         if proj.unit_list:
             for unit in proj.unit_list:
-                print(unit.name)
-                a = ttk.Label(self, text=unit.name)
-                a.grid(row=line, column=0, padx=7, sticky='w')
+                # print('\n' + unit.name)
+                sep = ttk.Separator(frame, orient='horizontal')
+                sep.grid(row=line, column=0, sticky='ew')
+                line += 1
+                
+                a = ttk.Label(frame, text=unit.name)
+                a.grid(row=line, column=0, padx=10, sticky='w')
                 
                 line += 1
                 if unit.test_list:
                     for test in unit.test_list:
-                        print(test.number, test.type)
+                        # print(test.number, test.type)
 
-                        b = ttk.Label(self, text="Test " + str(test.number))
-                        b.grid(row=line, column=0, padx=14, sticky='w')
+                        b = ttk.Label(frame, text="Test " + str(test.number))
+                        b.grid(row=line, column=0, padx=20, sticky='w')
                         line += 1
                         
-                        c = ttk.Label(self, text=test.type)
-                        c.grid(row=line, column=0, padx=21, sticky='w')
+                        c = ttk.Label(frame, text=test.type)
+                        c.grid(row=line, column=0, padx=30, sticky='w')
                         line += 1
                 else:
-                    print("no tests")
+                    # print("no tests")
                     line += 1
         else:
-            print("empty")
+            # print("empty")
+            pass
 
-        # example project tree text
-        # would look a lot better with frames to hold the trees
-        # num_units = 3
-        # num_tests = 4
-        # line = 0
-        # for i in range(num_units):
-        #     a = ttk.Label(self, text=("Unit " + str(i)))
-        #     a.grid(row=1+line, column=0, padx=7, sticky='w')
-            
-        #     line += 1
-        #     for j in range(num_tests):
-        #         b = ttk.Label(self, text=("Test " + str(j)))
-        #         b.grid(row=1+line, column=0, padx=14, sticky='w')
-        #         line += 1
-                
-        #         c = ttk.Label(self, text=("load ref"))
-        #         c.grid(row=1+line, column=0, padx=21, sticky='w')
-        #         line += 1
 
 class TestView(ttk.Frame):
     def __init__(self, parent):
@@ -132,3 +124,29 @@ class StatusBar(ttk.Frame):
     def set_text(self, text):
         self.main_text.config(text=text)
 
+class ScrollFrame(ttk.Frame):
+    def __init__(self, parent, **kwargs):
+        self.parent = parent
+        super().__init__(parent, **kwargs)
+        
+        scrollbar = tk.Scrollbar(self, orient='vertical')
+        scrollbar.pack(side='right', fill='y')
+        
+        self.canvas = tk.Canvas(self, background='#ffffff')
+        self.canvas.pack(side='left', fill='both', expand=True)
+        
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        scrollbar.configure(command=self.canvas.yview)
+        
+        self.frame = ttk.Frame(self.canvas)
+        self.canvas.create_window((0,0), window=self.frame, anchor='nw')
+        
+        self.frame.bind("<Configure>", self.on_configure)
+        
+    def on_configure(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        self.reset_width()
+    
+    def reset_width(self):
+        if self.frame.winfo_reqwidth() != self.canvas.winfo_width():
+            self.canvas.config(width=self.frame.winfo_reqwidth())
