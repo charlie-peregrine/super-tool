@@ -40,8 +40,8 @@ class ProjectView(ttk.Frame):
                 
                 a = ttk.Label(frame, text=unit.name)
                 a.grid(row=line, column=0, padx=10, sticky='w')
-                
-                line += 1
+                line += 1                
+
                 if unit.test_dict:
                     for num,test in unit.test_dict.items():
                         # print(test.number, test.type)
@@ -98,7 +98,7 @@ class TestView(ttk.Frame):
     def run_simulation(self, *args):
         blah = ' '.join([i.get() for i in self.strings])
         print(blah)
-        self.parent.statusbar_frame.set_text("Status Bar: " + blah)
+        self.parent.set_status("Status Bar: " + blah)
 
 class ParamView(ttk.Frame):
     def __init__(self, parent):
@@ -126,6 +126,11 @@ class StatusBar(ttk.Frame):
         
         self.main_text = ttk.Label(self, text="Status Bar")
         self.main_text.grid(row=0, column=0)
+        
+        menu = tk.Menu(self)
+        for i in ('One', 'Two', 'Three'):
+            menu.add_command(label=i)
+        self.bind('<3>', lambda e: menu.post(e.x_root, e.y_root))
 
     def set_text(self, text):
         self.main_text.config(text=text)
