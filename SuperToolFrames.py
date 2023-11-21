@@ -23,11 +23,11 @@ class ProjectView(ttk.Frame):
         self.scroller.grid(row=1, column=0, sticky='nesw')
         
         a = stp.Unit()
-        b = stp.Unit()
-        a.test_dict = {-1 : stp.Test(), 1 : stp.Test()}
-        b.test_dict = {3 : stp.Test(), 2 : stp.Test(), 4 : stp.Test()}
-        b.name = "Unit AAAAAAAAAAAAAAAAAAA"
-        proj.unit_list = [a,b, stp.Unit(), b, a, a]
+        # b = stp.Unit()
+        # a.test_dict = {-1 : stp.Test(), 1 : stp.Test()}
+        # b.test_dict = {3 : stp.Test(), 2 : stp.Test(), 4 : stp.Test()}
+        # b.name = "Unit AAAAAAAAAAAAAAAAAAA"
+        # proj.unit_list = [a] #,b, stp.Unit(), b, a, a]
         
         line = 1
         frame = self.scroller.frame
@@ -54,11 +54,17 @@ class ProjectView(ttk.Frame):
                         c.grid(row=line, column=0, padx=30, sticky='w')
                         line += 1
                 else:
-                    # print("no tests")
+                    b = ttk.Label(frame, text="No Tests")
+                    b.grid(row=line, column=0, padx=20, sticky='w')
                     line += 1
         else:
-            # print("empty")
-            pass
+            sep = ttk.Separator(frame, orient='horizontal')
+            sep.grid(row=line, column=0, sticky='ew')
+            line += 1
+            
+            a = ttk.Label(frame, text="No Units")
+            a.grid(row=line, column=0, padx=10, sticky='w')
+            line += 1
 
 
 class TestView(ttk.Frame):
@@ -132,13 +138,13 @@ class ScrollFrame(ttk.Frame):
         scrollbar = tk.Scrollbar(self, orient='vertical')
         scrollbar.pack(side='right', fill='y')
         
-        self.canvas = tk.Canvas(self, background='#ffffff')
+        self.canvas = tk.Canvas(self) #, background='#ffffff')
         self.canvas.pack(side='left', fill='both', expand=True)
         
         self.canvas.configure(yscrollcommand=scrollbar.set)
         scrollbar.configure(command=self.canvas.yview)
         
-        self.frame = ttk.Frame(self.canvas)
+        self.frame = ttk.Frame(self.canvas, padding="0 0 4 0")
         self.canvas.create_window((0,0), window=self.frame, anchor='nw')
         
         self.frame.bind("<Configure>", self.on_configure)

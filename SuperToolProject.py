@@ -9,7 +9,7 @@ class Project:
     def __init__(self, filename=''):
         self.title = "Untitled Project"
         self.file_name = "default-project.pec"
-        self.unit_dict = {}
+        self.unit_list = {}
     
     def write_to_file(self, *args):
         with open(self.file_name, mode='w') as file:
@@ -18,7 +18,7 @@ class Project:
                  self.file_name]
                 ) + "\n")
             
-            for unit in self.unit_dict:
+            for unit in self.unit_list:
                 file.write("\t".join(
                     ["U", unit.name]
                     ) + "\n")

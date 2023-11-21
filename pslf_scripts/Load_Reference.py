@@ -1,5 +1,5 @@
 from PSLF_PYTHON import *
-from Super_Tool import *
+from pslf_scripts.Super_Tool import *
 
 
 ###################################################################################################
@@ -21,8 +21,8 @@ from Super_Tool import *
 
 # initalizes some global variables
 TotalSteps = 6
-StepTimeInSecs=[0 for x in range(TotalSteps)]
-StepSizeInPu=[0 for x in range(TotalSteps)]
+StepTimeInSecs=[0.0 for x in range(TotalSteps)]
+StepSizeInPu=[0.0 for x in range(TotalSteps)]
 
 #OneLine=[[0 for x in range(1)] for y in range(500)]
 #print(OneLine)
@@ -32,11 +32,11 @@ StepSizeInPu=[0 for x in range(TotalSteps)]
 # Configure for your test with the following parameters
 #--------------------------------------------------------------------------------------------------
 
-dyd_filename    =   "HCPR1.dyd"
-sav_filename    =   "HCPR1_GOV.sav"
-chf_filename    =   "HCPR1_GOV_new_sim.chf"
-csv_filename    =   "HCPR1_GOV_new_sim.csv"
-rep_filename    =   "Rep.rep"
+dyd_filename    =   "HCPR3.dyd" # "HCPR1.dyd"
+sav_filename    =   "HCPR3_VStepP02_P0.sav" # "HCPR1_GOV.sav"
+chf_filename    =   "HCPR3_VStepP02_P0.chf" # "HCPR1_GOV_new_sim.chf"
+csv_filename    =   "HCPR3_VstepP02_P0_sim.csv" # "HCPR1_GOV_new_sim.csv"
+rep_filename    =   "HCPR3_VStepP-2_P0.rep" # "Rep.rep"
 
 
 StepTimeInSecs[0]  =	8.2
