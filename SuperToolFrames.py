@@ -31,8 +31,8 @@ class ProjectView(ttk.Frame):
         
         line = 1
         frame = self.scroller.frame
-        if proj.unit_list:
-            for unit in proj.unit_list:
+        if proj.units:
+            for unit in proj.units.values():
                 # print('\n' + unit.name)
                 sep = ttk.Separator(frame, orient='horizontal')
                 sep.grid(row=line, column=0, sticky='ew')
@@ -42,8 +42,8 @@ class ProjectView(ttk.Frame):
                 a.grid(row=line, column=0, padx=10, sticky='w')
                 line += 1                
 
-                if unit.test_dict:
-                    for num,test in unit.test_dict.items():
+                if unit.tests:
+                    for test in unit.tests.values():
                         # print(test.number, test.type)
 
                         b = ttk.Label(frame, text="Test " + str(test.number))

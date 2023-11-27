@@ -3,13 +3,11 @@
 # Super Tool Project. Handles reading and writing to save
 # files and storing test, unit, and plot data
 
-import pprint
-
 class Project:
     def __init__(self, filename=''):
         self.title = "Untitled Project"
         self.file_name = "default-project.pec"
-        self.unit_list = {}
+        self.units = {}
     
     def write_to_file(self, *args):
         with open(self.file_name, mode='w') as file:
@@ -18,7 +16,7 @@ class Project:
                  self.file_name]
                 ) + "\n")
             
-            for unit in self.unit_list:
+            for unit in self.units.values():
                 file.write("\t".join(
                     ["U", unit.name]
                     ) + "\n")
@@ -33,18 +31,53 @@ class Project:
     def read_from_file(self):
         pass
 
-class Unit:
-    def __init__(self):
-        self.name = "Untitled Unit"
-        self.test_dict = {}
+    def add_unit(self, name):
+        self.units[name] = Unit(name)
+
+    # @TODO add error checking above this call?
+    def rename_unit(self, old, new):
+        self.units[new] = self.units.pop(old)
+        self.units[new].name = new
+
+    def remove_unit(self, name):
+        del self.units[name]
+
+    def __str__(self):
+        return "[{} | {}]".format(self.title, self.file_name) + \
+            "".join(["\n" + str(i) for i in self.units.values()])
     
-    def add_test(self, number=-1, type="None", **kwargs):
-        new_test = Test(number, type, **kwargs)
-        self.test_dict[number] = new_test
+    def __getitem__(self, key):
+        return self.units[key]
+    
+
+class Unit:
+    def __init__(self, name="Untitled Unit"):
+        self.name = name
+        self.tests = {}
+        
+    def add_test(self, name, type_):
+        self.tests[name] = Test(name=name, type=type_)
+    
+    def rename_test(self, old, new):
+        self.tests[new] = self.tests.pop(old)
+        self.tests[new].name = new
+        
+    def remove_test(self, name):
+        del self.tests[name]
+    
+    def __str__(self):
+        return "  [{}]".format(self.name) + \
+            "".join(["\n" + str(i) for i in self.tests.values()]) 
+    
+    def __getitem__(self, key):
+        return self.tests[key]
         
 class Test:
     # @TODO handle kwargs
-    def __init__(self, number=-1, type="None", **kwargs):
-        self.number = number
+    def __init__(self, name="Untitled Test", type="None", **kwargs):
+        self.name = name
         self.type = type
-        self.attribute_dict = {}
+        self.attribute_dict = kwargs
+    
+    def __str__(self):
+        return "    [ {} | {} | {} ]".format(self.name, self.type, self.attribute_dict)
