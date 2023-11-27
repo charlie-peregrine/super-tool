@@ -40,6 +40,7 @@ class Project:
         self.units[new].name = new
 
     def remove_unit(self, name):
+        del self.units[name].tests
         del self.units[name]
 
     def __str__(self):

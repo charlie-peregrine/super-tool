@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 from superbackend import *
 import SuperToolProject as stp
+from SuperToolMenus import *
 
 class ProjectView(ttk.Frame):
     def __init__(self, parent):
@@ -46,15 +47,18 @@ class ProjectView(ttk.Frame):
                 sep.grid(row=line, column=0, sticky='ew')
                 line += 1
                 
-                a = ttk.Label(frame, text=unit.name)
+                a = UnitLabel(frame, text=unit.name)
                 a.grid(row=line, column=0, padx=10, sticky='w')
-                line += 1                
+                line += 1
+
+                # if line > 4:
+                #     a.menu.add_command(label="dummy")
 
                 if unit.tests:
                     for test in unit.tests.values():
                         # print(test.number, test.type)
 
-                        b = ttk.Label(frame, text="Test " + test.name)
+                        b = TestLabel(frame, text="Test " + test.name)
                         b.grid(row=line, column=0, padx=20, sticky='w')
                         line += 1
                         
