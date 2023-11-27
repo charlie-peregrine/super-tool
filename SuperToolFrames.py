@@ -22,12 +22,20 @@ class ProjectView(ttk.Frame):
         self.scroller = ScrollFrame(self)
         self.scroller.grid(row=1, column=0, sticky='nesw')
         
-        a = stp.Unit()
+        # a = stp.Unit()
         # b = stp.Unit()
         # a.test_dict = {-1 : stp.Test(), 1 : stp.Test()}
         # b.test_dict = {3 : stp.Test(), 2 : stp.Test(), 4 : stp.Test()}
         # b.name = "Unit AAAAAAAAAAAAAAAAAAA"
         # proj.unit_list = [a] #,b, stp.Unit(), b, a, a]
+        
+        proj.add_unit("Example Unit!!!")
+        proj["Example Unit!!!"].add_test("test one", "load ref")
+        proj["Example Unit!!!"].add_test("second test", "dynamic")
+        proj.add_unit("Second Unit")
+        u = proj["Second Unit"]
+        u.add_test("Idaho test 3", "load ref")
+        
         
         line = 1
         frame = self.scroller.frame
@@ -46,7 +54,7 @@ class ProjectView(ttk.Frame):
                     for test in unit.tests.values():
                         # print(test.number, test.type)
 
-                        b = ttk.Label(frame, text="Test " + str(test.number))
+                        b = ttk.Label(frame, text="Test " + test.name)
                         b.grid(row=line, column=0, padx=20, sticky='w')
                         line += 1
                         

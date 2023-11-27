@@ -20,9 +20,9 @@ class Project:
                 file.write("\t".join(
                     ["U", unit.name]
                     ) + "\n")
-                for test in unit.test_list:
+                for test in unit.tests.values():
                     file.write("\t".join([
-                        "T", str(test.number), test.type]
+                        "T", test.name, test.type]
                         ) + "\n")
                     # for k,v in test.attribute_dict:
                     #     write(k + "\t" + v)
