@@ -59,10 +59,12 @@ class ProjectView(ttk.Frame):
         
         self.clicked_widget = self.dummy_label
         
-        self.unit_frames = []
+        self.units = {}
         self.tests = {}
         if self.proj.units:
-            for unit in self.proj.units.values():
+            for unit_key in sorted(self.proj.units.keys()):
+                
+                unit = self.proj.units[unit_key]
                 sep = ttk.Separator(frame, orient='horizontal')
                 sep.pack(fill='x')
                 
@@ -71,12 +73,24 @@ class ProjectView(ttk.Frame):
                 
                 unit_label = UnitLabel(unit_frame, text=unit.name)
                 unit_label.pack(anchor='w')
+                self.units[unit.name] = unit
+
+                unit_label_menu = tk.Menu(unit_label)
+                def right_click_unit(e):
+                    self.clicked_widget = e.widget
+                    unit_label_menu.post(e.x_root, e.y_root)
+                
+                unit_label.bind("<3>", lambda e: right_click_unit(e))
+                unit_label_menu.add_command(label="delete unit",
+                                command=self.delete_unit)
+                unit_label_menu.add_command(label="rename unit",
+                                command=self.rename_unit)
 
                 if unit.tests:
                     # @TODO sort the tests better
-                    for i in sorted(unit.tests.keys()):
+                    for test_key in sorted(unit.tests.keys()):
                         
-                        test = unit.tests[i]
+                        test = unit.tests[test_key]
                         
                         test_frame = ttk.Frame(unit_frame, padding="10 0 0 0")
                         test_frame.pack(fill='x')
@@ -85,15 +99,15 @@ class ProjectView(ttk.Frame):
                         test_label.pack(padx=0, anchor='w')
                         self.tests[test.name] = (unit, test)
                         
-                        menu = tk.Menu(test_label)
-                        def right_click(e):
+                        test_label_menu = tk.Menu(test_label)
+                        def right_click_test(e):
                             self.clicked_widget = e.widget
-                            menu.post(e.x_root, e.y_root)
+                            test_label_menu.post(e.x_root, e.y_root)
                         
-                        test_label.bind("<3>", lambda e: right_click(e))
-                        menu.add_command(label="delete",
+                        test_label.bind("<3>", lambda e: right_click_test(e))
+                        test_label_menu.add_command(label="delete test",
                                          command=self.delete_test)
-                        menu.add_command(label="rename",
+                        test_label_menu.add_command(label="rename test",
                                          command=self.rename_test)
                         # menu.add_command(label="rename",
                         #                  command=lambda : self.rename_test(test_number))
@@ -127,6 +141,22 @@ class ProjectView(ttk.Frame):
             print("test {} already exists. renaming test {} failed".format(new_name, test.name))
         else:
             parent.rename_test(test.name, new_name)
+            self.render()
+    
+    def delete_unit(self):
+        unit = self.units[self.clicked_widget.cget("text")]
+        self.proj.remove_unit(unit.name)
+        self.render()
+    
+    def rename_unit(self):
+        unit = self.units[self.clicked_widget.cget("text")]
+        # popup
+        # get info
+        new_name = "bog!"
+        if new_name in self.proj.units.keys():
+            print("unit {} already exists. renaming unit {} failed".format(new_name, unit.name))
+        else:
+            self.proj.rename_unit(unit.name, new_name)
             self.render()
 
 class UnitTriad():
