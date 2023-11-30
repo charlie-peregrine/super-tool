@@ -7,78 +7,6 @@ from superbackend import *
 import SuperToolProject as stp
 from SuperToolMenus import *
 
-class ProjectView(ttk.Frame):
-    def __init__(self, parent):
-        self.parent = parent
-        super().__init__(self.parent, borderwidth=5, relief='groove',
-                    height=300, width=300)
-        self.grid(row=0,column=0, columnspan=1, rowspan=2, sticky="nesw")
-
-        proj = parent.project
-        
-        # @TODO font size up of header
-        proj_header = ttk.Label(self, text=proj.title)
-        proj_header.grid(row=0, column=0, columnspan=3, sticky='w')
-        
-        self.scroller = ScrollFrame(self)
-        self.scroller.grid(row=1, column=0, sticky='nesw')
-        
-        # a = stp.Unit()
-        # b = stp.Unit()
-        # a.test_dict = {-1 : stp.Test(), 1 : stp.Test()}
-        # b.test_dict = {3 : stp.Test(), 2 : stp.Test(), 4 : stp.Test()}
-        # b.name = "Unit AAAAAAAAAAAAAAAAAAA"
-        # proj.unit_list = [a] #,b, stp.Unit(), b, a, a]
-        
-        proj.add_unit("Example Unit!!!")
-        proj["Example Unit!!!"].add_test("test one", "load ref")
-        proj["Example Unit!!!"].add_test("second test", "dynamic")
-        proj.add_unit("Second Unit")
-        u = proj["Second Unit"]
-        u.add_test("Idaho test 3", "load ref")
-        
-        
-        line = 1
-        frame = self.scroller.frame
-        if proj.units:
-            for unit in proj.units.values():
-                # print('\n' + unit.name)
-                sep = ttk.Separator(frame, orient='horizontal')
-                sep.grid(row=line, column=0, sticky='ew')
-                line += 1
-                
-                a = UnitLabel(frame, text=unit.name)
-                a.grid(row=line, column=0, padx=10, sticky='w')
-                line += 1
-
-                # if line > 4:
-                #     a.menu.add_command(label="dummy")
-
-                if unit.tests:
-                    for test in unit.tests.values():
-                        # print(test.number, test.type)
-
-                        b = TestLabel(frame, text="Test " + test.name)
-                        b.grid(row=line, column=0, padx=20, sticky='w')
-                        line += 1
-                        
-                        c = ttk.Label(frame, text=test.type)
-                        c.grid(row=line, column=0, padx=30, sticky='w')
-                        line += 1
-                else:
-                    b = ttk.Label(frame, text="No Tests")
-                    b.grid(row=line, column=0, padx=20, sticky='w')
-                    line += 1
-        else:
-            sep = ttk.Separator(frame, orient='horizontal')
-            sep.grid(row=line, column=0, sticky='ew')
-            line += 1
-            
-            a = ttk.Label(frame, text="No Units")
-            a.grid(row=line, column=0, padx=10, sticky='w')
-            line += 1
-
-
 class TestView(ttk.Frame):
     def __init__(self, parent):
         self.parent = parent
@@ -128,6 +56,7 @@ class PlotView(ttk.Frame):
         super().__init__(self.parent, borderwidth=5, relief='groove',
                             height=300, width=400)
         self.grid(row=0,column=2, columnspan=1, rowspan=2, sticky="nesw")
+        
 
 class StatusBar(ttk.Frame):
     def __init__(self, parent):

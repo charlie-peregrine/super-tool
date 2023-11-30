@@ -6,6 +6,7 @@ from tkinter import ttk
 from superbackend import *
 from SuperToolFrames import *
 import SuperToolProject as stp
+from ProjectView import ProjectView
 
 class SuperToolGUI(tk.Tk):
     def __init__(self):
