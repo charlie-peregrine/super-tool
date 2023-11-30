@@ -111,50 +111,8 @@ class ProjectView(ttk.Frame):
             unit_label = ttk.Label(frame, text="No Units")
             unit_label.pack(padx=10, anchor='w')
         
-        # print(self.proj)
         
-        if True:
-            pass
-            # line = 1
-            # frame = self.scroller.frame
-            # if self.proj.units:
-            #     for unit in self.proj.units.values():
-            #         # print('\n' + unit.name)
-            #         sep = ttk.Separator(frame, orient='horizontal')
-            #         sep.grid(row=line, column=0, sticky='ew')
-            #         line += 1
-                    
-            #         a = UnitLabel(frame, text=unit.name)
-            #         a.grid(row=line, column=0, padx=10, sticky='w')
-            #         line += 1
-
-            #         # if line > 4:
-            #         #     a.menu.add_command(label="dummy")
-
-            #         if unit.tests:
-            #             for test in unit.tests.values():
-            #                 # print(test.number, test.type)
-
-            #                 b = TestLabel(frame, text="Test " + test.name)
-            #                 b.grid(row=line, column=0, padx=20, sticky='w')
-            #                 line += 1
-                            
-            #                 c = ttk.Label(frame, text=test.type)
-            #                 c.grid(row=line, column=0, padx=30, sticky='w')
-            #                 line += 1
-            #         else:
-            #             b = ttk.Label(frame, text="No Tests")
-            #             b.grid(row=line, column=0, padx=20, sticky='w')
-            #             line += 1
-            # else:
-            #     sep = ttk.Separator(frame, orient='horizontal')
-            #     sep.grid(row=line, column=0, sticky='ew')
-            #     line += 1
-                
-            #     a = ttk.Label(frame, text="No Units")
-            #     a.grid(row=line, column=0, padx=10, sticky='w')
-            #     line += 1
-
+        
     def delete_test(self):
         parent, test = self.tests[self.clicked_widget.cget("text")]
         parent.remove_test(test.name)
