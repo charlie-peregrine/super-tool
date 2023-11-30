@@ -81,19 +81,39 @@ class ScrollFrame(ttk.Frame):
         self.parent = parent
         super().__init__(parent, **kwargs)
         
-        scrollbar = tk.Scrollbar(self, orient='vertical')
-        scrollbar.pack(side='right', fill='y')
+        self.scrollbar = tk.Scrollbar(self, orient='vertical')
+        self.scrollbar.pack(side='right', fill='y')
+        
+        self.scrollbar.unbind('<MouseWheel>')
         
         self.canvas = tk.Canvas(self) #, background='#ffffff')
         self.canvas.pack(side='left', fill='both', expand=True)
         
-        self.canvas.configure(yscrollcommand=scrollbar.set)
-        scrollbar.configure(command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.configure(command=self.canvas.yview)
         
         self.frame = ttk.Frame(self.canvas, padding="0 0 4 0")
         self.canvas.create_window((0,0), window=self.frame, anchor='nw')
         
         self.frame.bind("<Configure>", self.on_configure)
+        
+        self.frame.bind_all('<MouseWheel>', self.scroll_vertical)
+        
+        
+    def scroll_vertical(self, e):
+        xl = self.canvas.winfo_rootx()
+        xr = xl + self.canvas.winfo_width() + self.scrollbar.winfo_width()
+        yt = self.canvas.winfo_rooty()
+        yb = yt + self.canvas.winfo_height()
+        # print(xl, yt, "|", xr, yb)
+        # print(self.canvas.winfo_pointerxy())
+        
+        x, y =self.canvas.winfo_pointerxy()
+        if x > xl and x < xr and y > yt and y < yb:
+            p = self.scrollbar.get()[0] + (-1*e.delta//120)*.05 # @TODO the .05 is a scrolling speed constant, change it
+            self.canvas.yview_moveto(p)
+        # self.canvas.yview_scroll(-1*e.delta//50, "units")
+        
         
     def on_configure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
