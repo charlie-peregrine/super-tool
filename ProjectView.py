@@ -6,8 +6,9 @@
 import tkinter as tk
 from tkinter import ttk
 from SuperToolFrames import ScrollFrame
-
-from functools import partial
+# @TODO replace messagebox and simpledialog with more robust windows
+from tkinter import messagebox
+from tkinter import simpledialog
 
 class ProjectView(ttk.Frame):
     def __init__(self, parent):
@@ -71,7 +72,7 @@ class ProjectView(ttk.Frame):
                 unit_frame = ttk.Frame(frame, padding='10 0 0 4')
                 unit_frame.pack(fill='x')
                 
-                unit_label = UnitLabel(unit_frame, text=unit.name)
+                unit_label = ttk.Label(unit_frame, text=unit.name)
                 unit_label.pack(anchor='w')
                 self.units[unit.name] = unit
 
@@ -95,7 +96,7 @@ class ProjectView(ttk.Frame):
                         test_frame = ttk.Frame(unit_frame, padding="10 0 0 0")
                         test_frame.pack(fill='x')
                         
-                        test_label = TestLabel(test_frame, text=test.name)
+                        test_label = ttk.Label(test_frame, text=test.name)
                         test_label.pack(padx=0, anchor='w')
                         self.tests[test.name] = (unit, test)
                         
@@ -129,14 +130,17 @@ class ProjectView(ttk.Frame):
         
     def delete_test(self):
         parent, test = self.tests[self.clicked_widget.cget("text")]
-        parent.remove_test(test.name)
-        self.render()
+        if messagebox.askyesno(message=
+                "Are you sure you want to delete the following test:\n\n"
+                + test.name, title="Delete Test"):
+            parent.remove_test(test.name)
+            self.render()
+        
     
     def rename_test(self):
         parent, test = self.tests[self.clicked_widget.cget("text")]
-        # popup
-        # get info
-        new_name = "frog!"
+        new_name = simpledialog.askstring(title="Rename Test", 
+            prompt="Enter a new name for the following test\n" + test.name)
         if new_name in parent.tests.keys():
             print("test {} already exists. renaming test {} failed".format(new_name, test.name))
         else:
@@ -145,57 +149,20 @@ class ProjectView(ttk.Frame):
     
     def delete_unit(self):
         unit = self.units[self.clicked_widget.cget("text")]
-        self.proj.remove_unit(unit.name)
-        self.render()
+        if messagebox.askyesno(message=
+                "Are you sure you want to delete the following unit and all of its tests:\n\n"
+                + unit.name, title="Delete Unit"):
+            self.proj.remove_unit(unit.name)
+            self.render()
     
     def rename_unit(self):
         unit = self.units[self.clicked_widget.cget("text")]
-        # popup
-        # get info
-        new_name = "bog!"
+        new_name = simpledialog.askstring(title="Rename Unit", 
+            prompt="Enter a new name for the following unit\n" + unit.name)
         if new_name in self.proj.units.keys():
             print("unit {} already exists. renaming unit {} failed".format(new_name, unit.name))
         else:
             self.proj.rename_unit(unit.name, new_name)
             self.render()
 
-class UnitTriad():
-    pass
 
-class UnitLabel(ttk.Label):
-    def __init__(self, parent, **kwargs):
-        self.parent = parent
-        super().__init__(self.parent, **kwargs)
-        
-        self.menu = ProjectUnitMenu(self)
-        self.bind('<3>', lambda e: self.menu.post(e.x_root, e.y_root))
-
-class TestLabel(ttk.Label):
-    def __init__(self, parent, **kwargs):
-        self.parent = parent
-        super().__init__(self.parent, **kwargs)
-        
-        self.menu = ProjectTestMenu(self)
-        self.bind('<3>', lambda e: self.menu.post(e.x_root, e.y_root))
-    
-    def delete(self):
-        project_view = self.parent.parent.parent
-        project_view.proj
-
-
-class ProjectUnitMenu(tk.Menu):
-    def __init__(self, parent, **kwargs):
-        self.parent = parent
-        super().__init__(self.parent)
-        
-        self.add_command(label="Rename Unit")
-        self.add_command(label="Delete Unit")
-        self.add_command(label="Add Test")
-
-class ProjectTestMenu(tk.Menu):
-    def __init__(self, parent, **kwargs):
-        self.parent = parent
-        super().__init__(self.parent)
-        
-        self.add_command(label="Rename Test")
-        self.add_command(label="Delete Test", command=parent.delete)
