@@ -40,18 +40,18 @@ class ProjectView(ttk.Frame):
         # proj.unit_list = [a] #,b, stp.Unit(), b, a, a]
         
         self.proj.add_unit("Example Unit!!!")
-        # self.proj["Example Unit!!!"].add_test("test one", "load ref")
-        # self.proj["Example Unit!!!"].add_test("test two", "load ref")
-        # self.proj["Example Unit!!!"].add_test("test three", "load ref")
-        # self.proj["Example Unit!!!"].add_test("test four", "load ref")
-        # self.proj["Example Unit!!!"].add_test("test five", "load ref")
-        # # self.proj["Example Unit!!!"].add_test("second test", "dynamic")
-        # self.proj.add_unit("Second Unit")
-        # self.proj.add_unit("3 U")
-        # self.proj.add_unit("AAAAAAAAAAAAA")
-        # u = self.proj["Second Unit"]
-        # u.add_test("Idaho test 3", "load ref")
-        # u.add_test("4000", "Evil Test Type >:)")
+        self.proj["Example Unit!!!"].add_test("test one", "load ref")
+        self.proj["Example Unit!!!"].add_test("test two", "load ref")
+        self.proj["Example Unit!!!"].add_test("test three", "load ref")
+        self.proj["Example Unit!!!"].add_test("test four", "load ref")
+        self.proj["Example Unit!!!"].add_test("test five", "load ref")
+        # self.proj["Example Unit!!!"].add_test("second test", "dynamic")
+        self.proj.add_unit("Second Unit")
+        self.proj.add_unit("3 U")
+        self.proj.add_unit("AAAAAAAAAAAAA")
+        u = self.proj["Second Unit"]
+        u.add_test("Idaho test 3", "load ref")
+        u.add_test("4000", "Evil Test Type >:)")
         
         self.dummy_label = ttk.Label(self)
         
@@ -115,6 +115,7 @@ class ProjectView(ttk.Frame):
                             self.clicked_widget = e.widget
                             test_label_menu.post(e.x_root, e.y_root)
                         
+                        test_label.bind("<1>", self.focus_test)
                         test_label.bind("<3>", lambda e: right_click_test(e))
                         test_label_menu.add_command(label="delete test",
                                          command=self.delete_test)
@@ -236,3 +237,7 @@ class ProjectView(ttk.Frame):
             self.proj.add_unit(unit_name)
             self.render()
 
+    def focus_test(self, event):
+        # event.widget
+        print(self.tests[event.widget.cget("text")])
+        # self.parent.focused_test = event

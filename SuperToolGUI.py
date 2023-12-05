@@ -20,6 +20,8 @@ class SuperToolGUI(tk.Tk):
         self.columnconfigure(0, weight=1)
 
         self.project = stp.Project()
+        self.focused_test = None
+        
         self.widgets()
         self.keybinds()
         
