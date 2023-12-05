@@ -58,6 +58,7 @@ class Unit:
         
     def add_test(self, name, type_):
         self.tests[name] = Test(name=name, type=type_)
+        self.tests[name].parent = self
     
     def rename_test(self, old, new):
         self.tests[new] = self.tests.pop(old)
@@ -75,10 +76,12 @@ class Unit:
         
 class Test:
     # @TODO handle kwargs
-    def __init__(self, name="Untitled Test", type="None", **kwargs):
+    def __init__(self, name="Untitled Test", type="None", parent=None, **kwargs):
         self.name = name
         self.type = type
+        self.parent = parent
         self.attribute_dict = kwargs
+        
     
     def __str__(self):
         return "    [ {} | {} | {} ]".format(self.name, self.type, self.attribute_dict)

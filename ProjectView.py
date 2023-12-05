@@ -108,8 +108,8 @@ class ProjectView(ttk.Frame):
                         
                         test_label = ttk.Label(test_frame, text=test.name)
                         test_label.pack(padx=0, anchor='w')
-                        self.tests[test.name] = (unit, test)
-                        
+                        self.tests[test.name] = test
+                                                
                         test_label_menu = tk.Menu(test_label)
                         def right_click_test(e):
                             self.clicked_widget = e.widget
@@ -130,14 +130,16 @@ class ProjectView(ttk.Frame):
                     test_label = ttk.Label(unit_frame, text="No Tests")
                     test_label.pack(anchor='w', padx=10)
                     
-                    test_label_menu = tk.Menu(test_label)
-                    def right_click_test(e):
-                        self.clicked_widget = e.widget
-                        test_label_menu.post(e.x_root, e.y_root)
+                    # @TODO add right click on the no tests label back.
+                    # currently it only works with one of the test_label_menus
+                    # test_label_menu = tk.Menu(test_label)
+                    # def right_click_test(e):
+                    #     self.clicked_widget = e.widget
+                    #     test_label_menu.post(e.x_root, e.y_root)
                     
-                    test_label.bind("<3>", lambda e: right_click_test(e))
-                    test_label_menu.add_command(label="new test",
-                                        command=self.add_test_from_no_test)
+                    # test_label.bind("<3>", lambda e: right_click_test(e))
+                    # test_label_menu.add_command(label="new test",
+                    #                     command=self.add_test_from_no_test)
         else:
             sep = ttk.Separator(frame, orient='horizontal')
             sep.pack(fill='x')
@@ -157,32 +159,32 @@ class ProjectView(ttk.Frame):
         
         
     def delete_test(self):
-        parent, test = self.tests[self.clicked_widget.cget("text")]
+        test = self.tests[self.clicked_widget.cget("text")]
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following test:\n\n"
                 + test.name, title="Delete Test"):
-            parent.remove_test(test.name)
+            test.parent.remove_test(test.name)
             self.render()
         
     
     def rename_test(self):
-        parent, test = self.tests[self.clicked_widget.cget("text")]
+        test = self.tests[self.clicked_widget.cget("text")]
         new_name = simpledialog.askstring(title="Rename Test", 
             prompt="Enter a new name for the following test\n" + test.name)
-        if new_name in parent.tests.keys():
+        if new_name in test.parent.tests.keys():
             print("test {} already exists. renaming test {} failed".format(new_name, test.name))
         else:
-            parent.rename_test(test.name, new_name)
+            test.parent.rename_test(test.name, new_name)
             self.render()
             
     def add_test_from_test(self):
-        parent, _ = self.tests[self.clicked_widget.cget("text")]
+        test = self.tests[self.clicked_widget.cget("text")]
         test_name = simpledialog.askstring(title="New Test", 
             prompt="Enter a name for the new test")
-        if test_name in parent.tests.keys():
+        if test_name in test.parent.tests.keys():
             print("test {} already exists. creating test {} failed".format(test_name, test_name))
         else:
-            parent.add_test(test_name, "test_type")
+            test.parent.add_test(test_name, "test_type")
             self.render()
             
     def add_test_from_unit(self):
