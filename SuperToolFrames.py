@@ -76,7 +76,7 @@ class StatusBar(ttk.Frame):
     def set_text(self, text):
         self.main_text.config(text=text)
 
-class ScrollFrame(ttk.Frame):
+class ScrollFrame(tk.Frame):
     def __init__(self, parent, **kwargs):
         self.parent = parent
         super().__init__(parent, **kwargs)
