@@ -84,7 +84,6 @@ class ScrollFrame(ttk.Frame):
         self.scrollbar = tk.Scrollbar(self, orient='vertical')
         self.scrollbar.pack(side='right', fill='y')
         
-        self.scrollbar.unbind('<MouseWheel>')
         
         self.canvas = tk.Canvas(self) #, background='#ffffff')
         self.canvas.pack(side='left', fill='both', expand=True)
@@ -93,9 +92,10 @@ class ScrollFrame(ttk.Frame):
         self.scrollbar.configure(command=self.canvas.yview)
         
         self.frame = ttk.Frame(self.canvas, padding="0 0 4 0")
-        self.canvas.create_window((0,0), window=self.frame, anchor='nw')
+        self.canvas_frame = self.canvas.create_window((0,0), window=self.frame, anchor='nw')
         
         self.frame.bind("<Configure>", self.on_configure)
+        self.canvas.bind('<Configure>', self.frame_width)
         
         self.frame.bind_all('<MouseWheel>', self.scroll_vertical)
         
@@ -118,6 +118,9 @@ class ScrollFrame(ttk.Frame):
     def on_configure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         self.reset_width()
+    
+    def frame_width(self, event):
+        self.canvas.itemconfig(self.canvas_frame, width=event.width)
     
     def reset_width(self):
         if self.frame.winfo_reqwidth() != self.canvas.winfo_width():

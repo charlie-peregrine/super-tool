@@ -18,13 +18,19 @@ class ProjectView(ttk.Frame):
         self.grid(row=0,column=0, columnspan=1, rowspan=2, sticky="nesw")
 
         self.proj = parent.project
-        
+
+        # the row and column configures allow for the scrollbar
+        # frame and label section to resize correctly
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1)
         # @TODO font size up of header
         self.proj_header = ttk.Label(self, text=self.proj.title)
         self.proj_header.grid(row=0, column=0, columnspan=3, sticky='w')
         
         self.scroller = ScrollFrame(self)
         self.scroller.grid(row=1, column=0, sticky='nesw')
+        # self.blog = tk.Frame(self, background='red')
+        # self.blog.grid(row=0, column=0, sticky='nesw')
         
         # a = stp.Unit()
         # b = stp.Unit()
