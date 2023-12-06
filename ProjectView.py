@@ -52,6 +52,30 @@ class ProjectView(ttk.Frame):
         u = self.proj["Second Unit"]
         u.add_test("Idaho test 3", "load ref")
         u.add_test("4000", "Evil Test Type >:)")
+        u.tests["Idaho test 3"].attribute_dict = {
+            "dyd_filename" : ("HCPR1.dyd", 'PATH'),
+            "sav_filename" : ("HCPR1_VR_P0_new.sav", 'PATH'),
+            "chf_filename" : ("HCPR1_VR_P0_new_sim.chf", 'PATH'),
+            "csv_filename" : ("HCPR1_VR_P0_new_sim.csv", 'PATH'),
+            "rep_filename" : ("Rep.rep", 'PATH'),
+            "StepTimeInSecs"    : (1.7, ''),
+            "UpStepInPU"        : (0.02, ''),
+            "DnStepInPU"        : (0.02, ''),
+            "StepLenInSecs"     : (9.0, ''),
+            "TotTimeInSecs"     : (15, ''),
+            "PSS_On"            : (True, 'BOOL'),
+            "SysFreqInHz"       : (60.00, ''),
+            "SimPtsPerCycle"    : (8.0, ''),
+            "set_loadflow"      : (False, 'BOOL'),
+            "save_loadflow"     : (False, 'BOOL'),
+            # loadflow Parameters
+            "Pinit"     : (118.85, ''),  # MW
+            "Qinit"     : (-1.98, ''),  # MVAR
+            "MVAbase"   : (145.0, ''),
+            "Vinit"     : (14.585, ''),  # kV,
+            "Vbase"     : (14.5, ''),   # kV,
+            "Zbranch"   : (0.09, ''),  # pu
+        }
         
         self.dummy_label = ttk.Label(self)
         
@@ -239,5 +263,10 @@ class ProjectView(ttk.Frame):
 
     def focus_test(self, event):
         # event.widget
-        print(self.tests[event.widget.cget("text")])
+        temp_test = self.tests[event.widget.cget("text")]
+        print(id(temp_test), id(self.parent.focused_test))
+        if temp_test != self.parent.focused_test:
+            self.parent.focused_test = temp_test
+            print(self.parent.focused_test)
+            self.parent.test_frame.show_focused_test()
         # self.parent.focused_test = event
