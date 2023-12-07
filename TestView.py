@@ -3,6 +3,7 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
+from SuperToolFrames import ScrollFrame
 
 class TestView(ttk.Frame):
     def __init__(self, parent):
@@ -19,8 +20,9 @@ class TestView(ttk.Frame):
         self.run_button = ttk.Button(self, image=self.img, command=self.run_simulation)
         self.run_button.grid(row=0, column=2, sticky='ne')
 
-        self.frame = tk.Frame(self, background='white')
-        self.frame.grid(row=1, column=0, columnspan=3, sticky='nesw')
+        self.scroller = ScrollFrame(self)
+        self.frame = self.scroller.frame
+        self.scroller.grid(row=1, column=0, columnspan=3, sticky='nesw')
 
         self.rowconfigure(1, weight=1)
         self.columnconfigure(0, weight=1)
@@ -33,6 +35,9 @@ class TestView(ttk.Frame):
     def show_focused_test(self):
         for widget in self.frame.winfo_children():
             widget.destroy()
+        
+        self.scroller.scroll_to_top()
+        
         focused = self.parent.focused_test
         if focused:
             self.title_label = ttk.Label(self.frame, text=focused.name)
@@ -64,20 +69,21 @@ class TestView(ttk.Frame):
                     pass # checkbox
                     a = ttk.Label(self.frame, text=attribute)
                     a.grid(row=i+offset, column=0, sticky='w')
-                    tk_val = tk.BooleanVar(value=val)
-                    b = tk.Checkbutton(self.frame, variable=tk_val)
+                    tk_var = tk.BooleanVar(self.frame, value=val)
+                    b = tk.Checkbutton(self.frame, variable=tk_var)
+                    b.bind("<1>", lambda e, blah=tk_var: print(blah.get()))
                     b.grid(row=i+offset, column=1)
                     if val:
                         b.select()
-                    self.interactibles.append((b, tk_val))
+                    self.interactibles.append((b, tk_var))
                 else:
-                    # number time
                     a = ttk.Label(self.frame, text=attribute)
                     a.grid(row=i+offset, column=0, sticky='w')
                     # b = ttk.Label(self.frame, text=val)
                     # b.grid(row=i+offset, column=1)
                     d = tk.DoubleVar(value=val)
                     c = ttk.Entry(self.frame, textvariable=d)
+                    c.bind("<Return>", lambda e, blah=d: print(blah.get()))
                     c.grid(row=i+offset, column=1)
                     self.interactibles.append((c, d))
                 
@@ -85,9 +91,9 @@ class TestView(ttk.Frame):
         else:
             self.grabo = ttk.Label(self.frame, text="No Test Selected. Create or click one to begin.")
             self.grabo.grid(row=1,column=0)
-
+        
     def run_simulation(self, *args):
-        pass
+        print(self.parent.project)
         # blah = ' '.join([i.get() for i in self.strings])
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)

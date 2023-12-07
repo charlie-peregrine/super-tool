@@ -64,10 +64,10 @@ class ScrollFrame(tk.Frame):
         self.frame.bind("<Configure>", self.on_configure)
         self.canvas.bind('<Configure>', self.frame_width)
         
-        self.frame.bind_all('<MouseWheel>', self.scroll_vertical)
+        self.frame.bind_all('<MouseWheel>', self.scroll_vertical, add=True)
         
         
-    def scroll_vertical(self, e):
+    def scroll_vertical(self, event):
         xl = self.canvas.winfo_rootx()
         xr = xl + self.canvas.winfo_width() + self.scrollbar.winfo_width()
         yt = self.canvas.winfo_rooty()
@@ -77,11 +77,14 @@ class ScrollFrame(tk.Frame):
         
         x, y =self.canvas.winfo_pointerxy()
         if x > xl and x < xr and y > yt and y < yb:
-            p = self.scrollbar.get()[0] + (-1*e.delta//120)*.05 # @TODO the .05 is a scrolling speed constant, change it
+            p = self.scrollbar.get()[0] + (-1*event.delta//120)*.05 # @TODO the .05 is a scrolling speed constant, change it
             self.canvas.yview_moveto(p)
         # self.canvas.yview_scroll(-1*e.delta//50, "units")
         
         
+    def scroll_to_top(self):
+        self.canvas.yview_moveto(0)
+    
     def on_configure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         self.reset_width()
