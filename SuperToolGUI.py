@@ -42,7 +42,7 @@ class SuperToolGUI(tk.Tk):
         file_menu = tk.Menu(menubar)
         about_menu = tk.Menu(menubar)
 
-        file_menu.add_command(label="Save Project", command=self.project.write_to_file, accelerator="ctrl+s")
+        file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
         file_menu.add_command(label="Open Project", command=open_project)
         file_menu.add_command(label="New Project", accelerator="ctrl+n") #@TODO make the accelerators do something
         file_menu.add_command(label="New Unit", command=print)
@@ -78,7 +78,7 @@ class SuperToolGUI(tk.Tk):
 
     def keybinds(self):
         self.bind("<F5>", self.test_frame.run_simulation)
-        self.bind("<Control-s>", self.project.write_to_file)
+        self.bind("<Control-s>", self.project.write_to_file_name)
     
     def set_status(self, string):
         self.statusbar_frame.set_text(string)

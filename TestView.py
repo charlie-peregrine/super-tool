@@ -56,8 +56,6 @@ class TestView(ttk.Frame):
             
             for i in range(len(keys)):
                 attr = focused.attribute_dict[keys[i]]
-                # val, type_ = focused.attribute_dict[attr]
-                # print(attr, val, type_, sep='\t\t')
                 print(attr)
                 if attr.type == 'PATH':
                     title_label = ttk.Label(self.frame, text=attr.name)

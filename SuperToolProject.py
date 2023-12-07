@@ -11,26 +11,19 @@ class Project:
         self.file_name = "default-project.pec"
         self.units = {}
     
-    def write_to_file(self, *args):
+    def write_to_file_name(self, *args):
         with open(self.file_name, mode='w') as file:
-            file.write("\t".join(
-                ["P", self.title,
-                 self.file_name]
-                ) + "\n")
+            self.write(file)
             
-            for unit in self.units.values():
-                file.write("\t".join(
-                    ["U", unit.name]
-                    ) + "\n")
-                for test in unit.tests.values():
-                    file.write("\t".join([
-                        "T", test.name, test.type]
-                        ) + "\n")
-                    # for k,v in test.attribute_dict:
-                    #     write(k + "\t" + v)
-            
+    def write(self, file):
+        file.write("\t".join(
+            ["P", self.title,
+                self.file_name]
+            ) + "\n")
+        for unit in self.units.values():
+            unit.write(file)
     
-    def read_from_file(self):
+    def read_from_file_name(self):
         pass
 
     def add_unit(self, name):
@@ -46,7 +39,7 @@ class Project:
         del self.units[name]
 
     def __str__(self):
-        return "[{} | {}]".format(self.title, self.file_name) + \
+        return "[P {} | {}]".format(self.title, self.file_name) + \
             "".join(["\n" + str(i) for i in self.units.values()])
     
     def __getitem__(self, key):
@@ -68,9 +61,16 @@ class Unit:
         
     def remove_test(self, name):
         del self.tests[name]
-    
+        
+    def write(self, file):
+        file.write("\t".join(
+            ["U", self.name]
+            ) + "\n")
+        for test in self.tests.values():
+            test.write(file)
+            
     def __str__(self):
-        return "  [{}]".format(self.name) + \
+        return "  [U {}]".format(self.name) + \
             "".join(["\n" + str(i) for i in self.tests.values()]) 
     
     def __getitem__(self, key):
@@ -84,9 +84,15 @@ class Test:
         self.parent = parent
         self.attribute_dict = kwargs
         
+    def write(self, file):
+        file.write("\t".join([
+                "T", self.name, self.type]
+                ) + "\n")
+        for attr in self.attribute_dict.values():
+            attr.write(file)
     
     def __str__(self):
-        return "    [ {} | {} | {} ]".format(self.name, self.type, self.attribute_dict)
+        return "    [T {} | {} | {} ]".format(self.name, self.type, len(self.attribute_dict.keys()))
 
 class Attribute:
     def __init__(self, name, value, type_, unit='NO_UNITS'):
@@ -100,7 +106,12 @@ class Attribute:
         else:
             self.var = tk.DoubleVar(value=value)
     
+    def write(self, file):
+        file.write("\t".join([
+                "A", self.name, str(self.var.get()), self.type, self.unit
+        ]) + "\n")
+    
     def __str__(self):
-        return "[ name:{}\ttype:{}\tvar:{}\tunit:{} ]".format(
-            self.name, self.type, self.var, self.unit
+        return "[A {} | {} | {} | {} ]".format(
+            self.name, self.type, self.var.get(), self.unit
         )
