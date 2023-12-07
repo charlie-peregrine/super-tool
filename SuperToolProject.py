@@ -3,6 +3,8 @@
 # Super Tool Project. Handles reading and writing to save
 # files and storing test, unit, and plot data
 
+import tkinter as tk
+
 class Project:
     def __init__(self, filename=''):
         self.title = "Untitled Project"
@@ -85,3 +87,20 @@ class Test:
     
     def __str__(self):
         return "    [ {} | {} | {} ]".format(self.name, self.type, self.attribute_dict)
+
+class Attribute:
+    def __init__(self, name, value, type_, unit='NO_UNITS'):
+        self.name = name
+        self.type = type_
+        self.unit = unit
+        if type_ == 'PATH':
+            self.var = tk.StringVar(value=value)
+        elif type_ == 'BOOL':
+            self.var = tk.BooleanVar(value=value)
+        else:
+            self.var = tk.DoubleVar(value=value)
+    
+    def __str__(self):
+        return "[ name:{}\ttype:{}\tvar:{}\tunit:{} ]".format(
+            self.name, self.type, self.var, self.unit
+        )
