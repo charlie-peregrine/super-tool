@@ -4,6 +4,8 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from SuperToolFrames import ScrollFrame
+from os.path import basename
+from tkinter.filedialog import askopenfilename
 
 class TestView(ttk.Frame):
     def __init__(self, parent):
@@ -57,35 +59,41 @@ class TestView(ttk.Frame):
                 val, type_ = focused.attribute_dict[attribute]
                 print(attribute, val, type_, sep='\t\t')
                 if type_ == 'PATH':
-                    pass # do path stuff
-                    a = ttk.Label(self.frame, text=attribute)
-                    a.grid(row=i+offset, column=0, sticky='w')
-                    b = ttk.Label(self.frame, text=val)
-                    b.grid(row=i+offset, column=1)
-                    c = ttk.Button(self.frame, text="select", command=lambda: print('gwa'))
-                    c.grid(row=i+offset, column=2)
-                    self.interactibles.append(c)
+                    title_label = ttk.Label(self.frame, text=attribute)
+                    title_label.grid(row=i+offset, column=0, sticky='w')
+                    
+                    path_var = tk.StringVar(self.frame, val)
+                    
+                    path_label = ttk.Label(self.frame, textvariable=path_var)
+                    path_label.grid(row=i+offset, column=1)
+                    
+                    path_button = ttk.Button(self.frame, text="select",
+                            command=lambda var=path_var: self.get_new_path(var))
+                    path_button.grid(row=i+offset, column=2)
+                    
+                    self.interactibles.append((path_button, path_label))
                 elif type_ == 'BOOL':
-                    pass # checkbox
-                    a = ttk.Label(self.frame, text=attribute)
-                    a.grid(row=i+offset, column=0, sticky='w')
-                    tk_var = tk.BooleanVar(self.frame, value=val)
-                    b = tk.Checkbutton(self.frame, variable=tk_var)
-                    b.bind("<1>", lambda e, blah=tk_var: print(blah.get()))
-                    b.grid(row=i+offset, column=1)
-                    if val:
-                        b.select()
-                    self.interactibles.append((b, tk_var))
+                    title_label = ttk.Label(self.frame, text=attribute)
+                    title_label.grid(row=i+offset, column=0, sticky='w')
+                    
+                    bool_var = tk.BooleanVar(self.frame, value=val)
+                    
+                    checkbutton = ttk.Checkbutton(self.frame, variable=bool_var)
+                    checkbutton.bind("<1>", lambda e, var=bool_var: print(not var.get()))
+                    checkbutton.grid(row=i+offset, column=1)
+                    
+                    self.interactibles.append((checkbutton, bool_var))
                 else:
-                    a = ttk.Label(self.frame, text=attribute)
-                    a.grid(row=i+offset, column=0, sticky='w')
-                    # b = ttk.Label(self.frame, text=val)
-                    # b.grid(row=i+offset, column=1)
-                    d = tk.DoubleVar(value=val)
-                    c = ttk.Entry(self.frame, textvariable=d)
-                    c.bind("<Return>", lambda e, blah=d: print(blah.get()))
-                    c.grid(row=i+offset, column=1)
-                    self.interactibles.append((c, d))
+                    title_label = ttk.Label(self.frame, text=attribute)
+                    title_label.grid(row=i+offset, column=0, sticky='w')
+                    
+                    double_var = tk.DoubleVar(value=val)
+                    
+                    entry = ttk.Entry(self.frame, textvariable=double_var)
+                    entry.bind("<Return>", lambda e, var=double_var: print(var.get()))
+                    entry.grid(row=i+offset, column=1)
+                    
+                    self.interactibles.append((entry, double_var))
                 
             
         else:
@@ -97,3 +105,9 @@ class TestView(ttk.Frame):
         # blah = ' '.join([i.get() for i in self.strings])
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)
+    
+    def get_new_path(self, var):
+        path = askopenfilename()
+        short_path = basename(path)
+        var.set(short_path)
+        

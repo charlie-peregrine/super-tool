@@ -21,7 +21,7 @@ class PlotView(ttk.Frame):
     def __init__(self, parent):
         self.parent = parent
         super().__init__(self.parent, borderwidth=5, relief='groove',
-                            height=300, width=400)
+                            height=200, width=250)
         self.grid(row=0,column=2, columnspan=1, rowspan=2, sticky="nesw")
         
 

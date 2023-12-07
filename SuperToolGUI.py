@@ -30,7 +30,8 @@ class SuperToolGUI(tk.Tk):
         # these 2 lines set the minimum size of the window to its initial size
         # @TODO may need to mess with this later but it's fine for now
         self.update()
-        self.minsize(self.winfo_width(), self.winfo_height())
+        self.minsize(500,250)
+        print(self.winfo_width(), self.winfo_height())
         
 
     def widgets(self):
