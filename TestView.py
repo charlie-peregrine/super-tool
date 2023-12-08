@@ -55,45 +55,38 @@ class TestView(ttk.Frame):
             self.interactibles = []
             
             for i in range(len(keys)):
-                attribute = keys[i]
-                val, type_ = focused.attribute_dict[attribute]
-                print(attribute, val, type_, sep='\t\t')
-                if type_ == 'PATH':
-                    title_label = ttk.Label(self.frame, text=attribute)
+                attr = focused.attribute_dict[keys[i]]
+                print(attr)
+                if attr.type == 'PATH':
+                    title_label = ttk.Label(self.frame, text=attr.name)
                     title_label.grid(row=i+offset, column=0, sticky='w')
                     
-                    path_var = tk.StringVar(self.frame, val)
-                    
-                    path_label = ttk.Label(self.frame, textvariable=path_var)
+                    path_label = ttk.Label(self.frame, textvariable=attr.var)
                     path_label.grid(row=i+offset, column=1)
                     
                     path_button = ttk.Button(self.frame, text="select",
-                            command=lambda var=path_var: self.get_new_path(var))
+                            command=lambda var=attr.var: self.get_new_path(var))
                     path_button.grid(row=i+offset, column=2)
                     
                     self.interactibles.append((path_button, path_label))
-                elif type_ == 'BOOL':
-                    title_label = ttk.Label(self.frame, text=attribute)
+                elif attr.type == 'BOOL':
+                    title_label = ttk.Label(self.frame, text=attr.name)
                     title_label.grid(row=i+offset, column=0, sticky='w')
                     
-                    bool_var = tk.BooleanVar(self.frame, value=val)
-                    
-                    checkbutton = ttk.Checkbutton(self.frame, variable=bool_var)
-                    checkbutton.bind("<1>", lambda e, var=bool_var: print(not var.get()))
+                    checkbutton = ttk.Checkbutton(self.frame, variable=attr.var)
+                    checkbutton.bind("<1>", lambda e, var=attr.var: print(not var.get()))
                     checkbutton.grid(row=i+offset, column=1)
                     
-                    self.interactibles.append((checkbutton, bool_var))
+                    self.interactibles.append((checkbutton, attr.var))
                 else:
-                    title_label = ttk.Label(self.frame, text=attribute)
+                    title_label = ttk.Label(self.frame, text=attr.name)
                     title_label.grid(row=i+offset, column=0, sticky='w')
                     
-                    double_var = tk.DoubleVar(value=val)
-                    
-                    entry = ttk.Entry(self.frame, textvariable=double_var)
-                    entry.bind("<Return>", lambda e, var=double_var: print(var.get()))
+                    entry = ttk.Entry(self.frame, textvariable=attr.var)
+                    entry.bind("<Return>", lambda e, var=attr.var: print(var.get()))
                     entry.grid(row=i+offset, column=1)
                     
-                    self.interactibles.append((entry, double_var))
+                    self.interactibles.append((entry, attr.var))
                 
             
         else:

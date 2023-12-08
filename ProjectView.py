@@ -9,6 +9,7 @@ from SuperToolFrames import ScrollFrame
 # @TODO replace messagebox and simpledialog with more robust windows
 from tkinter import messagebox
 from tkinter import simpledialog
+from SuperToolProject import Attribute
 
 class ProjectView(ttk.Frame):
     def __init__(self, parent):
@@ -53,28 +54,28 @@ class ProjectView(ttk.Frame):
         u.add_test("Idaho test 3", "load ref")
         u.add_test("4000", "Evil Test Type >:)")
         u.tests["Idaho test 3"].attribute_dict = {
-            "dyd_filename" : ("HCPR1.dyd", 'PATH'),
-            "sav_filename" : ("HCPR1_VR_P0_new.sav", 'PATH'),
-            "chf_filename" : ("HCPR1_VR_P0_new_sim.chf", 'PATH'),
-            "csv_filename" : ("HCPR1_VR_P0_new_sim.csv", 'PATH'),
-            "rep_filename" : ("Rep.rep", 'PATH'),
-            "StepTimeInSecs"    : (1.7, ''),
-            "UpStepInPU"        : (0.02, ''),
-            "DnStepInPU"        : (0.02, ''),
-            "StepLenInSecs"     : (9.0, ''),
-            "TotTimeInSecs"     : (15, ''),
-            "PSS_On"            : (True, 'BOOL'),
-            "SysFreqInHz"       : (60.00, ''),
-            "SimPtsPerCycle"    : (8.0, ''),
-            "set_loadflow"      : (False, 'BOOL'),
-            "save_loadflow"     : (False, 'BOOL'),
+            "dyd_filename" : Attribute("dyd_filename", "HCPR1.dyd", 'PATH'),
+            "sav_filename" : Attribute("sav_filename", "HCPR1_VR_P0_new.sav", 'PATH'),
+            "chf_filename" : Attribute("chf_filename", "HCPR1_VR_P0_new_sim.chf", 'PATH'),
+            "csv_filename" : Attribute("csv_filename", "HCPR1_VR_P0_new_sim.csv", 'PATH'),
+            "rep_filename" : Attribute("rep_filename", "Rep.rep", 'PATH'),
+            "StepTimeInSecs"    : Attribute("StepTimeInSecs", 1.7, ''),
+            "UpStepInPU"        : Attribute("UpStepInPU", 0.02, ''),
+            "DnStepInPU"        : Attribute("DnStepInPU", 0.02, ''),
+            "StepLenInSecs"     : Attribute("StepLenInSecs", 9.0, ''),
+            "TotTimeInSecs"     : Attribute("TotTimeInSecs", 15, ''),
+            "PSS_On"            : Attribute("PSS_On", True, 'BOOL'),
+            "SysFreqInHz"       : Attribute("SysFreqInHz", 60.00, ''),
+            "SimPtsPerCycle"    : Attribute("SimPtsPerCycle", 8.0, ''),
+            "set_loadflow"      : Attribute("set_loadflow", False, 'BOOL'),
+            "save_loadflow"     : Attribute("save_loadflow", False, 'BOOL'),
             # loadflow Parameters
-            "Pinit"     : (118.85, ''),  # MW
-            "Qinit"     : (-1.98, ''),  # MVAR
-            "MVAbase"   : (145.0, ''),
-            "Vinit"     : (14.585, ''),  # kV,
-            "Vbase"     : (14.5, ''),   # kV,
-            "Zbranch"   : (0.09, ''),  # pu
+            "Pinit"     : Attribute("Pinit", 118.85, ''),  # MW
+            "Qinit"     : Attribute("Qinit", -1.98, ''),  # MVAR
+            "MVAbase"   : Attribute("MVAbase", 145.0, ''),
+            "Vinit"     : Attribute("Vinit", 14.585, ''),  # kV,
+            "Vbase"     : Attribute("Vbase", 14.5, ''),   # kV,
+            "Zbranch"   : Attribute("Zbranch", 0.09, ''),  # pu
         }
         
         self.dummy_label = ttk.Label(self)
@@ -267,6 +268,6 @@ class ProjectView(ttk.Frame):
         print(id(temp_test), id(self.parent.focused_test))
         if temp_test != self.parent.focused_test:
             self.parent.focused_test = temp_test
-            print(self.parent.focused_test)
+            print(str(self.parent.focused_test)[:65] + "...")
             self.parent.test_frame.show_focused_test()
         # self.parent.focused_test = event

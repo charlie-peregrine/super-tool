@@ -20,7 +20,11 @@ def main():
 
     # print(p1)
 
+    import tkinter as tk
+    root = tk.Tk()
     p = stp.Project()
+    p.file_name = "blag.pec"
+    p.read_from_file_name()
     while True:
         print("=========================================")
         print("1: add unit 2: rename unit 3: delete unit")
