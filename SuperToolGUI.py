@@ -6,6 +6,7 @@ from tkinter import ttk
 from superbackend import *
 from SuperToolFrames import *
 import SuperToolProject as stp
+import tkinter.filedialog  as fd
 
 from ProjectView import ProjectView
 from TestView import TestView
@@ -42,9 +43,10 @@ class SuperToolGUI(tk.Tk):
         file_menu = tk.Menu(menubar)
         about_menu = tk.Menu(menubar)
 
-        file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
-        file_menu.add_command(label="Open Project", command=open_project)
+        file_menu.add_command(label="Open Project", command=self.open_project)
         file_menu.add_command(label="New Project", accelerator="ctrl+n") #@TODO make the accelerators do something
+        file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
+        file_menu.add_command(label="Save As", command=self.save_as_project, accelerator="ctrl+shift+s")
         file_menu.add_command(label="New Unit", command=print)
         file_menu.add_command(label="New Test")
         file_menu.add_separator()
@@ -78,11 +80,26 @@ class SuperToolGUI(tk.Tk):
 
     def keybinds(self):
         self.bind("<F5>", self.test_frame.run_simulation)
+        self.bind("<Control-o>", self.open_project)
         self.bind("<Control-s>", self.project.write_to_file_name)
+        self.bind("<Control-S>", self.save_as_project)
     
     def set_status(self, string):
         self.statusbar_frame.set_text(string)
+    
+    def open_project(self, e=None):
+        filename = fd.askopenfilename(filetypes=[("Super Tool Project Files", "*.pec")])
+        if filename:
+            self.project.file_name = filename
+            self.project.read_from_file_name()
+            self.proj_frame.render()
 
+    def save_as_project(self, e=None):
+        filename = fd.asksaveasfilename(defaultextension="*.*", filetypes=[("Super Tool Project Files", "*.pec")])
+        if filename:
+            # if '.' not in filename:
+            self.project.file_name = filename
+            self.project.write_to_file_name()
 
 if __name__ == "__main__":
     gui = SuperToolGUI()
