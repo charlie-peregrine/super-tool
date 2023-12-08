@@ -38,27 +38,7 @@ class SuperToolGUI(tk.Tk):
     def widgets(self):
 
         ### Top bar menu setup
-        menubar = tk.Menu(self)
-        self.config(menu=menubar)
-        file_menu = tk.Menu(menubar)
-        about_menu = tk.Menu(menubar)
-
-        file_menu.add_command(label="New Project", accelerator="ctrl+n") #@TODO make the accelerators do something
-        file_menu.add_command(label="Open Project", command=self.open_project, accelerator="ctrl+o")
-        file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
-        file_menu.add_command(label="Save Project As", command=self.save_as_project, accelerator="ctrl+shift+s")
-        file_menu.add_separator()
-        file_menu.add_command(label="New Unit", command=print)
-        file_menu.add_command(label="New Test")
-        file_menu.add_separator()
-        file_menu.add_command(label="Open Workspace", command=open_workspace)
-        file_menu.add_separator()
-        file_menu.add_command(label='Exit', command=self.destroy)
-
-        about_menu.add_command(label="About us")
-        about_menu.add_command(label="Version")
-        menubar.add_cascade(label="File", menu=file_menu)
-        menubar.add_cascade(label="About", menu=about_menu)
+        self.menu()
 
         ### Frame creation
         # main frame setup, row and column configure for initial size and resizeability
@@ -81,6 +61,29 @@ class SuperToolGUI(tk.Tk):
         self.bind("<Control-o>", self.open_project)
         self.bind("<Control-s>", self.project.write_to_file_name)
         self.bind("<Control-S>", self.save_as_project)
+        
+    def menu(self):
+        self.menubar = tk.Menu(self)
+        self.config(menu=self.menubar)
+        file_menu = tk.Menu(self.menubar)
+        about_menu = tk.Menu(self.menubar)
+
+        file_menu.add_command(label="New Project", accelerator="ctrl+n") #@TODO make the accelerators do something
+        file_menu.add_command(label="Open Project", command=self.open_project, accelerator="ctrl+o")
+        file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
+        file_menu.add_command(label="Save Project As", command=self.save_as_project, accelerator="ctrl+shift+s")
+        file_menu.add_separator()
+        file_menu.add_command(label="New Unit", command=print)
+        file_menu.add_command(label="New Test")
+        file_menu.add_separator()
+        file_menu.add_command(label="Open Workspace", command=open_workspace)
+        file_menu.add_separator()
+        file_menu.add_command(label='Exit', command=self.destroy)
+
+        about_menu.add_command(label="About us")
+        about_menu.add_command(label="Version")
+        self.menubar.add_cascade(label="File", menu=file_menu)
+        self.menubar.add_cascade(label="About", menu=about_menu)
     
     def set_status(self, string):
         self.statusbar_frame.set_text(string)
