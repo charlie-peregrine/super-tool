@@ -43,7 +43,7 @@ class SuperToolGUI(tk.Tk):
         file_menu = tk.Menu(menubar)
         about_menu = tk.Menu(menubar)
 
-        file_menu.add_command(label="Open Project", command=self.open_project)
+        file_menu.add_command(label="Open Project", command=self.open_project, accelerator="ctrl+o")
         file_menu.add_command(label="New Project", accelerator="ctrl+n") #@TODO make the accelerators do something
         file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
         file_menu.add_command(label="Save As", command=self.save_as_project, accelerator="ctrl+shift+s")
