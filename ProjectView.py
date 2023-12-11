@@ -236,6 +236,7 @@ class ProjectView(ttk.Frame):
         name_var = tk.StringVar(test_prompt_window)
         name_entry = ttk.Entry(test_prompt_window, textvariable=name_var)
         name_entry.grid(row=0, column=1, padx=4, pady=4)
+        name_entry.focus_set()
         
         type_label = ttk.Label(test_prompt_window, text="Test Type")
         type_label.grid(row=1, column=0, padx=4, pady=4)
@@ -250,11 +251,11 @@ class ProjectView(ttk.Frame):
         err_label.grid(row=4, column=0, columnspan=2, padx=4, pady=4)
         err_label.grid_remove()
         
-        def create_test():
+        def create_test(event=None):
             if name_var.get() == '':
                 err_label.config(text="Please enter a test name")
                 err_label.grid()
-            elif False: # check for invalid characters
+            elif False: # check for invalid characters, using validatecommand?
                 pass
             elif name_var.get() in unit.tests:
                 err_label.config(text=f"Test \"{name_var.get()}\" already exists")
@@ -265,16 +266,13 @@ class ProjectView(ttk.Frame):
             else:
                 err_label.grid_remove()
                 
-                if test_name in unit.tests:
-                    print("test {} already exists. creating test {} failed".format(test_name, test_name))
-                else:
-                    unit.add_test(test_name, "test_type")
-                    self.render()
-
-                
+                unit.add_test(name_var.get(), type_var.get())
+                test_prompt_window.destroy()
+                self.render()
 
         done_button = ttk.Button(test_prompt_window, text="Create New Test", command=create_test)
         done_button.grid(row=3, column=0, columnspan=2, padx=4, pady=4)
+        done_button.bind("<Return>", create_test)
         
         
             
