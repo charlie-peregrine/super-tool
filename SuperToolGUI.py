@@ -32,7 +32,7 @@ class SuperToolGUI(tk.Tk):
         # @TODO may need to mess with this later but it's fine for now
         self.update()
         self.minsize(500,250)
-        print(self.winfo_width(), self.winfo_height())
+        # print(self.winfo_width(), self.winfo_height())
         
 
     def widgets(self):
@@ -94,6 +94,8 @@ class SuperToolGUI(tk.Tk):
             self.project.file_name = filename
             self.project.read_from_file_name()
             self.proj_frame.render()
+            self.focused_test = None
+            self.test_frame.show_focused_test()
 
     def save_as_project(self, e=None):
         filename = fd.asksaveasfilename(defaultextension="*.*", filetypes=[("Super Tool Project Files", "*.pec")])

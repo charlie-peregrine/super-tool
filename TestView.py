@@ -56,7 +56,7 @@ class TestView(ttk.Frame):
             
             for i in range(len(keys)):
                 attr = focused.attribute_dict[keys[i]]
-                print(attr)
+                # print(attr)
                 if attr.type == 'PATH':
                     title_label = ttk.Label(self.frame, text=attr.name)
                     title_label.grid(row=i+offset, column=0, sticky='w')
@@ -85,6 +85,9 @@ class TestView(ttk.Frame):
                     entry = ttk.Entry(self.frame, textvariable=attr.var)
                     entry.bind("<Return>", lambda e, var=attr.var: print(var.get()))
                     entry.grid(row=i+offset, column=1)
+                    
+                    unit_label = ttk.Label(self.frame, text=attr.unit)
+                    unit_label.grid(row=i+offset, column=2)
                     
                     self.interactibles.append((entry, attr.var))
                 

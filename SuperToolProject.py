@@ -125,8 +125,54 @@ class Test:
         self.name = name
         self.type = type
         self.parent = parent
-        self.attribute_dict = kwargs
+        self.attribute_dict = {}
         
+        
+        # depending on the chosen type, give the full set of default
+        # attributes for that type.
+        self.default_attributes()
+        
+        
+        
+        [print(i) for i in self.attribute_dict.values()]
+        for k,v in kwargs:
+            self.attribute_dict[k] = v 
+        
+    def default_attributes(self):
+        if self.type == "Voltage Reference":
+            print("wahoo", self.name)
+            attributes = [
+                ("dyd_filename", '', 'PATH'),
+                ("sav_filename", '', 'PATH'),
+                ("chf_filename", '', 'PATH'),
+                ("csv_filename", '', 'PATH'),
+                ("rep_filename", '', 'PATH'),
+                ("StepTimeInSecs",  0,       'NUM'),
+                ("UpStepInPU",      0,       'NUM'),
+                ("DnStepInPU",      0,       'NUM'),
+                ("StepLenInSecs",   0,       'NUM'),
+                ("TotTimeInSecs",   0,      'NUM'),
+                ("PSS_On",          False,  'BOOL'),
+                ("SysFreqInHz",     0,      'NUM'),
+                ("SimPtsPerCycle",  0,      'NUM'),
+                ("set_loadflow",    False,  'BOOL'),
+                ("save_loadflow",   False,  'BOOL'),
+                ("Pinit",           0,      'NUM'),   # MW
+                ("Qinit",           0,      'NUM'),   # MVAR
+                ("MVAbase",         0,      'NUM'),
+                ("Vinit",           0,      'NUM'),   # kV,
+                ("Vbase",           0,      'NUM'),   # kV,
+                ("Zbranch",         0,      'NUM'),   # pu
+            ]
+            for n,v,t in attributes:
+                self.attribute_dict[n] = Attribute(n,v,t)
+                # print(self.attribute_dict[n])
+            [print(i) for i in self.attribute_dict.values()]
+        else:
+            # self.attribute_dict["dummy"] = Attribute("dummy", 0, '', 'sec')
+            pass
+    
+    
     def write(self, file):
         file.write("\t".join([
                 "T", self.name, self.type]
@@ -143,7 +189,9 @@ class Test:
         
         if line[0] == "T":
             _, self.name, self.type = line.split("\t")
-            # get parent somehow
+            # parent is assigned when the test is added to the parent unit's test list
+            
+            self.default_attributes()
         elif line[0] == "U":
             lines.append(line)
             return False, lines
