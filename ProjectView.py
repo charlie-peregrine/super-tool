@@ -40,19 +40,19 @@ class ProjectView(ttk.Frame):
         # b.name = "Unit AAAAAAAAAAAAAAAAAAA"
         # proj.unit_list = [a] #,b, stp.Unit(), b, a, a]
         
-        self.proj.add_unit("Example Unit!!!")
-        self.proj["Example Unit!!!"].add_test("test one", "load ref")
-        self.proj["Example Unit!!!"].add_test("test two", "load ref")
-        self.proj["Example Unit!!!"].add_test("test three", "load ref")
-        self.proj["Example Unit!!!"].add_test("test four", "load ref")
-        self.proj["Example Unit!!!"].add_test("test five", "load ref")
-        # self.proj["Example Unit!!!"].add_test("second test", "dynamic")
-        self.proj.add_unit("Second Unit")
-        self.proj.add_unit("3 U")
-        self.proj.add_unit("AAAAAAAAAAAAA")
-        u = self.proj["Second Unit"]
-        u.add_test("Idaho test 3", "Voltage Reference")
-        u.add_test("4000", "Evil Test Type >:)")
+        # self.proj.add_unit("Example Unit!!!")
+        # self.proj["Example Unit!!!"].add_test("test one", "load ref")
+        # self.proj["Example Unit!!!"].add_test("test two", "load ref")
+        # self.proj["Example Unit!!!"].add_test("test three", "load ref")
+        # self.proj["Example Unit!!!"].add_test("test four", "load ref")
+        # self.proj["Example Unit!!!"].add_test("test five", "load ref")
+        # # self.proj["Example Unit!!!"].add_test("second test", "dynamic")
+        # self.proj.add_unit("Second Unit")
+        # self.proj.add_unit("3 U")
+        # self.proj.add_unit("AAAAAAAAAAAAA")
+        # u = self.proj["Second Unit"]
+        # u.add_test("Idaho test 3", "Voltage Reference")
+        # u.add_test("4000", "Evil Test Type >:)")
         # u.tests["Idaho test 3"].attribute_dict = {
         #     "dyd_filename" : Attribute("dyd_filename", "HCPR1.dyd", 'PATH'),
         #     "sav_filename" : Attribute("sav_filename", "HCPR1_VR_P0_new.sav", 'PATH'),
@@ -117,10 +117,10 @@ class ProjectView(ttk.Frame):
                                 command=self.delete_unit)
                 unit_label_menu.add_command(label="rename unit",
                                 command=self.rename_unit)
-                unit_label_menu.add_command(label="new test",
-                                command=self.add_test_from_unit)
                 unit_label_menu.add_command(label="new unit",
                                 command=self.add_unit)
+                unit_label_menu.add_command(label="new test",
+                                command=self.add_test_from_unit)
 
                 if unit.tests:
                     # @TODO sort the tests better
@@ -243,7 +243,8 @@ class ProjectView(ttk.Frame):
         
         type_var = tk.StringVar(test_prompt_window)
         type_dropdown = ttk.Combobox(test_prompt_window, textvariable=type_var)
-        type_dropdown['values'] = ("Voltage Reference", "Other")
+        test_types = ("Voltage Reference", "Load Reference", "Current Interruption", "Speed Reference", "Steady State")
+        type_dropdown['values'] = test_types
         type_dropdown.state(['readonly'])
         type_dropdown.grid(row=1, column=1, padx=4, pady=4)
         
