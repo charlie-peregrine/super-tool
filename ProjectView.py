@@ -273,7 +273,12 @@ class ProjectView(ttk.Frame):
 
         done_button = ttk.Button(test_prompt_window, text="Create New Test", command=create_test)
         done_button.grid(row=3, column=0, columnspan=2, padx=4, pady=4)
+        
         done_button.bind("<Return>", create_test)
+        name_entry.bind("<Return>", lambda e: type_dropdown.focus())
+        type_dropdown.bind("<Return>", lambda e: type_dropdown.event_generate('<Down>'))
+        type_dropdown.bind("<space>", lambda e: type_dropdown.event_generate('<Down>'))
+        type_dropdown.bind("<<ComboboxSelected>>", lambda e: done_button.focus())
         
         
             
