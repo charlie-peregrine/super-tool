@@ -197,7 +197,7 @@ class ProjectView(ttk.Frame):
         test = self.tests[self.clicked_widget.cget("text")]
         new_name = simpledialog.askstring(title="Rename Test", 
             prompt="Enter a new name for the following test\n" + test.name)
-        if new_name in test.parent.tests.keys():
+        if new_name in test.parent.tests:
             print("test {} already exists. renaming test {} failed".format(new_name, test.name))
         else:
             test.parent.rename_test(test.name, new_name)
@@ -205,36 +205,79 @@ class ProjectView(ttk.Frame):
             
     def add_test_from_test(self):
         test = self.tests[self.clicked_widget.cget("text")]
-        test_name = simpledialog.askstring(title="New Test", 
-            prompt="Enter a name for the new test")
-        if test_name in test.parent.tests.keys():
-            print("test {} already exists. creating test {} failed".format(test_name, test_name))
-        else:
-            test.parent.add_test(test_name, "test_type")
-            self.render()
+        unit = test.parent
+        self.add_test(unit)
             
     def add_test_from_unit(self):
         unit = self.units[self.clicked_widget.cget("text")]
-        test_name = simpledialog.askstring(title="New Test", 
-            prompt="Enter a name for the new test")
-        if test_name in unit.tests.keys():
-            print("test {} already exists. creating test {} failed".format(test_name, test_name))
-        else:
-            unit.add_test(test_name, "test_type")
-            self.render()
+        self.add_test(unit)
     
     def add_test_from_no_test(self):
         parent = self.clicked_widget.master
         unit_name = parent.children['!label'].cget('text')
         unit = self.proj[unit_name]
-        test_name = simpledialog.askstring(title="New Test", 
-            prompt="Enter a name for the new test")
-        if test_name in unit.tests.keys():
-            print("test {} already exists. creating test {} failed".format(test_name, test_name))
-        else:
-            unit.add_test(test_name, "test_type")
-            self.render()
+        self.add_test(unit)
     
+    def add_test(self, unit):
+        test_prompt_window = tk.Toplevel(self.parent)
+        test_prompt_window.transient(self.parent)
+        test_prompt_window.grab_set()
+        test_prompt_window.focus_force()
+        # self.parent.wait_window(test_prompt_window) # not necessary?
+        
+        test_prompt_window.title("New Test")
+        # @TODO put window in center of parent window
+        test_prompt_window.geometry("+500+500")
+        test_prompt_window.resizable(False, False)
+        
+        name_label = ttk.Label(test_prompt_window, text="Test Name")
+        name_label.grid(row=0, column=0, padx=4, pady=4)
+        
+        name_var = tk.StringVar(test_prompt_window)
+        name_entry = ttk.Entry(test_prompt_window, textvariable=name_var)
+        name_entry.grid(row=0, column=1, padx=4, pady=4)
+        
+        type_label = ttk.Label(test_prompt_window, text="Test Type")
+        type_label.grid(row=1, column=0, padx=4, pady=4)
+        
+        type_var = tk.StringVar(test_prompt_window)
+        type_dropdown = ttk.Combobox(test_prompt_window, textvariable=type_var)
+        type_dropdown['values'] = ("Voltage Reference", "Other")
+        type_dropdown.state(['readonly'])
+        type_dropdown.grid(row=1, column=1, padx=4, pady=4)
+        
+        err_label = ttk.Label(test_prompt_window)
+        err_label.grid(row=4, column=0, columnspan=2, padx=4, pady=4)
+        err_label.grid_remove()
+        
+        def create_test():
+            if name_var.get() == '':
+                err_label.config(text="Please enter a test name")
+                err_label.grid()
+            elif False: # check for invalid characters
+                pass
+            elif name_var.get() in unit.tests:
+                err_label.config(text=f"Test \"{name_var.get()}\" already exists")
+                err_label.grid()
+            elif type_var.get() == '':
+                err_label.config(text="Select a test type")
+                err_label.grid()
+            else:
+                err_label.grid_remove()
+                
+                if test_name in unit.tests:
+                    print("test {} already exists. creating test {} failed".format(test_name, test_name))
+                else:
+                    unit.add_test(test_name, "test_type")
+                    self.render()
+
+                
+
+        done_button = ttk.Button(test_prompt_window, text="Create New Test", command=create_test)
+        done_button.grid(row=3, column=0, columnspan=2, padx=4, pady=4)
+        
+        
+            
     def delete_unit(self):
         unit = self.units[self.clicked_widget.cget("text")]
         if messagebox.askyesno(message=
@@ -247,7 +290,7 @@ class ProjectView(ttk.Frame):
         unit = self.units[self.clicked_widget.cget("text")]
         new_name = simpledialog.askstring(title="Rename Unit", 
             prompt="Enter a new name for the following unit\n" + unit.name)
-        if new_name in self.proj.units.keys():
+        if new_name in self.proj.units:
             print("unit {} already exists. renaming unit {} failed".format(new_name, unit.name))
         else:
             self.proj.rename_unit(unit.name, new_name)
@@ -256,7 +299,7 @@ class ProjectView(ttk.Frame):
     def add_unit(self):
         unit_name = simpledialog.askstring(title="New Unit", 
             prompt="Enter a name for the new unit")
-        if unit_name in self.proj.units.keys():
+        if unit_name in self.proj.units:
             print("unit {} already exists. creating unit {} failed".format(unit_name, unit_name))
         else:
             self.proj.add_unit(unit_name)
