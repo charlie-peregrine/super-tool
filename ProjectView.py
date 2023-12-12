@@ -256,7 +256,7 @@ class ProjectView(ttk.Frame):
             if name_var.get() == '':
                 err_label.config(text="Please enter a test name")
                 err_label.grid()
-            elif False: # check for invalid characters, using validatecommand?
+            elif False: # @TODO check for invalid characters, using validatecommand?
                 pass
             elif name_var.get() in unit.tests:
                 err_label.config(text=f"Test \"{name_var.get()}\" already exists")
@@ -310,11 +310,7 @@ class ProjectView(ttk.Frame):
             self.render()
 
     def focus_test(self, event):
-        # event.widget
         temp_test = self.tests[event.widget.cget("text")]
-        # print(id(temp_test), id(self.parent.focused_test))
         if temp_test != self.parent.focused_test:
             self.parent.focused_test = temp_test
-            # print(str(self.parent.focused_test)[:65] + "...")
             self.parent.test_frame.show_focused_test()
-        # self.parent.focused_test = event

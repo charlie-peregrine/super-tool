@@ -1,5 +1,5 @@
 from PSLF_PYTHON import *
-from Super_Tool import *
+from pslf_scripts.Super_Tool import *
 
 
 ###################################################################################################
@@ -18,43 +18,36 @@ from Super_Tool import *
 # 
 ###################################################################################################
 
+def run(test):
 
 #--------------------------------------------------------------------------------------------------
 # Configure for your test with the following parameters
 #--------------------------------------------------------------------------------------------------
 
-dyd_filename    = "HCPR1.dyd"
-sav_filename    = "HCPR1_VR_P0_new.sav"
-chf_filename    = "HCPR1_VR_P0_new_sim.chf"
-csv_filename    = "HCPR1_VR_P0_new_sim.csv"
-rep_filename    = "Rep.rep"
-StepTimeInSecs  = 1.7
-UpStepInPU      = 0.02
-DnStepInPU      = 0.02
-StepLenInSecs   = 9.0
-TotTimeInSecs   = 15
-PSS_On          = 0                                 # 0:disable PSS model, 1: enable PSS model 
-SysFreqInHz     = 60.00            
-SimPtsPerCycle  = 8.0  
-
-set_loadflow       = False      # If TRUE, initializes sav case with the below parameters if FALSE, loads existing sav case.
-save_loadflow      = False     # If TRUE, overwrites sav_filename with new set_loadflow solution. If FALSE, leaves sav_filename as is.  
-
-#----------------------------------
-# loadflow Parameters
-#----------------------------------
-
-Pinit               = 118.85  # MW
-Qinit               = -1.98  # MVAR
-MVAbase             = 145.0
-
-Vinit               = 14.585  # kV
-Vbase               = 14.5    # kV
-Zbranch             = 0.09    # pu
+    dyd_filename        = test.attribute_dict["dyd_filename"].var.get()      # "HCPR1.dyd"
+    sav_filename        = test.attribute_dict["sav_filename"].var.get()      # "HCPR1_VR_P0_new.sav"
+    chf_filename        = test.attribute_dict["chf_filename"].var.get()      # "HCPR1_VR_P0_new_sim.chf"
+    csv_filename        = test.attribute_dict["csv_filename"].var.get()      # "HCPR1_VR_P0_new_sim.csv"
+    rep_filename        = test.attribute_dict["rep_filename"].var.get()      # "Rep.rep"
+    StepTimeInSecs      = test.attribute_dict["StepTimeInSecs"].var.get()    # 1.7
+    UpStepInPU          = test.attribute_dict["UpStepInPU"].var.get()        # 0.02
+    DnStepInPU          = test.attribute_dict["DnStepInPU"].var.get()        # 0.02
+    StepLenInSecs       = test.attribute_dict["StepLenInSecs"].var.get()     # 9.0
+    TotTimeInSecs       = test.attribute_dict["TotTimeInSecs"].var.get()     # 15
+    PSS_On              = test.attribute_dict["PSS_On"].var.get()            # 0                  # 0:disable PSS model, 1: enable PSS model 
+    SysFreqInHz         = test.attribute_dict["SysFreqInHz"].var.get()       # 60.00            
+    SimPtsPerCycle      = test.attribute_dict["SimPtsPerCycle"].var.get()    # 8.0  
+    set_loadflow        = test.attribute_dict["set_loadflow"].var.get()      # False      # If TRUE, initializes sav case with the below parameters if FALSE, loads existing sav case.
+    save_loadflow       = test.attribute_dict["save_loadflow"].var.get()     # False     # If TRUE, overwrites sav_filename with new set_loadflow solution. If FALSE, leaves sav_filename as is.  
+    Pinit               = test.attribute_dict["Pinit"].var.get()             # 118.85  # MW          #----------------------------------
+    Qinit               = test.attribute_dict["Qinit"].var.get()             # -1.98  # MVAR         # <- loadflow Parameters
+    MVAbase             = test.attribute_dict["MVAbase"].var.get()           # 145.0                 #----------------------------------
+    Vinit               = test.attribute_dict["Vinit"].var.get()             # 14.585  # kV
+    Vbase               = test.attribute_dict["Vbase"].var.get()             # 14.5    # kV
+    Zbranch             = test.attribute_dict["Zbranch"].var.get()           # 0.09    # pu
 
 #--------------------------------------------------------------------------------------------------
 
-def run():
     # gets the project directory of this file and initialize the PSLF instance
     project_directory = os.path.dirname(os.path.realpath(__file__))
     #os.chdir(project_directory)
@@ -122,4 +115,4 @@ def run():
 
     print("Finished running Voltage_Reference.py script!\n")
 
-run()
+# run()

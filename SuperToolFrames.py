@@ -4,7 +4,7 @@
 import tkinter as tk
 from tkinter import ttk
 from superbackend import *
-from SuperToolMenus import *
+# from SuperToolMenus import *
 
 
 class ParamView(ttk.Frame):

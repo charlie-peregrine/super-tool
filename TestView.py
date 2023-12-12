@@ -97,7 +97,8 @@ class TestView(ttk.Frame):
             self.grabo.grid(row=1,column=0)
         
     def run_simulation(self, *args):
-        print(self.parent.project)
+        # print(self.parent.project)
+        self.parent.focused_test.script()
         # blah = ' '.join([i.get() for i in self.strings])
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)

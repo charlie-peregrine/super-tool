@@ -5,6 +5,7 @@
 
 import tkinter as tk
 from collections import deque
+from pslf_scripts import Voltage_Reference
 
 class Project:
     def __init__(self, filename=''):
@@ -126,11 +127,12 @@ class Test:
         self.type = type
         self.parent = parent
         self.attribute_dict = {}
+        self.script = lambda: print("No script set up for this test")
         
         
         # depending on the chosen type, give the full set of default
         # attributes for that type.
-        self.default_attributes()
+        self.test_defaults()
         
         
         
@@ -138,7 +140,7 @@ class Test:
         for k,v in kwargs:
             self.attribute_dict[k] = v 
         
-    def default_attributes(self):
+    def test_defaults(self):
         if self.type == "Voltage Reference":
             print("wahoo", self.name)
             attributes = [
@@ -164,11 +166,15 @@ class Test:
                 ("Vbase",           0,      'NUM'),   # kV,
                 ("Zbranch",         0,      'NUM'),   # pu
             ]
+            
+            self.script = lambda: Voltage_Reference.run(self)
+            
             for n,v,t in attributes:
                 self.attribute_dict[n] = Attribute(n,v,t)
                 # print(self.attribute_dict[n])
-            [print(i) for i in self.attribute_dict.values()]
+            # [print(i) for i in self.attribute_dict.values()]
         else:
+            self.script = lambda: print(f"No script set up for this test of type {self.type}")
             # self.attribute_dict["dummy"] = Attribute("dummy", 0, '', 'sec')
             pass
     
@@ -191,7 +197,7 @@ class Test:
             _, self.name, self.type = line.split("\t")
             # parent is assigned when the test is added to the parent unit's test list
             
-            self.default_attributes()
+            self.test_defaults()
         elif line[0] == "U":
             lines.append(line)
             return False, lines
