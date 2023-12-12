@@ -113,7 +113,11 @@ class TestView(ttk.Frame):
         
     def run_simulation(self, *args):
         # print(self.parent.project)
-        self.parent.focused_test.script()
+        if self.parent.focused_test:
+            self.parent.focused_test.script()
+        else:
+            # @TODO make this more elegant
+            print("No focused test to run a script for!")
         # blah = ' '.join([i.get() for i in self.strings])
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)
