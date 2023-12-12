@@ -84,6 +84,12 @@ class ProjectView(ttk.Frame):
         
     def render(self):
         
+        # reset self.proj in case the project object got changed
+        self.proj = self.parent.project
+        
+        # keep the visible project tile up to date
+        self.proj_header.config(text=self.proj.title)
+        
         frame = self.scroller.frame
         # clear the scroller frame if there's anything in it
         for widget in frame.winfo_children():

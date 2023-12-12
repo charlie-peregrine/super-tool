@@ -8,8 +8,8 @@ from collections import deque
 from pslf_scripts import Voltage_Reference
 
 class Project:
-    def __init__(self, filename=''):
-        self.title = "Untitled Project"
+    def __init__(self, title="Untitled Project", filename=''):
+        self.title = title
         self.file_name = "default-project.pec"
         self.units = {}
     

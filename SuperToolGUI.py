@@ -3,6 +3,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter import simpledialog
 from superbackend import *
 from SuperToolFrames import *
 import SuperToolProject as stp
@@ -68,7 +69,7 @@ class SuperToolGUI(tk.Tk):
         file_menu = tk.Menu(self.menubar)
         about_menu = tk.Menu(self.menubar)
 
-        file_menu.add_command(label="New Project", accelerator="ctrl+n") #@TODO make the accelerators do something
+        file_menu.add_command(label="New Project", command=self.new_project, accelerator="ctrl+n") #@TODO make the accelerators do something
         file_menu.add_command(label="Open Project", command=self.open_project, accelerator="ctrl+o")
         file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
         file_menu.add_command(label="Save Project As", command=self.save_as_project, accelerator="ctrl+shift+s")
@@ -87,6 +88,21 @@ class SuperToolGUI(tk.Tk):
     
     def set_status(self, string):
         self.statusbar_frame.set_text(string)
+    
+    def new_project(self, e=None):
+        # confirmation popup
+        # @TODO make this a string input for a new project name
+        new_project_name = simpledialog.askstring(title="New Project", 
+            prompt="Enter a name for the new project.\nAll unsaved progress will be lost.")
+        if new_project_name:
+            # delete current project class
+            del self.project
+            self.project = stp.Project(new_project_name)
+            # re-render project pane
+            self.proj_frame.render()
+            self.focused_test = None
+            # clear test view
+            self.test_frame.show_focused_test()
     
     def open_project(self, e=None):
         filename = fd.askopenfilename(filetypes=[("Super Tool Project Files", "*.pec")])
