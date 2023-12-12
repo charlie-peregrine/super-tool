@@ -6,6 +6,8 @@ import tkinter.ttk as ttk
 from SuperToolFrames import ScrollFrame
 from os.path import basename
 from tkinter.filedialog import askopenfilename
+from idlelib.tooltip import Hovertip
+
 
 class TestView(ttk.Frame):
     def __init__(self, parent):
@@ -61,8 +63,20 @@ class TestView(ttk.Frame):
                     title_label = ttk.Label(self.frame, text=attr.name)
                     title_label.grid(row=i+offset, column=0, sticky='w')
                     
-                    path_label = ttk.Label(self.frame, textvariable=attr.var)
+                    path_label = ttk.Label(self.frame, text=basename(attr.var.get()))
                     path_label.grid(row=i+offset, column=1)
+                    
+                    path_label_hover = Hovertip(path_label, attr.var.get(), hover_delay=300)
+                    
+                    attr.var.trace_add('write', lambda _1, _2, _3, l=path_label, v=attr.var: 
+                                        l.configure(text=basename(v.get())))
+                    
+                    # separate functions needed because lambdas don't allow assignments
+                    def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
+                        l.text = v.get()
+                    attr.var.trace_add('write', update_hover) 
+                    
+                    
                     
                     path_button = ttk.Button(self.frame, text="select",
                             command=lambda var=attr.var: self.get_new_path(var))
@@ -93,8 +107,9 @@ class TestView(ttk.Frame):
                 
             
         else:
-            self.grabo = ttk.Label(self.frame, text="No Test Selected. Create or click one to begin.")
-            self.grabo.grid(row=1,column=0)
+            # @TODO prolly a memory leak
+            self.no_test_label = ttk.Label(self.frame, text="No Test Selected. Create or click one to begin.")
+            self.no_test_label.grid(row=1,column=0)
         
     def run_simulation(self, *args):
         # print(self.parent.project)
@@ -105,6 +120,6 @@ class TestView(ttk.Frame):
     
     def get_new_path(self, var):
         path = askopenfilename()
-        short_path = basename(path)
-        var.set(short_path)
+        # short_path = basename(path)
+        var.set(path)
         
