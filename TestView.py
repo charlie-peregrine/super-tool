@@ -5,7 +5,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from SuperToolFrames import ScrollFrame
 from os.path import basename
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 from idlelib.tooltip import Hovertip
 
 
@@ -79,7 +79,7 @@ class TestView(ttk.Frame):
                     
                     
                     path_button = ttk.Button(self.frame, text="select",
-                            command=lambda var=attr.var: self.get_new_path(var))
+                            command=lambda attr=attr: self.get_new_path(attr))
                     path_button.grid(row=i+offset, column=2)
                     
                     self.interactibles.append((path_button, path_label))
@@ -118,8 +118,20 @@ class TestView(ttk.Frame):
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)
     
-    def get_new_path(self, var):
-        path = askopenfilename()
-        # short_path = basename(path)
-        var.set(path)
+    def get_new_path(self, attr):
+        if attr.name[:3] in ('dyd', 'sav'):
+            path = askopenfilename(title=f"Select {attr.name[:3]} file",
+                                   defaultextension="*.*",
+                                   filetypes=[("PSLF Input File", f"*.{attr.name[:3]}"),
+                                              ("All Files", "*.*")]
+                                   )
+        else:
+            path = asksaveasfilename(title=f"Choose file name and location for {attr.name[:3]} file",
+                                     defaultextension="*.*",
+                                     filetypes=[("PSLF Output File", f"*.{attr.name[:3]}"),
+                                              ("All Files", "*.*")]
+                                     )
+        
+        if path:
+            attr.var.set(path)
         
