@@ -97,8 +97,6 @@ class ProjectView(ttk.Frame):
         
         self.clicked_widget = self.dummy_label
         
-        self.units = {}
-        self.tests = {}
         if self.proj.units:
             for unit_key in sorted(self.proj.units.keys()):
                 
@@ -111,7 +109,6 @@ class ProjectView(ttk.Frame):
                 
                 unit_label = ttk.Label(unit_frame, text=unit.name)
                 unit_label.pack(anchor='w')
-                self.units[unit.name] = unit
 
                 unit_label_menu = tk.Menu(unit_label)
                 def right_click_unit(e):
@@ -139,7 +136,6 @@ class ProjectView(ttk.Frame):
                         
                         test_label = ttk.Label(test_frame, text=test.name)
                         test_label.pack(padx=0, anchor='w')
-                        self.tests[test.name] = test
                                                 
                         test_label_menu = tk.Menu(test_label)
                         def right_click_test(e):
@@ -188,10 +184,60 @@ class ProjectView(ttk.Frame):
             unit_label_menu.add_command(label="new unit",
                             command=self.add_unit)
         
+
+    # returns the test or unit object in the project object tree
+    # correlating to the widget that the user clicked on (should be a label)
+    # defaults to self.clicked_widget
+    def get_current_test_or_unit(self, widg=None):
+        if widg == None:
+            widg = self.clicked_widget
+        
+        # print("\n======================================")
+        # print("clicked widget:", widg)
+        # print("masters' children:", widg.master.children)
+        # print("=======================================")
+        
+        # search up the widget hierarchy for the canvas widget holding the
+        # selected widget, storing each preceding widget in widg_parents
+        widg.widgetName
+        current_widg = widg
+        widg_parents = []
+        while current_widg.master.widgetName != 'canvas': # type: ignore
+            widg_parents.append(current_widg)
+            current_widg = current_widg.master
+            # print(current_widg, current_widg.widgetName, end='\n\n') # type: ignore
         
         
+        # print("==============")
+        # print(len(widg_parents), widg_parents)
+        # depending on the depth, the widget either holds a unit or a test
+        if len(widg_parents) == 2: # unit
+            unit_label = widg_parents[0]
+            unit_frame = widg_parents[1]
+            # print(f"unit {unit_label.cget('text')}")
+            # print(self.parent.project[unit_label.cget('text')])
+            
+            # return the unit object
+            return self.parent.project[unit_label.cget('text')]
+        elif len(widg_parents) == 3: # test
+            test_label = widg_parents[0]
+            test_frame = widg_parents[1]
+            unit_frame = widg_parents[2]
+            unit_label = unit_frame.children['!label']
+            # print(f"test {test_label.cget('text')} in unit {unit_label.cget('text')}")
+            # print(self.parent.project[unit_label.cget('text')][test_label.cget('text')])
+            
+            # return the test object. note the double access 
+            return self.parent.project[unit_label.cget('text')][test_label.cget('text')]
+        else:
+            # in case of a different depth, throw an error. This should not happen
+            # in normal use
+            raise Exception("nesting depth issue in get_current_test_or_unit")
+        
+        
+    
     def delete_test(self):
-        test = self.tests[self.clicked_widget.cget("text")]
+        test = self.get_current_test_or_unit()
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following test:\n\n"
                 + test.name, title="Delete Test"):
@@ -200,7 +246,7 @@ class ProjectView(ttk.Frame):
         
     
     def rename_test(self):
-        test = self.tests[self.clicked_widget.cget("text")]
+        test = self.get_current_test_or_unit()
         new_name = simpledialog.askstring(title="Rename Test", 
             prompt="Enter a new name for the following test\n" + test.name)
         if new_name in test.parent.tests:
@@ -210,12 +256,12 @@ class ProjectView(ttk.Frame):
             self.render()
             
     def add_test_from_test(self):
-        test = self.tests[self.clicked_widget.cget("text")]
+        test = self.get_current_test_or_unit()
         unit = test.parent
         self.add_test(unit)
             
     def add_test_from_unit(self):
-        unit = self.units[self.clicked_widget.cget("text")]
+        unit = self.get_current_test_or_unit()
         self.add_test(unit)
     
     def add_test_from_no_test(self):
@@ -289,7 +335,7 @@ class ProjectView(ttk.Frame):
         
             
     def delete_unit(self):
-        unit = self.units[self.clicked_widget.cget("text")]
+        unit = self.get_current_test_or_unit()
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following unit and all of its tests:\n\n"
                 + unit.name, title="Delete Unit"):
@@ -297,7 +343,7 @@ class ProjectView(ttk.Frame):
             self.render()
     
     def rename_unit(self):
-        unit = self.units[self.clicked_widget.cget("text")]
+        unit = self.get_current_test_or_unit()
         new_name = simpledialog.askstring(title="Rename Unit", 
             prompt="Enter a new name for the following unit\n" + unit.name)
         if new_name in self.proj.units:
@@ -316,7 +362,7 @@ class ProjectView(ttk.Frame):
             self.render()
 
     def focus_test(self, event):
-        temp_test = self.tests[event.widget.cget("text")]
+        temp_test = self.get_current_test_or_unit(event.widget)
         if temp_test != self.parent.focused_test:
             self.parent.focused_test = temp_test
             self.parent.test_frame.show_focused_test()

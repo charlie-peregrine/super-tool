@@ -136,7 +136,7 @@ class Test:
         
         
         
-        [print(i) for i in self.attribute_dict.values()]
+        # [print(i) for i in self.attribute_dict.values()]
         for k,v in kwargs:
             self.attribute_dict[k] = v 
         
