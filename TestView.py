@@ -58,7 +58,6 @@ class TestView(ttk.Frame):
             
             for i in range(len(keys)):
                 attr = focused.attribute_dict[keys[i]]
-                # print(attr)
                 if attr.type == 'PATH':
                     title_label = ttk.Label(self.frame, text=attr.name)
                     title_label.grid(row=i+offset, column=0, sticky='w')
@@ -66,18 +65,18 @@ class TestView(ttk.Frame):
                     path_label = ttk.Label(self.frame, text=basename(attr.var.get()))
                     path_label.grid(row=i+offset, column=1)
                     
+                    # create hovertext for paths to show the long path instead of just the basename
                     path_label_hover = Hovertip(path_label, attr.var.get(), hover_delay=300)
                     
+                    # set up traces for when the path variables update to modify the path label
+                    # separate functions needed because lambdas don't allow assignments
                     attr.var.trace_add('write', lambda _1, _2, _3, l=path_label, v=attr.var: 
                                         l.configure(text=basename(v.get())))
-                    
-                    # separate functions needed because lambdas don't allow assignments
                     def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
                         l.text = v.get()
                     attr.var.trace_add('write', update_hover) 
                     
-                    
-                    
+                    # place a select button to get new a new path
                     path_button = ttk.Button(self.frame, text="select",
                             command=lambda attr=attr: self.get_new_path(attr))
                     path_button.grid(row=i+offset, column=2)
@@ -107,7 +106,7 @@ class TestView(ttk.Frame):
                 
             
         else:
-            # @TODO prolly a memory leak
+            # @TODO prolly a memory leak due to dropping the old no_test_label
             self.no_test_label = ttk.Label(self.frame, text="No Test Selected. Create or click one to begin.")
             self.no_test_label.grid(row=1,column=0)
         
