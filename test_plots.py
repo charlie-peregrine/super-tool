@@ -18,8 +18,6 @@ sim_array = np.genfromtxt(sim_file_name, delimiter=',', skip_header=True)
 real_time = sim_array[:, 0] - sim_array[0,0]
 # print(real_time)
 
-x = np.linspace(0, 2, 100)
-
 fig, axs = plt.subplots(5, 1, figsize=(8,5), layout='constrained')
 
 axs[0].plot(real_time, sim_array[:, 1], label='sim') # vt 1

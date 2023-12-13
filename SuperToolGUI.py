@@ -13,6 +13,8 @@ from ProjectView import ProjectView
 from TestView import TestView
 from PlotView import PlotView
 
+from matplotlib import pyplot as plt
+
 class SuperToolGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -37,6 +39,12 @@ class SuperToolGUI(tk.Tk):
         self.minsize(500,250)
         # print(self.winfo_width(), self.winfo_height())
         
+        def on_quit():
+            plt.close('all')
+            self.destroy()
+
+        self.protocol('WM_DELETE_WINDOW', on_quit)
+        
 
     def widgets(self):
 
@@ -54,8 +62,8 @@ class SuperToolGUI(tk.Tk):
         # set up the sub-frames
         self.proj_frame = ProjectView(self)
         self.test_frame = TestView(self)
-        self.param_frame = ParamView(self)
         self.plot_frame = PlotView(self)
+        self.param_frame = ParamView(self)
         self.statusbar_frame = StatusBar(self)
 
 

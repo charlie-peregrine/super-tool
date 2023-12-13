@@ -12,8 +12,12 @@ class ParamView(ttk.Frame):
                          height=100, width=100)
         self.grid(row=1,column=1, columnspan=1, rowspan=1, sticky="nesw")
 
-        param_text = ttk.Label(self, text="plot params")
-        param_text.grid(row=0,column=0)
+        # param_text = ttk.Label(self, text="plot params")
+        # param_text.grid(row=0,column=0)
+        
+        self.render_button = ttk.Button(self, text="Show Graphs",
+                                        command=self.parent.plot_frame.render)
+        self.render_button.grid(row=0, column=0)
 
 class StatusBar(ttk.Frame):
     def __init__(self, parent):
