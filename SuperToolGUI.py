@@ -11,6 +11,7 @@ import tkinter.filedialog  as fd
 
 from ProjectView import ProjectView
 from TestView import TestView
+from PlotView import PlotView
 
 class SuperToolGUI(tk.Tk):
     def __init__(self):
