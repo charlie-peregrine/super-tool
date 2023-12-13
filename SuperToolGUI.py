@@ -18,6 +18,7 @@ class SuperToolGUI(tk.Tk):
         super().__init__()
         ### setup root window options
         self.title("Super Tool")
+        self.iconphoto(True, tk.PhotoImage(file="./icons/supertoolplay.png"))
         # remove the tear off option from the top menu bar
         self.option_add('*tearOff', tk.FALSE)
         # Allows the main frame to be resizeable with the window
