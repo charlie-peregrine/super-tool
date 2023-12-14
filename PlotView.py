@@ -40,7 +40,9 @@ class PlotView(ttk.Frame):
         real_time = sim_array[:, 0] - sim_array[0,0]
         # print(real_time)
 
-        fig, axs = plt.subplots(5, 1, figsize=(8,5), layout='constrained')
+        matplotlib.rcParams.update({'font.size': 8})
+
+        fig, axs = plt.subplots(5, 1, figsize=(3.5,5), layout='constrained')
 
         axs[0].plot(real_time, sim_array[:, 1], label='sim') # vt 1
         axs[0].set_ylabel('Vt (kV)')
@@ -61,7 +63,15 @@ class PlotView(ttk.Frame):
 
         fig.align_ylabels(axs)
 
-        canvas = FigureCanvasTkAgg(fig, master = self)
-        canvas.get_tk_widget().pack(fill='both', expand=1)
+        RENDER_AS_IMAGE = False
+
+        if RENDER_AS_IMAGE:
+            fig.savefig('blah.png')
+            self.pic = tk.PhotoImage(file="blah.png")
+            self.label = ttk.Label(self, image=self.pic)
+            self.label.pack(fill="both", expand=1)
+        else:
+            canvas = FigureCanvasTkAgg(fig, master = self)
+            canvas.get_tk_widget().pack(anchor="nw") #fill='both', expand=1)
 
         
