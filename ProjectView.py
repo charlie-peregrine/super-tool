@@ -188,7 +188,7 @@ class ProjectView(ttk.Frame):
     # returns the test or unit object in the project object tree
     # correlating to the widget that the user clicked on (should be a label)
     # defaults to self.clicked_widget
-    def get_current_test_or_unit(self, widg=None):
+    def get_clicked_test_or_unit(self, widg=None):
         if widg == None:
             widg = self.clicked_widget
         
@@ -237,7 +237,7 @@ class ProjectView(ttk.Frame):
         
     
     def delete_test(self):
-        test = self.get_current_test_or_unit()
+        test = self.get_clicked_test_or_unit()
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following test:\n\n"
                 + test.name, title="Delete Test"):
@@ -246,7 +246,7 @@ class ProjectView(ttk.Frame):
         
     
     def rename_test(self):
-        test = self.get_current_test_or_unit()
+        test = self.get_clicked_test_or_unit()
         new_name = simpledialog.askstring(title="Rename Test", 
             prompt="Enter a new name for the following test\n" + test.name)
         if new_name in test.parent.tests:
@@ -256,12 +256,12 @@ class ProjectView(ttk.Frame):
             self.render()
             
     def add_test_from_test(self):
-        test = self.get_current_test_or_unit()
+        test = self.get_clicked_test_or_unit()
         unit = test.parent
         self.add_test(unit)
             
     def add_test_from_unit(self):
-        unit = self.get_current_test_or_unit()
+        unit = self.get_clicked_test_or_unit()
         self.add_test(unit)
     
     def add_test_from_no_test(self):
@@ -335,15 +335,15 @@ class ProjectView(ttk.Frame):
         
             
     def delete_unit(self):
-        unit = self.get_current_test_or_unit()
+        unit = self.get_clicked_test_or_unit()
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following unit and all of its tests:\n\n"
                 + unit.name, title="Delete Unit"):
             self.proj.remove_unit(unit.name)
             self.render()
     
-    def rename_unit(self):
-        unit = self.get_current_test_or_unit()
+    def rename_unit(self): # @TODO handle a cancel in the askstring popup
+        unit = self.get_clicked_test_or_unit()
         new_name = simpledialog.askstring(title="Rename Unit", 
             prompt="Enter a new name for the following unit\n" + unit.name)
         if new_name in self.proj.units:
@@ -362,7 +362,7 @@ class ProjectView(ttk.Frame):
             self.render()
 
     def focus_test(self, event):
-        temp_test = self.get_current_test_or_unit(event.widget)
+        temp_test = self.get_clicked_test_or_unit(event.widget)
         if temp_test != self.parent.focused_test:
             self.parent.focused_test = temp_test
             self.parent.test_frame.show_focused_test()
