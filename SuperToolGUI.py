@@ -57,12 +57,12 @@ class SuperToolGUI(tk.Tk):
         self.grid_columnconfigure(0, minsize=50, weight=1)
         self.grid_rowconfigure(1, minsize=150, weight=1)
         self.grid_columnconfigure(1, minsize=50, weight=1)
-        self.grid_columnconfigure(2, minsize=50, weight=0)
+        # self.grid_columnconfigure(2, minsize=50, weight=0)
 
         # set up the sub-frames
         self.proj_frame = ProjectView(self)
         self.test_frame = TestView(self)
-        self.plot_frame = PlotView(self)
+        # self.plot_frame = PlotView(self)
         self.param_frame = ParamView(self)
         self.statusbar_frame = StatusBar(self)
 
