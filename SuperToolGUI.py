@@ -12,13 +12,16 @@ import SuperToolProject as stp
 
 from ProjectView import ProjectView
 from TestView import TestView
+from PlotView import PlotView
+
+from matplotlib import pyplot as plt
 
 class SuperToolGUI(tk.Tk):
     def __init__(self):
         super().__init__()
         ### setup root window
         self.title("Super Tool")
-        
+        self.iconphoto(True, tk.PhotoImage(file="./icons/supertoolplay.png"))
         # remove the tear off option from the top menu bar
         self.option_add('*tearOff', tk.FALSE)
         
@@ -41,6 +44,12 @@ class SuperToolGUI(tk.Tk):
         self.minsize(500,250)
         # print(self.winfo_width(), self.winfo_height())
         
+        def on_quit():
+            plt.close('all')
+            self.destroy()
+
+        self.protocol('WM_DELETE_WINDOW', on_quit)
+        
 
     # helper method to create and add all of the high level widgets to the 
     # main window. also handles making each row and column resize-able
@@ -54,13 +63,13 @@ class SuperToolGUI(tk.Tk):
         self.grid_columnconfigure(0, minsize=50, weight=1)
         self.grid_rowconfigure(1, minsize=150, weight=1)
         self.grid_columnconfigure(1, minsize=50, weight=1)
-        self.grid_columnconfigure(2, minsize=50, weight=1)
+        # self.grid_columnconfigure(2, minsize=50, weight=0)
 
         # create the sub-frames
         self.proj_frame = ProjectView(self)
         self.test_frame = TestView(self)
+        # self.plot_frame = PlotView(self)
         self.param_frame = ParamView(self)
-        self.plot_frame = PlotView(self)
         self.statusbar_frame = StatusBar(self)
 
 
