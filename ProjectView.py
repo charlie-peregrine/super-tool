@@ -2,22 +2,26 @@
 # Contains the frame for the project panel and
 # all of its derivatives
 
-
 import tkinter as tk
 from tkinter import ttk
 from SuperToolFrames import ScrollFrame
 # @TODO replace messagebox and simpledialog with more robust windows
 from tkinter import messagebox
 from tkinter import simpledialog
-from SuperToolProject import Attribute
 
+# subclass of frame, used to hold a nested visual structure of the
+# underlying SuperToolProject object, and allow the user to manipulate
+# the project with right click context menus
 class ProjectView(ttk.Frame):
     def __init__(self, parent):
+        
+        # set up frame
         self.parent = parent
         super().__init__(self.parent, borderwidth=5, relief='groove',
                     height=300, width=300)
         self.grid(row=0,column=0, columnspan=1, rowspan=2, sticky="nesw")
 
+        # grab project for easier access
         self.proj = parent.project
 
         # the row and column configures allow for the scrollbar
@@ -28,94 +32,75 @@ class ProjectView(ttk.Frame):
         self.proj_header = ttk.Label(self, text=self.proj.title)
         self.proj_header.grid(row=0, column=0, columnspan=3, sticky='w')
         
+        # add scrollbar frame for the project section
         self.scroller = ScrollFrame(self)
         self.scroller.grid(row=1, column=0, sticky='nesw')
-        # self.blog = tk.Frame(self, background='red')
-        # self.blog.grid(row=0, column=0, sticky='nesw')
-        
-        # a = stp.Unit()
-        # b = stp.Unit()
-        # a.test_dict = {-1 : stp.Test(), 1 : stp.Test()}
-        # b.test_dict = {3 : stp.Test(), 2 : stp.Test(), 4 : stp.Test()}
-        # b.name = "Unit AAAAAAAAAAAAAAAAAAA"
-        # proj.unit_list = [a] #,b, stp.Unit(), b, a, a]
-        
-        # self.proj.add_unit("Example Unit!!!")
-        # self.proj["Example Unit!!!"].add_test("test one", "load ref")
-        # self.proj["Example Unit!!!"].add_test("test two", "load ref")
-        # self.proj["Example Unit!!!"].add_test("test three", "load ref")
-        # self.proj["Example Unit!!!"].add_test("test four", "load ref")
-        # self.proj["Example Unit!!!"].add_test("test five", "load ref")
-        # # self.proj["Example Unit!!!"].add_test("second test", "dynamic")
-        # self.proj.add_unit("Second Unit")
-        # self.proj.add_unit("3 U")
-        # self.proj.add_unit("AAAAAAAAAAAAA")
-        # u = self.proj["Second Unit"]
-        # u.add_test("Idaho test 3", "Voltage Reference")
-        # u.add_test("4000", "Evil Test Type >:)")
-        # u.tests["Idaho test 3"].attribute_dict = {
-        #     "dyd_filename" : Attribute("dyd_filename", "HCPR1.dyd", 'PATH'),
-        #     "sav_filename" : Attribute("sav_filename", "HCPR1_VR_P0_new.sav", 'PATH'),
-        #     "chf_filename" : Attribute("chf_filename", "HCPR1_VR_P0_new_sim.chf", 'PATH'),
-        #     "csv_filename" : Attribute("csv_filename", "HCPR1_VR_P0_new_sim.csv", 'PATH'),
-        #     "rep_filename" : Attribute("rep_filename", "Rep.rep", 'PATH'),
-        #     "StepTimeInSecs"    : Attribute("StepTimeInSecs", 1.7, ''),
-        #     "UpStepInPU"        : Attribute("UpStepInPU", 0.02, ''),
-        #     "DnStepInPU"        : Attribute("DnStepInPU", 0.02, ''),
-        #     "StepLenInSecs"     : Attribute("StepLenInSecs", 9.0, ''),
-        #     "TotTimeInSecs"     : Attribute("TotTimeInSecs", 15, ''),
-        #     "PSS_On"            : Attribute("PSS_On", True, 'BOOL'),
-        #     "SysFreqInHz"       : Attribute("SysFreqInHz", 60.00, ''),
-        #     "SimPtsPerCycle"    : Attribute("SimPtsPerCycle", 8.0, ''),
-        #     "set_loadflow"      : Attribute("set_loadflow", False, 'BOOL'),
-        #     "save_loadflow"     : Attribute("save_loadflow", False, 'BOOL'),
-        #     # loadflow Parameters
-        #     "Pinit"     : Attribute("Pinit", 118.85, ''),  # MW
-        #     "Qinit"     : Attribute("Qinit", -1.98, ''),  # MVAR
-        #     "MVAbase"   : Attribute("MVAbase", 145.0, ''),
-        #     "Vinit"     : Attribute("Vinit", 14.585, ''),  # kV,
-        #     "Vbase"     : Attribute("Vbase", 14.5, ''),   # kV,
-        #     # "Zbranch"   : Attribute("Zbranch", 0.09, ''),  # pu
-        # }
-        
+
+        # dummy_label is here so clicked_widget doesn't throw type errors
+        # in vscode
         self.dummy_label = ttk.Label(self)
         
+        # render the project pane
         self.render()
         
+    # helper method to re-render the project panel, used for when the
+    # backend project object changes
     def render(self):
-        
         # reset self.proj in case the project object got changed
         self.proj = self.parent.project
         
-        # keep the visible project tile up to date
+        # keep the visible project header up to date
         self.proj_header.config(text=self.proj.title)
         
+        # grab the scroller's frame for easier access
         frame = self.scroller.frame
+        
         # clear the scroller frame if there's anything in it
         for widget in frame.winfo_children():
             widget.destroy()
         
+        # reset the clicked_widget to dummy_label
         self.clicked_widget = self.dummy_label
         
+        # main block for rendering the nested project structure
+        # nesting is handled through padding in tkinter's frames primarily
         if self.proj.units:
+            # iterate through each unit in the dictionary
+            # @TODO sort the units better
             for unit_key in sorted(self.proj.units.keys()):
-                
                 unit = self.proj.units[unit_key]
                 sep = ttk.Separator(frame, orient='horizontal')
                 sep.pack(fill='x')
+                #   ^ using pack here since everything is in a single column
                 
+                # each unit has a frame that it and its tests live in
                 unit_frame = ttk.Frame(frame, padding='10 0 0 4')
                 unit_frame.pack(fill='x')
                 
+                # the unit_label shows the name of the unit
+                # it is also how units are looked up for left and
+                # right click actions, so be very careful if changing the
+                # widget hierarchy and labeling of the units and tests
                 unit_label = ttk.Label(unit_frame, text=unit.name)
                 unit_label.pack(anchor='w')
 
+                # make a right click menu for the unit labels
                 unit_label_menu = tk.Menu(unit_label)
+                
+                # internal helper function that sets the clicked_widget
+                # and triggers the unit_label_menu to be posted
                 def right_click_unit(e):
                     self.clicked_widget = e.widget
                     unit_label_menu.post(e.x_root, e.y_root)
                 
+                # right click calls right_click_unit, effectively
+                # saving the right clicked widget and posting the unit
+                # context menu. This is necessary because of a
+                # lexing/scoping issue with context menus and commands
+                # with arguments
                 unit_label.bind("<3>", lambda e: right_click_unit(e))
+                
+                # add commands to the context menu
                 unit_label_menu.add_command(label="delete unit",
                                 command=self.delete_unit)
                 unit_label_menu.add_command(label="rename unit",
@@ -125,24 +110,38 @@ class ProjectView(ttk.Frame):
                 unit_label_menu.add_command(label="new test",
                                 command=self.add_test_from_unit)
 
+                # show all of the unit's tests
                 if unit.tests:
+                    # iterate through the tests and show them
                     # @TODO sort the tests better
                     for test_key in sorted(unit.tests.keys()):
                         
                         test = unit.tests[test_key]
                         
+                        # every test lives in a frame that house it and its
+                        # type label
                         test_frame = ttk.Frame(unit_frame, padding="10 0 0 0")
                         test_frame.pack(fill='x')
                         
+                        # same warning as with units, be very careful when
+                        # changing the hierarchy and names of the test labels
+                        # and frames
                         test_label = ttk.Label(test_frame, text=test.name)
                         test_label.pack(padx=0, anchor='w')
-                                                
+                        
+                        # create context menu for tests
                         test_label_menu = tk.Menu(test_label)
+                        # right_click_test works the same as right_click_unit
                         def right_click_test(e):
                             self.clicked_widget = e.widget
                             test_label_menu.post(e.x_root, e.y_root)
                         
+                        # left clicking on a test focuses the test, showing its
+                        # details and attributes in the testview frame
                         test_label.bind("<1>", self.focus_test)
+                        
+                        # right clicking a test runs the right_click_test
+                        # method with the added commands in it
                         test_label.bind("<3>", lambda e: right_click_test(e))
                         test_label_menu.add_command(label="delete test",
                                          command=self.delete_test)
@@ -151,10 +150,12 @@ class ProjectView(ttk.Frame):
                         test_label_menu.add_command(label="new test",
                                          command=self.add_test_from_test)
 
+                        # add the type label of the test to the test frame
                         test_type_label = ttk.Label(test_frame, text=test.type)
                         test_type_label.pack(padx=10, anchor='w')
                         
                 else:
+                    # if there aren't any tests then say so
                     test_label = ttk.Label(unit_frame, text="No Tests")
                     test_label.pack(anchor='w', padx=10)
                     
@@ -172,9 +173,11 @@ class ProjectView(ttk.Frame):
             sep = ttk.Separator(frame, orient='horizontal')
             sep.pack(fill='x')
             
+            # show no units if there are no units
             unit_label = ttk.Label(frame, text="No Units")
             unit_label.pack(padx=10, anchor='w')
             
+            # right clicking on no units allows the user to add a unit
             unit_label_menu = tk.Menu(unit_label)
             def right_click_unit(e):
                 self.clicked_widget = e.widget
@@ -232,10 +235,12 @@ class ProjectView(ttk.Frame):
         else:
             # in case of a different depth, throw an error. This should not happen
             # in normal use
-            raise Exception("nesting depth issue in get_current_test_or_unit")
+            raise Exception("nesting depth issue in ProjectView.get_current_test_or_unit")
         
         
-    
+    # @TODO make all of the dialogs custom
+    # method used to delete a test
+    # uses a messagebox to ask the user for confirmation
     def delete_test(self):
         test = self.get_clicked_test_or_unit()
         if messagebox.askyesno(message=
@@ -243,8 +248,9 @@ class ProjectView(ttk.Frame):
                 + test.name, title="Delete Test"):
             test.parent.remove_test(test.name)
             self.render()
-        
     
+    # method used to rename a test 
+    # uses a dialog box to ask for the new test name
     def rename_test(self):
         test = self.get_clicked_test_or_unit()
         new_name = simpledialog.askstring(title="Rename Test", 
@@ -255,6 +261,7 @@ class ProjectView(ttk.Frame):
             test.parent.rename_test(test.name, new_name)
             self.render()
             
+    ## add test methods. all 3 are wrapper for the add_test method
     def add_test_from_test(self):
         test = self.get_clicked_test_or_unit()
         unit = test.parent
@@ -270,46 +277,62 @@ class ProjectView(ttk.Frame):
         unit = self.proj[unit_name]
         self.add_test(unit)
     
+    # add_test helper method. creates a custom top level window that asks the
+    # user for a test name and type, as well as performing error checking
+    # on their input and prompting them for fixes to those errors
     def add_test(self, unit):
+        # create the add_test window and make it hold onto focus
         test_prompt_window = tk.Toplevel(self.parent)
         test_prompt_window.transient(self.parent)
         test_prompt_window.grab_set()
         test_prompt_window.focus_force()
         # self.parent.wait_window(test_prompt_window) # not necessary?
         
+        # set window title, size, and resizability
         test_prompt_window.title("New Test")
         # @TODO put window in center of parent window
         test_prompt_window.geometry("+500+500")
         test_prompt_window.resizable(False, False)
         
+        ## section for putting in single gui elements
+        # add test name label
         name_label = ttk.Label(test_prompt_window, text="Test Name")
         name_label.grid(row=0, column=0, padx=4, pady=4)
         
+        # add test name entry 
         name_var = tk.StringVar(test_prompt_window)
         name_entry = ttk.Entry(test_prompt_window, textvariable=name_var)
         name_entry.grid(row=0, column=1, padx=4, pady=4)
+        # give the entry keyboard focus
         name_entry.focus_set()
         
+        # add test type label
         type_label = ttk.Label(test_prompt_window, text="Test Type")
         type_label.grid(row=1, column=0, padx=4, pady=4)
         
+        # add test type interactible combobox (aka dropdown menu)
         type_var = tk.StringVar(test_prompt_window)
         type_dropdown = ttk.Combobox(test_prompt_window, textvariable=type_var)
         test_types = ("Voltage Reference", "Load Reference", "Current Interruption", "Speed Reference", "Steady State")
         type_dropdown['values'] = test_types
+        # state = readonly makes it so the user cannot add test types
         type_dropdown.state(['readonly'])
         type_dropdown.grid(row=1, column=1, padx=4, pady=4)
         
+        # create a hidden error label that can pop up when a planned error
+        # occurs (such as an empty entry or invalid characters)
         err_label = ttk.Label(test_prompt_window)
         err_label.grid(row=4, column=0, columnspan=2, padx=4, pady=4)
         err_label.grid_remove()
         
+        # function called by the create new test button, checks that the
+        # name and test entered are valid and  if so creates a new test
         def create_test(event=None):
             if name_var.get() == '':
                 err_label.config(text="Please enter a test name")
                 err_label.grid()
-            elif False: # @TODO check for invalid characters, using validatecommand?
-                pass
+            elif False:
+                pass # @TODO check for invalid characters, using validatecommand?
             elif name_var.get() in unit.tests:
                 err_label.config(text=f"Test \"{name_var.get()}\" already exists")
                 err_label.grid()
@@ -319,13 +342,18 @@ class ProjectView(ttk.Frame):
             else:
                 err_label.grid_remove()
                 
+                # add the test, destroy this window, and update the projectview
                 unit.add_test(name_var.get(), type_var.get())
                 test_prompt_window.destroy()
                 self.render()
 
-        done_button = ttk.Button(test_prompt_window, text="Create New Test", command=create_test)
+        # add a button for creating a new test
+        done_button = ttk.Button(test_prompt_window, text="Create New Test",
+                                 command=create_test)
         done_button.grid(row=3, column=0, columnspan=2, padx=4, pady=4)
         
+        # usability keybinds to make the combobox and button interface
+        # more intuitive
         done_button.bind("<Return>", create_test)
         name_entry.bind("<Return>", lambda e: type_dropdown.focus())
         type_dropdown.bind("<Return>", lambda e: type_dropdown.event_generate('<Down>'))
@@ -333,7 +361,8 @@ class ProjectView(ttk.Frame):
         type_dropdown.bind("<<ComboboxSelected>>", lambda e: done_button.focus())
         
         
-            
+    ## @TODO make the unit methods use custom windows
+    # delete the clicked unit
     def delete_unit(self):
         unit = self.get_clicked_test_or_unit()
         if messagebox.askyesno(message=
@@ -342,7 +371,10 @@ class ProjectView(ttk.Frame):
             self.proj.remove_unit(unit.name)
             self.render()
     
-    def rename_unit(self): # @TODO handle a cancel in the askstring popup
+    # rename the clicked unit
+    # @TODO handle a cancel in the askstring popup
+    # @TODO make sure that the entered string isn't empty
+    def rename_unit(self): 
         unit = self.get_clicked_test_or_unit()
         new_name = simpledialog.askstring(title="Rename Unit", 
             prompt="Enter a new name for the following unit\n" + unit.name)
@@ -352,6 +384,7 @@ class ProjectView(ttk.Frame):
             self.proj.rename_unit(unit.name, new_name)
             self.render()
 
+    # add a unit to the project structure
     def add_unit(self):
         unit_name = simpledialog.askstring(title="New Unit", 
             prompt="Enter a name for the new unit")
@@ -361,6 +394,7 @@ class ProjectView(ttk.Frame):
             self.proj.add_unit(unit_name)
             self.render()
 
+    # helpder method to set the root's focused test to the clicked widget  
     def focus_test(self, event):
         temp_test = self.get_clicked_test_or_unit(event.widget)
         if temp_test != self.parent.focused_test:
