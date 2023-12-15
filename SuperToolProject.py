@@ -217,6 +217,11 @@ class Test:
         return "    [T {} | {} | {} ]".format(
             self.name, self.type, len(self.attribute_dict.keys())
             ) + "".join(["\n" + str(i) for i in self.attribute_dict.values()])
+    
+    # overloading indexing operator, note that this is a get from the variable,
+    # not just accessing the attribute in the dictionary
+    def __getitem__(self, key):
+        return self.attribute_dict[key].var.get()
 
 class Attribute:
     def __init__(self, name, value, type_, unit='NO_UNITS'):
@@ -263,3 +268,4 @@ class Attribute:
         return "      [A {} | {} | {} | {} ]".format(
             self.name, self.type, self.var.get(), self.unit
         )
+    

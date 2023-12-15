@@ -36,10 +36,15 @@ class ParamView(ttk.Frame):
         if self.graph_window:
             self.graph_window.destroy() # could be optimized by not destroying and instead replacing?
         
+        if not self.parent.focused_test:
+            print("no focused test yet")
+            return
+        
         self.graph_window = tk.Toplevel(self.parent)
         self.graph_window.title("Graph!")
         
-        sim_file_name = r'C:\CODE\demo super tool gui\pslf_scripts\dump\HCPR3_VStepP02_P0_sim.csv'
+        # r'C:\CODE\demo super tool gui\pslf_scripts\dump\HCPR3_VStepP02_P0_sim.csv'
+        sim_file_name = self.parent.focused_test['csv_filename']
         sim_array = np.genfromtxt(sim_file_name, delimiter=',', skip_header=True)
         real_time = sim_array[:, 0] - sim_array[0,0]
         # print(real_time)
@@ -72,7 +77,6 @@ class ParamView(ttk.Frame):
         
         def resize_canvas(e):
             if str(e.widget) == '.!toplevel':
-                print(e, e.widget)
                 if getattr(self, "_after_id", None):
                     self.graph_window.after_cancel(self._after_id)  # type: ignore
                 if canvas.get_tk_widget().winfo_viewable():
