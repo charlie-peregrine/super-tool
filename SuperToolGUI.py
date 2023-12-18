@@ -61,16 +61,20 @@ class SuperToolGUI(tk.Tk):
         # main frame setup, row and column configure for initial size and resizeability
         self.grid_rowconfigure(0, minsize=150, weight=1)
         self.grid_columnconfigure(0, minsize=50, weight=1)
-        self.grid_rowconfigure(1, minsize=150, weight=1)
         self.grid_columnconfigure(1, minsize=50, weight=1)
-        # self.grid_columnconfigure(2, minsize=50, weight=0)
+        self.grid_columnconfigure(2, minsize=50, weight=1)
 
         # create the sub-frames
         self.proj_frame = ProjectView(self)
         self.test_frame = TestView(self)
-        # self.plot_frame = PlotView(self)
         self.param_frame = ParamView(self)
         self.statusbar_frame = StatusBar(self)
+        
+        # place the sub-frames into the main window
+        self.proj_frame.grid(row=0,column=0, columnspan=1, rowspan=1, sticky="nesw")
+        self.test_frame.grid(row=0,column=1, columnspan=1, rowspan=1, sticky="nesw")
+        self.param_frame.grid(row=0,column=2, columnspan=1, rowspan=1, sticky="nesw")
+        self.statusbar_frame.grid(row=1, column=0, columnspan=3, sticky="nesw")
 
 
     # helper method to set up main window keybinds

@@ -25,7 +25,6 @@ class ParamView(ttk.Frame):
         self.parent = parent
         super().__init__(self.parent, borderwidth=5, relief='groove',
                          height=100, width=100)
-        self.grid(row=1,column=1, columnspan=1, rowspan=1, sticky="nesw")
 
         # param_text = ttk.Label(self, text="plot params")
         # param_text.grid(row=0,column=0)
@@ -103,7 +102,6 @@ class StatusBar(ttk.Frame):
     def __init__(self, parent):
         self.parent = parent
         super().__init__(self.parent, borderwidth=2, relief='groove')
-        self.grid(row=2, column=0, columnspan=2, sticky="nesw")
 
         
         self.main_text = ttk.Label(self, text="Status Bar")

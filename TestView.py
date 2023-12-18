@@ -17,7 +17,6 @@ class TestView(ttk.Frame):
         self.parent = parent
         super().__init__(self.parent, borderwidth=5, relief='groove',
                             height=100, width=100)
-        self.grid(row=0,column=1, columnspan=1, rowspan=1, sticky="nesw")
         
         ### Test Parameters Box details
         # header

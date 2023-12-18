@@ -19,7 +19,6 @@ class ProjectView(ttk.Frame):
         self.parent = parent
         super().__init__(self.parent, borderwidth=5, relief='groove',
                     height=300, width=300)
-        self.grid(row=0,column=0, columnspan=1, rowspan=2, sticky="nesw")
 
         # grab project for easier access
         self.proj = parent.project
