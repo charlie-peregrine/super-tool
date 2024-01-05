@@ -51,15 +51,15 @@ class SuperTool:
         return
     
 
-    def launch_Pslf(project_directory):
+    def launch_Pslf(project_directory, silent=False):
         # launches pslf gui      
         os.chdir(project_directory) # changes the python working directory to the project directory
         # Initializes the PSLF instance
         try:
-            init_pslf(use_existing=True, working_directory=project_directory, silent = False) 
+            init_pslf(use_existing=True, working_directory=project_directory, silent = silent) 
             print("GUI already launched")
         except:
-            init_pslf(use_existing=False, working_directory=project_directory, silent = False) 
+            init_pslf(use_existing=False, working_directory=project_directory, silent = silent) 
             print("launching GUI")
         finally:
             pass
