@@ -183,6 +183,7 @@ class Test:
                 ("chf_filename", '', 'PATH'),
                 ("csv_filename", '', 'PATH'),
                 ("rep_filename", '', 'PATH'),
+                ("mes_filename", '', 'PATH'),
                 ("StepTimeInSecs",  0,       'NUM'),
                 ("UpStepInPU",      0,       'NUM'),
                 ("DnStepInPU",      0,       'NUM'),

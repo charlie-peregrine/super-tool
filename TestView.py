@@ -185,7 +185,13 @@ class TestView(ttk.Frame):
     # picker has different behavior depending on if it's saving or
     # opening. uses tkinter.filedialog
     def get_new_path(self, attr):
-        if attr.name[:3] in ('dyd', 'sav'):
+        if attr.name[:3] == 'mes':
+            path = askopenfilename(title=f"Select measured data file",
+                                   defaultextension="*.csv",
+                                   filetypes=[("Measured Data CSV File", f"*.csv"),
+                                              ("All Files", "*.*")]
+                                   )
+        elif attr.name[:3] in ('dyd', 'sav'):
             path = askopenfilename(title=f"Select {attr.name[:3]} file",
                                    defaultextension="*.*",
                                    filetypes=[("PSLF Input File", f"*.{attr.name[:3]}"),
