@@ -8,6 +8,7 @@ from os.path import basename
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from idlelib.tooltip import Hovertip
 
+import os
 
 # Frame subclass for presenting and receving info regarding
 # individual tests and their attributes
@@ -162,7 +163,16 @@ class TestView(ttk.Frame):
     def run_simulation(self, *args):
         # print(self.parent.project)
         if self.parent.focused_test:
+            
+            # save working directory
+            working_dir = os.getcwd()
+            
+            # run script
             self.parent.focused_test.script()
+            
+            # return to old working directory
+            os.chdir(working_dir)
+            
         else:
             # @TODO make this more elegant
             print("No focused test to run a script for!")
