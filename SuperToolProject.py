@@ -4,7 +4,7 @@
 # files and storing test, unit, and plot data
 
 import tkinter as tk
-from pslf_scripts import Voltage_Reference
+from pslf_scripts import Voltage_Reference, Steady_State
 
 # main class that holds information of units and tests
 # contains title and filename of the project, as well as 
@@ -174,19 +174,20 @@ class Test:
         
     # depending on the current test type set the default attributes of the test 
     def test_defaults(self):
+        
         # only voltage ref set up as of yet
         if self.type == "Voltage Reference":
-            print("wahoo", self.name)
+            print("voltage ref in test_defaults: ", self.name)
             attributes = [
-                ("dyd_filename", '', 'PATH'),
-                ("sav_filename", '', 'PATH'),
-                ("chf_filename", '', 'PATH'),
-                ("csv_filename", '', 'PATH'),
-                ("rep_filename", '', 'PATH'),
-                ("StepTimeInSecs",  0,       'NUM'),
-                ("UpStepInPU",      0,       'NUM'),
-                ("DnStepInPU",      0,       'NUM'),
-                ("StepLenInSecs",   0,       'NUM'),
+                ("dyd_filename",    '',     'PATH'),
+                ("sav_filename",    '',     'PATH'),
+                ("chf_filename",    '',     'PATH'),
+                ("csv_filename",    '',     'PATH'),
+                ("rep_filename",    '',     'PATH'),
+                ("StepTimeInSecs",  0,      'NUM'),
+                ("UpStepInPU",      0,      'NUM'),
+                ("DnStepInPU",      0,      'NUM'),
+                ("StepLenInSecs",   0,      'NUM'),
                 ("TotTimeInSecs",   0,      'NUM'),
                 ("PSS_On",          False,  'BOOL'),
                 ("SysFreqInHz",     0,      'NUM'),
@@ -200,17 +201,45 @@ class Test:
                 ("Vbase",           0,      'NUM'),   # kV,
                 ("Zbranch",         0,      'NUM'),   # pu
             ]
-            
+
+            for n,v,t in attributes:
+                # @TODO double check that n is already in the attribute dict
+                self.attribute_dict[n] = Attribute(n,v,t)
+                            
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Voltage_Reference.run(self)
             
+        
+        if self.type == "Steady State":
+            print("steady state in test_defaults:", self.name)
+            attributes = [
+                ("dyd_filename",        '',     'PATH'),
+                ("sav_filename",        '',     'PATH'),
+                ("chf_filename",        '',     'PATH'),
+                ("rep_filename",        '',     'PATH'),
+                ("in_filename",         '',     'PATH'),
+                ("out_filename",        '',     'PATH'),
+                ("out_casename",        '',     'PATH'),
+                ("if_base",             0,      'NUM'),
+                ("if_res",              0,      'NUM'),
+                ("SaveCaseFiles",       0,      'NUM'),
+                ("UseGenField",         0,      'NUM'),
+                ("Ifd_A",               0,      'NUM'),
+                ("Ifd_pu",              0,      'NUM'),
+                ("Efd_pu",              0,      'NUM'),
+                ("ExcModIndex",         0,      'NUM'),
+                ]
+            
             for n,v,t in attributes:
+                # @TODO double check that n is already in the attribute dict
                 self.attribute_dict[n] = Attribute(n,v,t)
-                # print(self.attribute_dict[n])
-            # [print(i) for i in self.attribute_dict.values()]
+            
+            self.script = lambda: Steady_State.run(self)
+            
         else:
             # script changed to print out the current type info as well
             self.script = lambda: print(f"No script set up for this test of type {self.type}")
+    
     
     # internal write method to write a test and its attributes to a file
     def write(self, file):
