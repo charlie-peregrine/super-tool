@@ -38,7 +38,11 @@ def run(test):
     if_res              = test.attribute_dict["if_res"].var.get()             # 0.0
     # SaveCaseFiles       = test.attribute_dict["SaveCaseFiles"].var.get()      # 0 # generally leave as 0
     UseGenField         = test.attribute_dict["UseGenField"].var.get()        # 0 # set this to '1' if you want to use generator field even for brushless 
+    Vbase               = test.attribute_dict["Vbase"].var.get()        # 0 # set this to '1' if you want to use generator field even for brushless 
+    Zbranch             = test.attribute_dict["Zbranch"].var.get()        # 0 # set this to '1' if you want to use generator field even for brushless 
     #mva_base           = test.attribute_dict["mva_base"].var.get()           # 145.0
+
+
 
     # 0 initialize 4 variables used later. NOT inputs
     Ifd_A               = 0.0
@@ -71,9 +75,9 @@ def run(test):
         SuperTool.fatal_error(errmsg)
 
 
-    # Gets the Nominal Generator Bus Voltage and branch impedance from the first two lines of the CSV Input File
-    Vbase = float(csvInData[0][0])
-    Zbranch = float(csvInData[1][0])
+    # # Gets the Nominal Generator Bus Voltage and branch impedance from the first two lines of the CSV Input File
+    # Vbase = float(csvInData[0][0])
+    # Zbranch = float(csvInData[1][0])
 
 
     #  This opens the CSV Output File for writing
@@ -102,12 +106,29 @@ def run(test):
         errmsg = "*** Error: unable to find exciter model. Exitting..."
         SuperTool.fatal_error(errmsg)
 
-    csvRowIndex=2
+
+    # if the first line is a header line then skip it
+    try:
+        float(csvInData[0][0])
+        csvRowIndex=0
+    except ValueError:
+        csvRowIndex=1
+    
+    # if the first 2 lines are set up like it was printed
+    # out by the spreadsheet ( first 2 rows 1 element, 3 elements every other row)
+    # then act like it works like that @TODO prompt to override?
+    if csvInData[0][0] and csvInData[0][0] and \
+        csvInData[0][1:3] == csvInData[1][1:3] == ['', '']:
+            Vbase = float(csvInData[0][0])
+            Zbranch = float(csvInData[1][0])
+            SuperTool.print_to_pslf(f"Using Vbase and Zbranch from {in_filename}")
+    
+    
     while(TRUE):
         # sets the measured generator quantities from the csv row into local variables
         Pgen  = float(csvInData[csvRowIndex][0])
         Qgen  = float(csvInData[csvRowIndex][1])
-        Vtgen = float(csvInData[csvRowIndex][2])
+        Vtgen = float(csvInData[csvRowIndex][2]) / Vbase # per unitize voltage
 
         SuperTool.print_to_pslf("\nLoad Point #",csvRowIndex-1)
         SuperTool.print_to_pslf("P: ",Pgen," Q: ",Qgen," Vt: ",Vtgen)

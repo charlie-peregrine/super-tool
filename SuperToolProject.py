@@ -228,6 +228,8 @@ class Test:
                 ("Ifd_pu",              0,      'NUM'),
                 ("Efd_pu",              0,      'NUM'),
                 ("ExcModIndex",         0,      'NUM'),
+                ("Vbase",               0,      'NUM'),
+                ("Zbranch",             0,      'NUM'),
                 ]
             
             for n,v,t in attributes:
