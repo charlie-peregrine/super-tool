@@ -84,7 +84,9 @@ def run(test):
     try:
         f = open(os.path.join(project_directory,out_filename), "w", newline='')
         csvOutFile = csv.writer(f)
-        csvHeader = ['Load Point','P (MW)','Q (MVAR)','Vt-desired (pu)','Vt-sim (pu)','Vfd (pu)','Ifd (pu)','BusV-sched (pu)','Ifd (A)']
+        csvHeader = ['Load Point','P (MW)','Q (MVAR)','Vt-desired (pu)',
+                     'Vt-sim (pu)','Vfd (pu)','Ifd (pu)','BusV-sched (pu)',
+                     'Ifd (A)', 'Ifd-meas (pu)', 'Diff (%)', 'Abs(Diff) (%)']
         csvOutFile.writerow(csvHeader)
     except:
         SuperTool.fatal_error("Unable to open output .csv file.")
@@ -129,6 +131,16 @@ def run(test):
         Pgen  = float(csvInData[csvRowIndex][0])
         Qgen  = float(csvInData[csvRowIndex][1])
         Vtgen = float(csvInData[csvRowIndex][2]) / Vbase # per unitize voltage
+        
+        try:
+            Efdgen = float(csvInData[csvRowIndex][3])
+            Ifdgen = float(csvInData[csvRowIndex][4])
+            fields_measured = True
+            print("efd and ifd in data")
+        except IndexError:
+            fields_measured = False
+            print("no efd and ifd in data")
+            
 
         SuperTool.print_to_pslf("\nLoad Point #",csvRowIndex-1)
         SuperTool.print_to_pslf("P: ",Pgen," Q: ",Qgen," Vt: ",Vtgen)
@@ -169,9 +181,25 @@ def run(test):
 
         # calculates Exciter Field in amps
         Ifd_A = Ifd_pu * (if_base-if_res)
+        
+        if fields_measured:
+            
+            # convert measured exciter field to per unit
+            Ifd_pu_meas = (Ifdgen + if_res) / if_base
+            diff_perc = 100 * (Ifd_pu - Ifd_pu_meas) / Ifd_pu
+            abs_diff_perc = 100 * abs(Ifd_pu - Ifd_pu_meas) / Ifd_pu
 
+            # generate row to write
+            csvOutData = [csvRowIndex-1, Pgen, Qgen, round(Vtgen,3), round(Bus[0].Vm,3),
+                        round(Efd_pu,5), round(Ifd_pu,5), round(Bus[1].Vsched,3),
+                        round(Ifd_A,2), round(Ifd_pu_meas,5), round(diff_perc,2),
+                        round(abs_diff_perc,2)]
+        else:
+            # generate row to write
+            csvOutData = [csvRowIndex-1, Pgen, Qgen, round(Vtgen,3), round(Bus[0].Vm,3),
+                        round(Efd_pu,5), round(Ifd_pu,5), round(Bus[1].Vsched,3),
+                        round(Ifd_A,2)]
         # write to the csv
-        csvOutData = [csvRowIndex-1, Pgen, Qgen, round(Vtgen,3), round(Bus[0].Vm,3), round(Efd_pu,5), round(Ifd_pu,5), round(Bus[1].Vsched,3),round(Ifd_A,2)]
         csvOutFile.writerow(csvOutData)
     
         SuperTool.print_to_pslf("\n-----------------------------------------------------------------------------------------")
