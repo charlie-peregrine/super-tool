@@ -38,16 +38,38 @@ def plot_voltage_reference(sim_file='', mes_file=''):
     with open("veusz_files/Voltage_Reference.fvsz", 'r') as file:
         text_to_format = file.read()
 
+    # get column titles for the simulated data
+    sim_dict = {}
+    if sim_file:
+        with open(sim_file, 'r') as file:
+            headers = file.readline().replace(',', '\n')
+        sim_dict['time'] = re.findall(r'.*time.*', headers, flags=re.IGNORECASE)
+        sim_dict['vt'] = re.findall(r'"vt\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        sim_dict['pg'] = re.findall(r'"pg\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        sim_dict['qg'] = re.findall(r'"qg\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        sim_dict['efd'] = re.findall(r'"efd\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        sim_dict['ifd'] = re.findall(r'"ifd\s+1"?gen.*', headers, flags=re.IGNORECASE)
+
+        for k,v in sim_dict.items():
+            print(len(sim_dict[k]), sim_dict[k])
+            if len(sim_dict[k]) == 0:
+                print(f"blah blah {k} has zero oops")
+                sim_dict[k] = 'x'
+            else:
+                if len(sim_dict[k]) > 1:
+                    print(f"blah blah {k} too many, picking the first one")
+                sim_dict[k] = v[0]
+        print(sim_dict)
+
 
     if sim_file and mes_file:
-        # leave time as x or dependent variable as y to blank it
         result_text = text_to_format.format(s_filename=sim_file,
-                            s_time='Time',
-                            s_vt='"vt   1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
-                            s_p='"pg   1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
-                            s_q='"qg   1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
-                            s_efd='"efd  1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
-                            s_ifd='"ifd  1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
+                            s_time=sim_dict['time'],
+                            s_vt=sim_dict['vt'],
+                            s_p=sim_dict['pg'],
+                            s_q=sim_dict['qg'],
+                            s_efd=sim_dict['efd'],
+                            s_ifd=sim_dict['ifd'],
                             m_filename=mes_file,
                             m_time='Seconds',
                             m_vt='Vave 0',
@@ -61,12 +83,12 @@ def plot_voltage_reference(sim_file='', mes_file=''):
         text_to_format = re.sub(pattern, '', text_to_format, flags=re.MULTILINE)
         
         result_text = text_to_format.format(s_filename=sim_file,
-                            s_time='Time',
-                            s_vt='"vt   1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
-                            s_p='"pg   1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
-                            s_q='"qg   1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
-                            s_efd='"efd  1"GENERATOR   "-0 "            " [1 ] [1 ]  "',
-                            s_ifd='"ifd  1"GENERATOR   "-0 "            " [1 ] [1 ]  "'
+                            s_time=sim_dict['time'],
+                            s_vt=sim_dict['vt'],
+                            s_p=sim_dict['pg'],
+                            s_q=sim_dict['qg'],
+                            s_efd=sim_dict['efd'],
+                            s_ifd=sim_dict['ifd']
                             )
     elif mes_file:
         pattern = r"Add\('xy', name='Simulated'(?:.*\n)+?To\('\.\.'\)\n|.*{s_filename}.*\n"
