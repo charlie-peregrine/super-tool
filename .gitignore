@@ -5,4 +5,5 @@ __pycache__
 */dump/*
 *.dyd
 *.tmp
+*.rep
 Docs/Supertool Meeting Notes 12-15-2023.docx
