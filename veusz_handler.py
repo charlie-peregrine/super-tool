@@ -50,22 +50,30 @@ def plot_voltage_reference(sim_file='', mes_file=''):
     sim_dict = {}
     if sim_file:
         with open(sim_file, 'r') as file:
-            headers = file.readline().replace(',', '\n')
+            headers = file.readline().split(',')
+            headers = '\n'.join([s.strip() for s in headers])
+            
         sim_dict['time'] = re.findall(r'.*time.*', headers, flags=re.IGNORECASE)
-        sim_dict['vt'] = re.findall(r'"vt\s+1"?gen.*', headers, flags=re.IGNORECASE)
-        sim_dict['pg'] = re.findall(r'"pg\s+1"?gen.*', headers, flags=re.IGNORECASE)
-        sim_dict['qg'] = re.findall(r'"qg\s+1"?gen.*', headers, flags=re.IGNORECASE)
-        sim_dict['efd'] = re.findall(r'"efd\s+1"?gen.*', headers, flags=re.IGNORECASE)
-        sim_dict['ifd'] = re.findall(r'"ifd\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        sim_dict['vt'] = re.findall( r'(?=.*vt)(?=.*1)(?=.*gen).*', headers, flags=re.IGNORECASE)
+        sim_dict['pg'] = re.findall( r'(?=.*pg)(?=.*1)(?=.*gen).*', headers, flags=re.IGNORECASE)
+        sim_dict['qg'] = re.findall( r'(?=.*qg)(?=.*1)(?=.*gen).*', headers, flags=re.IGNORECASE)
+        sim_dict['efd'] = re.findall(r'(?=.*efd)(?=.*1)(?=.*gen).*', headers, flags=re.IGNORECASE)
+        sim_dict['ifd'] = re.findall(r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*', headers, flags=re.IGNORECASE)
+        # sim_dict['time'] = re.findall(r'.*time.*', headers, flags=re.IGNORECASE)
+        # sim_dict['vt'] = re.findall(r'"vt\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        # sim_dict['pg'] = re.findall(r'"pg\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        # sim_dict['qg'] = re.findall(r'"qg\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        # sim_dict['efd'] = re.findall(r'"efd\s+1"?gen.*', headers, flags=re.IGNORECASE)
+        # sim_dict['ifd'] = re.findall(r'"ifd\s+1"?gen.*', headers, flags=re.IGNORECASE)
 
         for k,v in sim_dict.items():
             # print(len(sim_dict[k]), sim_dict[k])
             if len(sim_dict[k]) == 0:
-                print(f"blah blah {k} has zero oops")
+                print(f"blah blah simulated {k} has zero oops")
                 sim_dict[k] = ''
             else:
                 if len(sim_dict[k]) > 1:
-                    print(f"blah blah {k} too many, picking the first one")
+                    print(f"blah blah simulated {k} too many, picking the first one")
                 sim_dict[k] = v[0]
         # print(sim_dict)
         
