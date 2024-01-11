@@ -149,7 +149,18 @@ class SuperToolGUI(tk.Tk):
             self.proj_frame.render()
             self.focused_test = None
             self.test_frame.show_focused_test()
-
+    
+    # method called in project view
+    # shows a prompt for the user to rename the currently open project
+    def rename_project(self, e=None):
+        # entry popup
+        new_project_name = simpledialog.askstring(title="Rename Project",
+            prompt=f"Enter a new project name to replace\n{self.project.title}.")
+        if new_project_name:
+            # set the project name
+            self.project.title = new_project_name
+            # re-render project pane
+            self.proj_frame.render()
 
 
     # method called by ctrl+shift+s and the file menu
