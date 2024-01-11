@@ -85,12 +85,25 @@ def plot_voltage_reference(sim_file='', mes_file=''):
     # get measured headers
     mes_dict = {}
     if mes_file:
-        mes_dict['time'] = 'Seconds'
-        mes_dict['vt'] = 'Vave 0'
-        mes_dict['pg'] = 'KW 0'
-        mes_dict['qg'] = 'Kvar 0'
-        mes_dict['efd'] = 'Vfd 0'
-        mes_dict['ifd'] = 'Ifd 0'
+        with open(mes_file, 'r') as file:
+            headers = file.readline().split(',')
+            headers = '\n'.join([s.strip() for s in headers])
+        
+        mes_dict['time'] = re.findall(r'.*(?:time|seconds).*', headers, flags=re.IGNORECASE)
+        mes_dict['vt'] = re.findall( r'(?=.*vave).*', headers, flags=re.IGNORECASE)
+        mes_dict['pg'] = re.findall( r'(?=.*kw).*', headers, flags=re.IGNORECASE)
+        mes_dict['qg'] = re.findall( r'(?=.*kvar).*', headers, flags=re.IGNORECASE)
+        mes_dict['efd'] = re.findall(r'(?=.*vfd).*', headers, flags=re.IGNORECASE)
+        mes_dict['ifd'] = re.findall(r'(?=.*ifd).*', headers, flags=re.IGNORECASE)
+    
+        for k,v in mes_dict.items():
+            if len(mes_dict[k]) == 0:
+                print(f"blah blah measured {k} has zero oops")
+                mes_dict[k] = ''
+            else:
+                if len(mes_dict[k]) > 1:
+                    print(f"blah blah measured {k} too many, picking the first one")
+                mes_dict[k] = v[0]
     
         replace_dict(mes_dict, 'vt', '*14.4')
         replace_dict(mes_dict, 'pg', '*166.75')
