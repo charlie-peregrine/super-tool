@@ -59,7 +59,7 @@ def plot_voltage_reference(sim_file='', mes_file=''):
         sim_dict['ifd'] = re.findall(r'"ifd\s+1"?gen.*', headers, flags=re.IGNORECASE)
 
         for k,v in sim_dict.items():
-            print(len(sim_dict[k]), sim_dict[k])
+            # print(len(sim_dict[k]), sim_dict[k])
             if len(sim_dict[k]) == 0:
                 print(f"blah blah {k} has zero oops")
                 sim_dict[k] = ''
@@ -67,7 +67,7 @@ def plot_voltage_reference(sim_file='', mes_file=''):
                 if len(sim_dict[k]) > 1:
                     print(f"blah blah {k} too many, picking the first one")
                 sim_dict[k] = v[0]
-        print(sim_dict)
+        # print(sim_dict)
         
         # modify necessary sim header names for veusz use
         replace_dict(sim_dict, 'vt', '*14.4')
