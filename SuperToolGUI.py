@@ -78,7 +78,7 @@ class SuperToolGUI(tk.Tk):
     def keybinds(self):
         self.bind("<F5>", self.test_frame.run_simulation)
         self.bind("<Control-o>", self.open_project)
-        self.bind("<Control-s>", self.project.write_to_file_name)
+        self.bind("<Control-s>", self.save_project) 
         self.bind("<Control-S>", self.save_as_project)
         
     # helper method to set up the main file menu at the top of the
@@ -149,6 +149,16 @@ class SuperToolGUI(tk.Tk):
             self.proj_frame.render()
             self.focused_test = None
             self.test_frame.show_focused_test()
+
+
+
+    # method called by ctrl+shift+s and the file menu
+    # shows a prompt allowing the user to save to a pec file
+    def save_project(self, e=None):
+        if self.project.file_name:
+            self.project.write_to_file_name()
+        else:
+            self.save_as_project()
 
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file

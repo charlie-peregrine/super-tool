@@ -12,10 +12,11 @@ from pslf_scripts import Voltage_Reference, Steady_State
 class Project:
     def __init__(self, title="Untitled Project", filename=''):
         self.title = title
-        self.file_name = "default-project.pec"
+        self.file_name = ''
         self.units = {}
     
     # wrapper for write, intended for use by the gui
+    # does not check if the file_name is valid
     def write_to_file_name(self, *args):
         with open(self.file_name, mode='w') as file:
             self.write(file)
