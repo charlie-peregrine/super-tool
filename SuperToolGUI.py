@@ -97,7 +97,7 @@ class SuperToolGUI(tk.Tk):
         # in the keybinds method
         file_menu.add_command(label="New Project", command=self.new_project, accelerator="ctrl+n") #@TODO make the accelerators do something
         file_menu.add_command(label="Open Project", command=self.open_project, accelerator="ctrl+o")
-        file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
+        file_menu.add_command(label="Save Project", command=self.save_project, accelerator="ctrl+s")
         file_menu.add_command(label="Save Project As", command=self.save_as_project, accelerator="ctrl+shift+s")
         file_menu.add_separator()
         file_menu.add_command(label="New Unit", command=print)
