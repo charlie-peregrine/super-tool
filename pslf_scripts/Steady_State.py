@@ -38,8 +38,8 @@ def run(test):
     if_res              = test.attribute_dict["if_res"].var.get()             # 0.0
     # SaveCaseFiles       = test.attribute_dict["SaveCaseFiles"].var.get()      # 0 # generally leave as 0
     UseGenField         = test.attribute_dict["UseGenField"].var.get()        # 0 # set this to '1' if you want to use generator field even for brushless 
-    Vbase               = test.attribute_dict["Vbase"].var.get()        # 0 # set this to '1' if you want to use generator field even for brushless 
-    Zbranch             = test.attribute_dict["Zbranch"].var.get()        # 0 # set this to '1' if you want to use generator field even for brushless 
+    Vbase               = test.attribute_dict["Vbase"].var.get()
+    Zbranch             = test.attribute_dict["Zbranch"].var.get()
     #mva_base           = test.attribute_dict["mva_base"].var.get()           # 145.0
 
 
