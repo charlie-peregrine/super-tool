@@ -12,6 +12,7 @@ import SuperToolProject as stp
 
 from ProjectView import ProjectView
 from TestView import TestView
+from ParamView import ParamView
 
 class SuperToolGUI(tk.Tk):
     def __init__(self):
