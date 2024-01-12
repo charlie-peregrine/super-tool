@@ -208,14 +208,13 @@ class Test:
             ]
 
             for n,v,t in attributes:
-                # @TODO double check that n is already in the attribute dict
                 self.attribute_dict[n] = Attribute(n,v,t)
                             
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Voltage_Reference.run(self)
             
         
-        if self.type == "Steady State":
+        elif self.type == "Steady State":
             print("steady state in test_defaults:", self.name)
             attributes = [
                 ("dyd_filename",        '',     'PATH'),
@@ -245,7 +244,7 @@ class Test:
             
         else:
             # script changed to print out the current type info as well
-            self.script = lambda: print(f"No script set up for this test of type {self.type}")
+            self.script = lambda: print(f"No script set up for this test of type '{self.type}'")
     
     
     # internal write method to write a test and its attributes to a file
