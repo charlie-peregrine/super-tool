@@ -174,6 +174,10 @@ class Test:
         
     # depending on the current test type set the default attributes of the test 
     def test_defaults(self):
+        
+        # clear attribute dict. used if test_defaults is being used to change type
+        self.attribute_dict.clear()
+        
         # only voltage ref set up as of yet
         if self.type == "Voltage Reference":
             print("wahoo", self.name)
