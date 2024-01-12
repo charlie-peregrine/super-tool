@@ -4,8 +4,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-import veusz_handler
-
 # subclass of frame that holds the plot parameter view
 # the goal of this view is to allow the user to manipulate
 # the plotted graphs to be more visually appealing in order
@@ -32,9 +30,7 @@ class ParamView(ttk.Frame):
             print("no focused test yet")
             return
         
-        veusz_handler.plot_voltage_reference(
-            sim_file=self.parent.focused_test['csv_filename'],
-            mes_file=self.parent.focused_test['mes_filename']
-        )
+        self.parent.focused_test.plot()
+        
         
         

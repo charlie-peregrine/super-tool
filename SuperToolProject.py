@@ -6,6 +6,8 @@
 import tkinter as tk
 from pslf_scripts import Voltage_Reference, Steady_State
 
+import veusz_handler
+
 # main class that holds information of units and tests
 # contains title and filename of the project, as well as 
 # a dictionary of the units it holds
@@ -161,8 +163,10 @@ class Test:
         self.parent = parent
         self.attribute_dict = {}
         
-        # default script says that this test type isn't set up yet
-        self.script = lambda: print("No script set up for this test")
+        # default script and plot that say that this test type isn't set up yet
+        self.script = lambda: print("No run script set up for this test")
+        self.plot = lambda: print("No plot script set up for this test")
+        
         
         # depending on the chosen type, give the full set of default
         # attributes for that type.
@@ -213,6 +217,12 @@ class Test:
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Voltage_Reference.run(self)
             
+            # set the voltage reference plotter to use for the show graphs button
+            self.plot = lambda : veusz_handler.plot_voltage_reference(
+                sim_file=self['csv_filename'],
+                mes_file=self['mes_filename']
+            )
+            
         
         elif self.type == "Steady State":
             print("steady state in test_defaults:", self.name)
@@ -242,9 +252,15 @@ class Test:
             
             self.script = lambda: Steady_State.run(self)
             
+            # set the steady state plotter to use for the show graphs button
+            self.plot = lambda : veusz_handler.plot_steady_state(
+                self['out_filename']
+            )
+            
         else:
             # script changed to print out the current type info as well
-            self.script = lambda: print(f"No script set up for this test of type '{self.type}'")
+            self.script = lambda: print(f"No run script set up for this test of type '{self.type}'")
+            self.plot = lambda: print(f"No plot script set up for this test of type '{self.type}'")
     
     
     # internal write method to write a test and its attributes to a file

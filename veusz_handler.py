@@ -44,7 +44,7 @@ def replace_dict(d, k, m, default='y'):
 
 def plot_voltage_reference(sim_file='', mes_file=''):
     with open("veusz_files/Voltage_Reference.fvsz", 'r') as file:
-        text_to_format = file.read()
+        fvsz_text = file.read()
 
     # get column titles for the simulated data
     sim_dict = {}
@@ -113,7 +113,7 @@ def plot_voltage_reference(sim_file='', mes_file=''):
         
 
     if sim_file and mes_file:
-        result_text = text_to_format.format(s_filename=sim_file,
+        result_text = fvsz_text.format(s_filename=sim_file,
                             s_time=sim_dict['time'],
                             s_vt=sim_dict['vt'],
                             s_p=sim_dict['pg'],
@@ -130,9 +130,9 @@ def plot_voltage_reference(sim_file='', mes_file=''):
                             )
     elif sim_file:
         pattern = r"Add\('xy', name='Measured'(?:.*\n)+?To\('\.\.'\)\n|.*{m_filename}.*\n"
-        text_to_format = re.sub(pattern, '', text_to_format, flags=re.MULTILINE)
+        fvsz_text = re.sub(pattern, '', fvsz_text, flags=re.MULTILINE)
         
-        result_text = text_to_format.format(s_filename=sim_file,
+        result_text = fvsz_text.format(s_filename=sim_file,
                             s_time=sim_dict['time'],
                             s_vt=sim_dict['vt'],
                             s_p=sim_dict['pg'],
@@ -142,9 +142,9 @@ def plot_voltage_reference(sim_file='', mes_file=''):
                             )
     elif mes_file:
         pattern = r"Add\('xy', name='Simulated'(?:.*\n)+?To\('\.\.'\)\n|.*{s_filename}.*\n"
-        text_to_format = re.sub(pattern, '', text_to_format, flags=re.MULTILINE)
+        fvsz_text = re.sub(pattern, '', fvsz_text, flags=re.MULTILINE)
         
-        result_text = text_to_format.format(m_filename=mes_file,
+        result_text = fvsz_text.format(m_filename=mes_file,
                             m_time=mes_dict['time'],
                             m_vt=mes_dict['vt'],
                             m_p=mes_dict['pg'],
@@ -168,3 +168,25 @@ def plot_voltage_reference(sim_file='', mes_file=''):
         
         # process.kill()
 
+def plot_steady_state(out_file):
+    
+    if not out_file:
+        print("no file to get steady state graphs from! uh oh")
+        return
+    
+    with open("veusz_files/Steady_State.fvsz", 'r') as file:
+        fvsz_text = file.read()
+
+    with open(out_file, 'r') as file:
+        headers = [s.strip() for s in file.readline().split(',')]
+
+    # 6 -> sim, 9 -> measured
+    result_text = fvsz_text.format(filename=out_file, s_header=headers[6],
+                                   m_header=headers[9])
+    
+    with open("veusz_files/.blahg.vsz", 'w') as file:
+        file.write(result_text)
+    process = subprocess.Popen('"' + VEUSZ_PATH + 'veusz.exe" ./veusz_files/.blahg.vsz') #, shell=True)
+        
+    return process
+        
