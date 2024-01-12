@@ -228,7 +228,7 @@ class Test:
                 ("if_base",             0,      'NUM'),
                 ("if_res",              0,      'NUM'),
                 # ("SaveCaseFiles",       0,      'NUM'),
-                ("UseGenField",         0,      'NUM'),
+                ("UseGenField",         False,      'BOOL'),
                 # ("Ifd_A",               0,      'NUM'),
                 # ("Ifd_pu",              0,      'NUM'),
                 # ("Efd_pu",              0,      'NUM'),

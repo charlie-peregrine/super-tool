@@ -153,7 +153,7 @@ def run(test):
         ret = SuperTool.init(chf_filename,rep_filename,0,1,"","", 1)
 
         #  Retrieve Ifd_pu and Efd_pu for writing to output csv file
-        if(UseGenField!=0):
+        if(UseGenField):
             Ifd_pu = GeneratorInitialConditions[0].Ladifd
             Efd_pu = GeneratorInitialConditions[0].Efd
         elif('esac1a' in excModName):
