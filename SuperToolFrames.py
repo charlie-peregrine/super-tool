@@ -15,6 +15,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import numpy as np
 
+import veusz_handler
+
 # subclass of frame that holds the plot parameter view
 # the goal of this view is to allow the user to manipulate
 # the plotted graphs to be more visually appealing in order
@@ -38,61 +40,15 @@ class ParamView(ttk.Frame):
     
     def render(self):
         
-        if self.graph_window:
-            self.graph_window.destroy() # could be optimized by not destroying and instead replacing?
-        
         if not self.parent.focused_test:
             print("no focused test yet")
             return
         
-        self.graph_window = tk.Toplevel(self.parent)
-        self.graph_window.title("Graph!")
+        veusz_handler.plot_voltage_reference(
+            sim_file=self.parent.focused_test['csv_filename'],
+            mes_file=self.parent.focused_test['mes_filename']
+        )
         
-        # r'C:\CODE\demo super tool gui\pslf_scripts\dump\HCPR3_VStepP02_P0_sim.csv'
-        sim_file_name = self.parent.focused_test['csv_filename']
-        sim_array = np.genfromtxt(sim_file_name, delimiter=',', skip_header=True)
-        real_time = sim_array[:, 0] - sim_array[0,0]
-        # print(real_time)
-
-        matplotlib.rcParams.update({'font.size': 8})
-
-        fig, axs = plt.subplots(5, 1, figsize=(3.5,5), layout='constrained')
-
-        axs[0].plot(real_time, sim_array[:, 1], label='sim') # vt 1
-        axs[0].set_ylabel('Vt (kV)')
-        axs[0].legend()
-
-        axs[1].plot(real_time, sim_array[:, 5]) # pg 1
-        axs[1].set_ylabel("P (MW)")
-
-        axs[2].plot(real_time, sim_array[:, 7]) # qg 1
-        axs[2].set_ylabel("Q (MVAR)")
-
-        axs[3].plot(real_time, sim_array[:, 3], ) # efd 1
-        axs[3].set_ylabel("Efd (VDC)")
-
-        axs[4].plot(real_time, sim_array[:, 10])# ifd 1 ?
-        axs[4].set_ylabel("Ifd (ADC)")
-        axs[4].set_xlabel("Time (s)")
-
-        fig.align_ylabels(axs)
-
-        canvas = FigureCanvasTkAgg(fig, master = self.graph_window)
-        canvas.get_tk_widget().pack(anchor="nw", fill='both', expand=1)
-        
-        def resize_canvas(e):
-            if str(e.widget) == '.!toplevel':
-                if getattr(self, "_after_id", None):
-                    self.graph_window.after_cancel(self._after_id)  # type: ignore
-                if canvas.get_tk_widget().winfo_viewable():
-                    canvas.get_tk_widget().pack_forget()
-                self._after_id = self.graph_window.after(250,       # type: ignore
-                    lambda: canvas.get_tk_widget().pack(
-                        anchor="nw", fill='both', expand=1
-                    )
-                )
-            
-        self.graph_window.bind('<Configure>', resize_canvas)
         
 
 # the statusbar frame should hold details about current background tasks
