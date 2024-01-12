@@ -96,27 +96,28 @@ class TestView(ttk.Frame):
                     title_label.grid(row=i+offset, column=0, sticky='w')
                     
                     # show short name of path
-                    path_label = ttk.Label(self.frame, text=basename(attr.var.get()))
-                    path_label.grid(row=i+offset, column=1)
+                    path_button = ttk.Button(self.frame, text=basename(attr.var.get()),
+                            command=lambda attr=attr: self.get_new_path(attr))
+                    path_button.grid(row=i+offset, column=1, sticky='nesw')
                     
                     # create hovertext for paths to show the long path instead of just the basename
-                    path_label_hover = Hovertip(path_label, attr.var.get(), hover_delay=300)
+                    path_label_hover = Hovertip(path_button, attr.var.get(), hover_delay=300)
                     
                     # set up traces for when the path variables update to modify the path label
                     # separate functions needed because lambdas don't allow assignments
-                    attr.var.trace_add('write', lambda _1, _2, _3, l=path_label, v=attr.var: 
+                    attr.var.trace_add('write', lambda _1, _2, _3, l=path_button, v=attr.var: 
                                         l.configure(text=basename(v.get())))
                     def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
                         l.text = v.get()
                     attr.var.trace_add('write', update_hover) 
                     
-                    # place a select button to get new a new path
-                    path_button = ttk.Button(self.frame, text="select",
-                            command=lambda attr=attr: self.get_new_path(attr))
-                    path_button.grid(row=i+offset, column=2)
+                    # place a select button to get a new path
+                    open_path_button = ttk.Button(self.frame, text="open",
+                            command=lambda attr=attr: self.open_path(attr))
+                    open_path_button.grid(row=i+offset, column=2)
                     
                     # add interactibles to a higher scoped list
-                    self.interactibles.append((path_button, path_label))
+                    self.interactibles.append((open_path_button, path_button))
                 
                 # boolean attributes are shown as their name and a checkbox
                 elif attr.type == 'BOOL':
@@ -258,6 +259,10 @@ class TestView(ttk.Frame):
         type_dropdown.bind("<space>", lambda e: type_dropdown.event_generate('<Down>'))
         type_dropdown.bind("<<ComboboxSelected>>", lambda e: done_button.focus())
         
+        
+    # @TODO needs typechecking
+    def open_path(self, attr):
+        os.startfile(attr.var.get())
     
     # get a new path for path type attributes
     # need to pick between input and output files because the file
