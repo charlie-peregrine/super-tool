@@ -154,7 +154,7 @@ class Unit:
 # a dictionary of attributes, and a script to run based on the type
 # of test that it is
 class Test:
-    def __init__(self, name="Untitled Test", type="None", parent=None, **kwargs):
+    def __init__(self, name="Untitled Test", type="None", parent=None): #, **kwargs):
         self.name = name
         self.type = type
         self.parent = parent
@@ -169,25 +169,29 @@ class Test:
         
         # @TODO this is not the right way to handle these
         # [print(i) for i in self.attribute_dict.values()]
-        for k,v in kwargs:
-            self.attribute_dict[k] = v 
+        # for k,v in kwargs:
+        #     self.attribute_dict[k] = v 
         
     # depending on the current test type set the default attributes of the test 
     def test_defaults(self):
+        
+        # clear attribute dict. used if test_defaults is being used to change type
+        self.attribute_dict.clear()
         
         # only voltage ref set up as of yet
         if self.type == "Voltage Reference":
             print("voltage ref in test_defaults: ", self.name)
             attributes = [
-                ("dyd_filename",    '',     'PATH'),
-                ("sav_filename",    '',     'PATH'),
-                ("chf_filename",    '',     'PATH'),
-                ("csv_filename",    '',     'PATH'),
-                ("rep_filename",    'Rep.rep', 'PATH'),
-                ("StepTimeInSecs",  0,      'NUM'),
-                ("UpStepInPU",      0,      'NUM'),
-                ("DnStepInPU",      0,      'NUM'),
-                ("StepLenInSecs",   0,      'NUM'),
+                ("dyd_filename", '', 'PATH'),
+                ("sav_filename", '', 'PATH'),
+                ("chf_filename", '', 'PATH'),
+                ("csv_filename", '', 'PATH'),
+                ("rep_filename", 'Rep.rep', 'PATH'),
+                ("mes_filename", '', 'PATH'),
+                ("StepTimeInSecs",  0,       'NUM'),
+                ("UpStepInPU",      0,       'NUM'),
+                ("DnStepInPU",      0,       'NUM'),
+                ("StepLenInSecs",   0,       'NUM'),
                 ("TotTimeInSecs",   0,      'NUM'),
                 ("PSS_On",          False,  'BOOL'),
                 ("SysFreqInHz",     0,      'NUM'),
@@ -275,11 +279,47 @@ class Test:
         
         # read in attributes
         while lines:
-            a, lines = Attribute('ERR', 'ERR', 'ERR').read(lines)
+            a, lines = Attribute.read(lines)
             if not a:
                 break
+            name, val = a
             
-            self.attribute_dict[a.name] = a
+            if name not in self.attribute_dict:
+                print(f"error: {name} not a valid test attribute. it will be ignored.")
+            else:
+                type_ = self.attribute_dict[name].type
+                match type_:
+                    case 'PATH':
+                        convert_type = str      # type: ignore
+                    case 'BOOL':
+                        def convert_type(b: str):
+                            if b == 'True':
+                                return True
+                            elif b == 'False':
+                                return False
+                            else:
+                                raise ValueError()
+                    case 'NUM':
+                        convert_type = float    # type: ignore
+                    case _:
+                        print(type_ + " is not a valid attribute type. ignoring.")
+                        continue
+                
+                try:
+                    self.attribute_dict[name].var.set(convert_type(val))
+                except ValueError:
+                    print(f"Could not set attribute {name} of type " + \
+                            f"{type_} to value {val} of type " + \
+                            f"{type(val).__name__}. Ignoring this attribute.")
+                
+                
+                # try: # @TODO this try does not work properly
+                #     self.attribute_dict[name].var.set(val)
+                # except tk.TclError:
+                #     print(f"TclError: could not set attribute {name} of type " + \
+                #         f"{self.attribute_dict[name].type} to value {val} of " + \
+                #         f"type {type(val).__name__}. Ignoring this attribute.")
+            
         
         return self, lines
     
@@ -311,10 +351,11 @@ class Attribute:
     
     def write(self, file):
         file.write("\t".join([
-                "A", self.name, str(self.var.get()), self.type, self.unit
+                "A", self.name, str(self.var.get())
         ]) + "\n")
     
-    def read(self, lines):
+    @staticmethod
+    def read(lines):
         line = lines.pop()
         
         print('a', line)
@@ -323,20 +364,15 @@ class Attribute:
             return False, lines
         
         if line[0] == 'A':
-            _, self.name, val, self.type, self.unit = line.split("\t")
-            if self.type == 'PATH':
-                self.var = tk.StringVar(value=val)
-            elif self.type == 'BOOL':
-                self.var = tk.BooleanVar(value=val)
-            else:
-                self.var = tk.DoubleVar(value=val)
+            name, val = line.split("\t")[1:3]
+            return (name, val), lines
+        
         elif line[0] in 'UT':
             lines.append(line)
             return False, lines
         else:
             raise ValueError("not an attribute")
         
-        return self, lines
     
     # string conversion overload
     def __str__(self):
