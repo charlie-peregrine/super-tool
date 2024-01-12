@@ -4,16 +4,6 @@
 import tkinter as tk
 from tkinter import ttk
 
-# import matplotlib
-import matplotlib
-# tell matplotlib to use the tkinter backend
-matplotlib.use("TkAgg")
-
-from matplotlib import pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-# from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
-
-import numpy as np
 
 import veusz_handler
 

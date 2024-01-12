@@ -14,8 +14,6 @@ from ProjectView import ProjectView
 from TestView import TestView
 from PlotView import PlotView
 
-from matplotlib import pyplot as plt
-
 class SuperToolGUI(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -45,7 +43,6 @@ class SuperToolGUI(tk.Tk):
         # print(self.winfo_width(), self.winfo_height())
         
         def on_quit():
-            plt.close('all')
             self.destroy()
 
         self.protocol('WM_DELETE_WINDOW', on_quit)
