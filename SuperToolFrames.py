@@ -64,9 +64,6 @@ class StatusBar(ttk.Frame):
         
         self.main_text = ttk.Label(self, text="Status Bar")
         self.main_text.grid(row=0, column=0)
-        
-        self.button = ttk.Button(self, text="read proj", command=self.parent.project.read_from_file_name)
-        self.button.grid(row=0, column=1, sticky='e')
 
     # helper method to let other methods easily set the status bar's main
     # text field

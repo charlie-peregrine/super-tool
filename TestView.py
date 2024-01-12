@@ -128,7 +128,6 @@ class TestView(ttk.Frame):
                     # show a check box
                     # @TODO the bind not be necessary
                     checkbutton = ttk.Checkbutton(self.frame, variable=attr.var)
-                    checkbutton.bind("<1>", lambda e, var=attr.var: print(not var.get()))
                     checkbutton.grid(row=i+offset, column=1)
                     
                     # add the checkbox and variable to a higher scoped list
@@ -144,7 +143,6 @@ class TestView(ttk.Frame):
                     
                     # space to enter the user's number
                     entry = ttk.Entry(self.frame, textvariable=attr.var)
-                    entry.bind("<Return>", lambda e, var=attr.var: print(var.get()))
                     entry.grid(row=i+offset, column=1)
                     
                     # label containing unit
@@ -172,6 +170,9 @@ class TestView(ttk.Frame):
             working_dir = os.getcwd()
             
             # run script
+            for k,v in self.parent.focused_test.attribute_dict.items():
+                print(k, v)
+
             self.parent.focused_test.script()
             
             # return to old working directory
@@ -263,6 +264,7 @@ class TestView(ttk.Frame):
     # need to pick between input and output files because the file
     # picker has different behavior depending on if it's saving or
     # opening. uses tkinter.filedialog
+    # @TODO make this better with getting the extension
     def get_new_path(self, attr):
         if attr.name[:3] == 'mes':
             path = askopenfilename(title=f"Select measured data file",

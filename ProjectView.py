@@ -246,6 +246,11 @@ class ProjectView(ttk.Frame):
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following test:\n\n"
                 + test.name, title="Delete Test"):
+            
+            if self.parent.focused_test == test:
+                self.parent.focused_test = None
+                self.parent.test_frame.show_focused_test()
+            
             test.parent.remove_test(test.name)
             self.render()
     
