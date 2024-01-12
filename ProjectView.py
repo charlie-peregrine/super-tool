@@ -31,6 +31,16 @@ class ProjectView(ttk.Frame):
         self.proj_header = ttk.Label(self, text=self.proj.title)
         self.proj_header.grid(row=0, column=0, columnspan=3, sticky='w')
         
+        # project header label change menu
+        self.proj_header_menu = tk.Menu(self.proj_header)
+        self.proj_header.bind('<3>', 
+                lambda e: self.proj_header_menu.post(e.x_root, e.y_root))
+        self.proj_header_menu.add_command(label="Rename Project",
+                command=self.parent.rename_project)
+        self.proj_header_menu.add_command(label="New Project",
+                command=self.parent.new_project)
+        
+        
         # add scrollbar frame for the project section
         self.scroller = ScrollFrame(self)
         self.scroller.grid(row=1, column=0, sticky='nesw')
@@ -245,6 +255,11 @@ class ProjectView(ttk.Frame):
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following test:\n\n"
                 + test.name, title="Delete Test"):
+            
+            if self.parent.focused_test == test:
+                self.parent.focused_test = None
+                self.parent.test_frame.show_focused_test()
+            
             test.parent.remove_test(test.name)
             self.render()
     

@@ -4,7 +4,7 @@
 # files and storing test, unit, and plot data
 
 import tkinter as tk
-from pslf_scripts import Voltage_Reference
+from pslf_scripts import Voltage_Reference, Steady_State
 
 # main class that holds information of units and tests
 # contains title and filename of the project, as well as 
@@ -12,10 +12,11 @@ from pslf_scripts import Voltage_Reference
 class Project:
     def __init__(self, title="Untitled Project", filename=''):
         self.title = title
-        self.file_name = "default-project.pec"
+        self.file_name = ''
         self.units = {}
     
     # wrapper for write, intended for use by the gui
+    # does not check if the file_name is valid
     def write_to_file_name(self, *args):
         with open(self.file_name, mode='w') as file:
             self.write(file)
@@ -154,7 +155,7 @@ class Unit:
 # a dictionary of attributes, and a script to run based on the type
 # of test that it is
 class Test:
-    def __init__(self, name="Untitled Test", type="None", parent=None, **kwargs):
+    def __init__(self, name="Untitled Test", type="None", parent=None): #, **kwargs):
         self.name = name
         self.type = type
         self.parent = parent
@@ -169,20 +170,25 @@ class Test:
         
         # @TODO this is not the right way to handle these
         # [print(i) for i in self.attribute_dict.values()]
-        for k,v in kwargs:
-            self.attribute_dict[k] = v 
+        # for k,v in kwargs:
+        #     self.attribute_dict[k] = v 
         
     # depending on the current test type set the default attributes of the test 
     def test_defaults(self):
+        
+        # clear attribute dict. used if test_defaults is being used to change type
+        self.attribute_dict.clear()
+        
         # only voltage ref set up as of yet
         if self.type == "Voltage Reference":
-            print("wahoo", self.name)
+            print("voltage ref in test_defaults: ", self.name)
             attributes = [
                 ("dyd_filename", '', 'PATH'),
                 ("sav_filename", '', 'PATH'),
                 ("chf_filename", '', 'PATH'),
                 ("csv_filename", '', 'PATH'),
-                ("rep_filename", '', 'PATH'),
+                ("rep_filename", 'Rep.rep', 'PATH'),
+                ("mes_filename", '', 'PATH'),
                 ("StepTimeInSecs",  0,       'NUM'),
                 ("UpStepInPU",      0,       'NUM'),
                 ("DnStepInPU",      0,       'NUM'),
@@ -200,17 +206,47 @@ class Test:
                 ("Vbase",           0,      'NUM'),   # kV,
                 ("Zbranch",         0,      'NUM'),   # pu
             ]
-            
+
+            for n,v,t in attributes:
+                # @TODO double check that n is already in the attribute dict
+                self.attribute_dict[n] = Attribute(n,v,t)
+                            
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Voltage_Reference.run(self)
             
+        
+        if self.type == "Steady State":
+            print("steady state in test_defaults:", self.name)
+            attributes = [
+                ("dyd_filename",        '',     'PATH'),
+                ("sav_filename",        '',     'PATH'),
+                ("chf_filename",        '',     'PATH'),
+                ("rep_filename",        'Rep.rep',     'PATH'),
+                ("in_filename",         '',     'PATH'),
+                ("out_filename",        '',     'PATH'),
+                # ("out_casename",        '',     'PATH'),
+                ("if_base",             0,      'NUM'),
+                ("if_res",              0,      'NUM'),
+                # ("SaveCaseFiles",       0,      'NUM'),
+                ("UseGenField",         False,      'BOOL'),
+                # ("Ifd_A",               0,      'NUM'),
+                # ("Ifd_pu",              0,      'NUM'),
+                # ("Efd_pu",              0,      'NUM'),
+                # ("ExcModIndex",         0,      'NUM'),
+                ("Vbase",               0,      'NUM'),
+                ("Zbranch",             0,      'NUM'),
+                ]
+            
             for n,v,t in attributes:
+                # @TODO double check that n is already in the attribute dict
                 self.attribute_dict[n] = Attribute(n,v,t)
-                # print(self.attribute_dict[n])
-            # [print(i) for i in self.attribute_dict.values()]
+            
+            self.script = lambda: Steady_State.run(self)
+            
         else:
             # script changed to print out the current type info as well
             self.script = lambda: print(f"No script set up for this test of type {self.type}")
+    
     
     # internal write method to write a test and its attributes to a file
     def write(self, file):
@@ -244,11 +280,47 @@ class Test:
         
         # read in attributes
         while lines:
-            a, lines = Attribute('ERR', 'ERR', 'ERR').read(lines)
+            a, lines = Attribute.read(lines)
             if not a:
                 break
+            name, val = a
             
-            self.attribute_dict[a.name] = a
+            if name not in self.attribute_dict:
+                print(f"error: {name} not a valid test attribute. it will be ignored.")
+            else:
+                type_ = self.attribute_dict[name].type
+                match type_:
+                    case 'PATH':
+                        convert_type = str      # type: ignore
+                    case 'BOOL':
+                        def convert_type(b: str):
+                            if b == 'True':
+                                return True
+                            elif b == 'False':
+                                return False
+                            else:
+                                raise ValueError()
+                    case 'NUM':
+                        convert_type = float    # type: ignore
+                    case _:
+                        print(type_ + " is not a valid attribute type. ignoring.")
+                        continue
+                
+                try:
+                    self.attribute_dict[name].var.set(convert_type(val))
+                except ValueError:
+                    print(f"Could not set attribute {name} of type " + \
+                            f"{type_} to value {val} of type " + \
+                            f"{type(val).__name__}. Ignoring this attribute.")
+                
+                
+                # try: # @TODO this try does not work properly
+                #     self.attribute_dict[name].var.set(val)
+                # except tk.TclError:
+                #     print(f"TclError: could not set attribute {name} of type " + \
+                #         f"{self.attribute_dict[name].type} to value {val} of " + \
+                #         f"type {type(val).__name__}. Ignoring this attribute.")
+            
         
         return self, lines
     
@@ -280,10 +352,11 @@ class Attribute:
     
     def write(self, file):
         file.write("\t".join([
-                "A", self.name, str(self.var.get()), self.type, self.unit
+                "A", self.name, str(self.var.get())
         ]) + "\n")
     
-    def read(self, lines):
+    @staticmethod
+    def read(lines):
         line = lines.pop()
         
         print('a', line)
@@ -292,20 +365,15 @@ class Attribute:
             return False, lines
         
         if line[0] == 'A':
-            _, self.name, val, self.type, self.unit = line.split("\t")
-            if self.type == 'PATH':
-                self.var = tk.StringVar(value=val)
-            elif self.type == 'BOOL':
-                self.var = tk.BooleanVar(value=val)
-            else:
-                self.var = tk.DoubleVar(value=val)
+            name, val = line.split("\t")[1:3]
+            return (name, val), lines
+        
         elif line[0] in 'UT':
             lines.append(line)
             return False, lines
         else:
             raise ValueError("not an attribute")
         
-        return self, lines
     
     # string conversion overload
     def __str__(self):

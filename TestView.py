@@ -8,6 +8,7 @@ from os.path import basename
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from idlelib.tooltip import Hovertip
 
+import os
 
 # Frame subclass for presenting and receving info regarding
 # individual tests and their attributes
@@ -64,9 +65,13 @@ class TestView(ttk.Frame):
             self.title_label.grid(row=0, column=0, sticky='w')
             self.type_label = ttk.Label(self.frame, text=focused.type)
             self.type_label.grid(row=1, column=0)
+            
             # @TODO give the change type button an action
-            self.type_button = ttk.Button(self.frame, text="change")
+            self.type_button = ttk.Button(self.frame, text="change",
+                                          command=self.change_focused_test_type)
             self.type_button.grid(row=1, column=1, sticky='e')
+            
+            
             
             # set up for loop, offset is how many rows down the big
             # list of attributes should start
@@ -122,7 +127,6 @@ class TestView(ttk.Frame):
                     # show a check box
                     # @TODO the bind not be necessary
                     checkbutton = ttk.Checkbutton(self.frame, variable=attr.var)
-                    checkbutton.bind("<1>", lambda e, var=attr.var: print(not var.get()))
                     checkbutton.grid(row=i+offset, column=1)
                     
                     # add the checkbox and variable to a higher scoped list
@@ -138,7 +142,6 @@ class TestView(ttk.Frame):
                     
                     # space to enter the user's number
                     entry = ttk.Entry(self.frame, textvariable=attr.var)
-                    entry.bind("<Return>", lambda e, var=attr.var: print(var.get()))
                     entry.grid(row=i+offset, column=1)
                     
                     # label containing unit
@@ -161,7 +164,19 @@ class TestView(ttk.Frame):
     def run_simulation(self, *args):
         # print(self.parent.project)
         if self.parent.focused_test:
+            
+            # save working directory
+            working_dir = os.getcwd()
+            
+            # run script
+            for k,v in self.parent.focused_test.attribute_dict.items():
+                print(k, v)
+
             self.parent.focused_test.script()
+            
+            # return to old working directory
+            os.chdir(working_dir)
+            
         else:
             # @TODO make this more elegant
             print("No focused test to run a script for!")
@@ -169,12 +184,94 @@ class TestView(ttk.Frame):
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)
     
+    def change_focused_test_type(self):
+        
+        foc = self.parent.focused_test
+        
+        # create the change type window and make it hold onto focus
+        type_prompt_window = tk.Toplevel(self.parent)
+        type_prompt_window.transient(self.parent)
+        type_prompt_window.grab_set()
+        type_prompt_window.focus_force()
+        
+        # set window title, size, and resizability
+        type_prompt_window.title("Change Test Type")
+        # @TODO put window in center of parent window
+        type_prompt_window.geometry("+500+500")
+        type_prompt_window.resizable(False, False)
+        
+        ## section for putting in single gui elements
+        # add test name label
+        name_label = ttk.Label(type_prompt_window, text="Test Name: " + foc.name)
+        name_label.grid(row=0, column=0, columnspan=2, padx=4, pady=4)
+        
+        # add test type label
+        type_label = ttk.Label(type_prompt_window, text="Test Type")
+        type_label.grid(row=1, column=0, padx=4, pady=4)
+        
+        # add test type interactible combobox (aka dropdown menu)
+        type_var = tk.StringVar(type_prompt_window)
+        type_dropdown = ttk.Combobox(type_prompt_window, textvariable=type_var)
+        test_types = ("Voltage Reference", "Load Reference", "Current Interruption", "Speed Reference", "Steady State")
+        type_dropdown['values'] = test_types
+        # set default option to the current type
+        type_dropdown.current(test_types.index(foc.type))
+        # state = readonly makes it so the user cannot add test types
+        type_dropdown.state(['readonly'])
+        type_dropdown.grid(row=1, column=1, padx=4, pady=4)
+        
+        type_dropdown.focus_set()
+        
+        # create a hidden error label that can pop up when a planned error
+        # occurs (such as an empty entry or invalid characters)
+        err_label = ttk.Label(type_prompt_window)
+        err_label.grid(row=4, column=0, columnspan=2, padx=4, pady=4)
+        err_label.grid_remove()
+        
+        # function called by the create new test button, checks that the
+        # name and test entered are valid and  if so creates a new test
+        def change_type(event=None):
+            if type_var.get() == '':
+                err_label.config(text="Select a test type")
+                err_label.grid()
+            if type_var.get() == foc.type:
+                type_prompt_window.destroy()
+            else:
+                err_label.grid_remove()
+                
+                # add the test, destroy this window, and update the projectview
+                foc.type = type_var.get()
+                foc.test_defaults()
+                type_prompt_window.destroy()
+                self.show_focused_test()
+                self.parent.proj_frame.render()
+
+        # add a button for creating a new test
+        done_button = ttk.Button(type_prompt_window, text="Done",
+                                 command=change_type)
+        done_button.grid(row=3, column=0, columnspan=2, padx=4, pady=4)
+        
+        # usability keybinds to make the combobox and button interface
+        # more intuitive
+        done_button.bind("<Return>", change_type)
+        type_dropdown.bind("<Return>", lambda e: type_dropdown.event_generate('<Down>'))
+        type_dropdown.bind("<space>", lambda e: type_dropdown.event_generate('<Down>'))
+        type_dropdown.bind("<<ComboboxSelected>>", lambda e: done_button.focus())
+        
+    
     # get a new path for path type attributes
     # need to pick between input and output files because the file
     # picker has different behavior depending on if it's saving or
     # opening. uses tkinter.filedialog
+    # @TODO make this better with getting the extension
     def get_new_path(self, attr):
-        if attr.name[:3] in ('dyd', 'sav'):
+        if attr.name[:3] == 'mes':
+            path = askopenfilename(title=f"Select measured data file",
+                                   defaultextension="*.csv",
+                                   filetypes=[("Measured Data CSV File", f"*.csv"),
+                                              ("All Files", "*.*")]
+                                   )
+        elif attr.name[:3] in ('dyd', 'sav'):
             path = askopenfilename(title=f"Select {attr.name[:3]} file",
                                    defaultextension="*.*",
                                    filetypes=[("PSLF Input File", f"*.{attr.name[:3]}"),

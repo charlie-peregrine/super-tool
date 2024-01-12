@@ -82,7 +82,7 @@ class SuperToolGUI(tk.Tk):
     def keybinds(self):
         self.bind("<F5>", self.test_frame.run_simulation)
         self.bind("<Control-o>", self.open_project)
-        self.bind("<Control-s>", self.project.write_to_file_name)
+        self.bind("<Control-s>", self.save_project) 
         self.bind("<Control-S>", self.save_as_project)
         
     # helper method to set up the main file menu at the top of the
@@ -101,7 +101,7 @@ class SuperToolGUI(tk.Tk):
         # in the keybinds method
         file_menu.add_command(label="New Project", command=self.new_project, accelerator="ctrl+n") #@TODO make the accelerators do something
         file_menu.add_command(label="Open Project", command=self.open_project, accelerator="ctrl+o")
-        file_menu.add_command(label="Save Project", command=self.project.write_to_file_name, accelerator="ctrl+s")
+        file_menu.add_command(label="Save Project", command=self.save_project, accelerator="ctrl+s")
         file_menu.add_command(label="Save Project As", command=self.save_as_project, accelerator="ctrl+shift+s")
         file_menu.add_separator()
         file_menu.add_command(label="New Unit", command=print)
@@ -153,6 +153,27 @@ class SuperToolGUI(tk.Tk):
             self.proj_frame.render()
             self.focused_test = None
             self.test_frame.show_focused_test()
+    
+    # method called in project view
+    # shows a prompt for the user to rename the currently open project
+    def rename_project(self, e=None):
+        # entry popup
+        new_project_name = simpledialog.askstring(title="Rename Project",
+            prompt=f"Enter a new project name to replace\n{self.project.title}.")
+        if new_project_name:
+            # set the project name
+            self.project.title = new_project_name
+            # re-render project pane
+            self.proj_frame.render()
+
+
+    # method called by ctrl+shift+s and the file menu
+    # shows a prompt allowing the user to save to a pec file
+    def save_project(self, e=None):
+        if self.project.file_name:
+            self.project.write_to_file_name()
+        else:
+            self.save_as_project()
 
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file
