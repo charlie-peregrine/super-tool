@@ -12,7 +12,6 @@ import SuperToolProject as stp
 
 from ProjectView import ProjectView
 from TestView import TestView
-from PlotView import PlotView
 
 class SuperToolGUI(tk.Tk):
     def __init__(self):
