@@ -4,6 +4,8 @@
 import tkinter as tk
 from tkinter import ttk
 
+from SuperToolFrames import ScrollFrame
+
 # subclass of frame that holds the plot parameter view
 # the goal of this view is to allow the user to manipulate
 # the plotted graphs to be more visually appealing in order
@@ -24,6 +26,23 @@ class ParamView(ttk.Frame):
 
         self.graph_window = None
     
+        # self.scroller = ScrollFrame(self)
+        # self.scroll_frame = self.scroller.frame
+    
+        self.blobs = []
+        for i in range(4):
+            l = ttk.Label(self, text="hey " + str(i))
+            l.grid(row=1+i, column=0)
+            self.blobs.append(l)
+            
+            e1 = ttk.Entry(self)
+            e1.grid(row=1+i, column=1)
+            self.blobs.append(e1)
+            
+            e2 = ttk.Entry(self)
+            e2.grid(row=1+i, column=2)
+            self.blobs.append(e2)
+            
     def render(self):
         
         if not self.parent.focused_test:
