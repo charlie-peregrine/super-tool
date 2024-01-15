@@ -210,8 +210,8 @@ class Test:
                 ("Zbranch",         0,      'NUM'),   # pu
             ]
 
-            for n,v,t in attributes:
-                self.attribute_dict[n] = Attribute(n,v,t)
+            for a in attributes:
+                self.attribute_dict[a[0]] = Attribute(*a)
                             
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Voltage_Reference.run(self)
@@ -245,9 +245,8 @@ class Test:
                 ("Zbranch",             0,      'NUM'),
                 ]
             
-            for n,v,t in attributes:
-                # @TODO double check that n is already in the attribute dict
-                self.attribute_dict[n] = Attribute(n,v,t)
+            for a in attributes:
+                self.attribute_dict[a[0]] = Attribute(*a)
             
             self.script = lambda: Steady_State.run(self)
             
@@ -353,7 +352,7 @@ class Test:
 # attribute class that stores details like name, type, the measuring units,
 # and a tk variable that updates with the gui
 class Attribute:
-    def __init__(self, name, value, type_, unit='NO_UNITS'):
+    def __init__(self, name, value, type_, unit='NO_UNITS', *args):
         self.name = name
         self.type = type_
         self.unit = unit
