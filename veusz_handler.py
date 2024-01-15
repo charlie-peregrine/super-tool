@@ -4,6 +4,7 @@
 # blocks in them) to use the right headers and csv files
 
 
+VEUSZ_PATH = "C:/Program Files (x86)/Veusz/"
 # # importing veusz using importlib.util, not currently in use
 # try:
 #     import veusz.embed as veusz
@@ -23,7 +24,6 @@
 #     print(veusz)
 #     print("importlib.util worked")
 
-VEUSZ_PATH = "C:/Program Files (x86)/Veusz/"
 # @TODO add veusz_path to user path, prolly done in an install script
 
 import time
