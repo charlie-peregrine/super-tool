@@ -28,8 +28,7 @@ class Project:
     # recursing through the project tree
     def write(self, file):
         file.write("\t".join(
-            ["P", self.title,
-                self.file_name]
+            ["P", self.title]
             ) + "\n")
         for unit in self.units.values():
             unit.write(file)
@@ -52,7 +51,7 @@ class Project:
         line = lines.pop()
         print('p', line)
         if line[0] == "P":
-            _, self.title, self.file_name = line.split("\t")
+            self.title = line.split("\t")[1]
         else:
             raise ValueError("not a project")
         print(self)
