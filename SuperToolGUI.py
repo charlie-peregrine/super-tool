@@ -79,7 +79,8 @@ class SuperToolGUI(tk.Tk):
     def keybinds(self):
         self.bind("<F5>", self.test_frame.run_simulation)
         self.bind("<Control-o>", self.open_project)
-        self.bind("<Control-s>", self.save_project) 
+        self.bind("<Control-s>", self.save_project)
+        self.bind("<Control-n>", self.new_project)
         self.bind("<Control-S>", self.save_as_project)
         
     # helper method to set up the main file menu at the top of the
