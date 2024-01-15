@@ -270,24 +270,20 @@ class TestView(ttk.Frame):
     # opening. uses tkinter.filedialog
     # @TODO make this better with getting the extension
     def get_new_path(self, attr):
-        if attr.name[:3] == 'mes':
-            path = askopenfilename(title=f"Select measured data file",
-                                   defaultextension="*.csv",
-                                   filetypes=[("Measured Data CSV File", f"*.csv"),
-                                              ("All Files", "*.*")]
-                                   )
-        elif attr.name[:3] in ('dyd', 'sav'):
-            path = askopenfilename(title=f"Select {attr.name[:3]} file",
-                                   defaultextension="*.*",
-                                   filetypes=[("PSLF Input File", f"*.{attr.name[:3]}"),
-                                              ("All Files", "*.*")]
-                                   )
+        if attr.read_only_file:
+            path = askopenfilename(
+                title=f"Select input {attr.extension.upper()} file",
+                defaultextension=f"*.{attr.extension}",
+                filetypes=[(f"Input {attr.extension.upper()} File", f"*.{attr.extension}"),
+                           ("All Files", "*.*")]
+                )
         else:
-            path = asksaveasfilename(title=f"Choose file name and location for {attr.name[:3]} file",
-                                     defaultextension="*.*",
-                                     filetypes=[("PSLF Output File", f"*.{attr.name[:3]}"),
-                                              ("All Files", "*.*")]
-                                     )
+            path = asksaveasfilename(
+                title=f"Choose File Name and Location for Output {attr.extension.upper()} File",
+                defaultextension="*.*",
+                filetypes=[(f"PSLF Output {attr.extension.upper()} File", f"*.{attr.extension}"),
+                           ("All Files", "*.*")]
+                )
         
         if path:
             attr.var.set(path)

@@ -186,12 +186,12 @@ class Test:
         if self.type == "Voltage Reference":
             print("voltage ref in test_defaults: ", self.name)
             attributes = [
-                ("dyd_filename", '', 'PATH'),
-                ("sav_filename", '', 'PATH'),
-                ("chf_filename", '', 'PATH'),
-                ("csv_filename", '', 'PATH'),
-                ("rep_filename", 'Rep.rep', 'PATH'),
-                ("mes_filename", '', 'PATH'),
+                ("dyd_filename",    '',     'PATH',     True,   "dyd"),
+                ("sav_filename",    '',     'PATH',     True,   "sav"),
+                ("chf_filename",    '',     'PATH',     False,  "chf"),
+                ("csv_filename",    '',     'PATH',     False,  "csv"),
+                ("rep_filename",    '',     'PATH',     False,  "rep"),
+                ("mes_filename",    '',     'PATH',     True,   "csv"),
                 ("StepTimeInSecs",  0,       'NUM'),
                 ("UpStepInPU",      0,       'NUM'),
                 ("DnStepInPU",      0,       'NUM'),
@@ -226,21 +226,15 @@ class Test:
         elif self.type == "Steady State":
             print("steady state in test_defaults:", self.name)
             attributes = [
-                ("dyd_filename",        '',     'PATH'),
-                ("sav_filename",        '',     'PATH'),
-                ("chf_filename",        '',     'PATH'),
-                ("rep_filename",        'Rep.rep',     'PATH'),
-                ("in_filename",         '',     'PATH'),
-                ("out_filename",        '',     'PATH'),
-                # ("out_casename",        '',     'PATH'),
+                ("dyd_filename",        '',     'PATH',     True,   "dyd"),
+                ("sav_filename",        '',     'PATH',     True,   "sav"),
+                ("chf_filename",        '',     'PATH',     False,  "chf"),
+                ("rep_filename",        '',     'PATH',     False,  "rep"),
+                ("in_filename",         '',     'PATH',     True,   "csv"),
+                ("out_filename",        '',     'PATH',     False,  "csv"),
                 ("if_base",             0,      'NUM'),
                 ("if_res",              0,      'NUM'),
-                # ("SaveCaseFiles",       0,      'NUM'),
-                ("UseGenField",         False,      'BOOL'),
-                # ("Ifd_A",               0,      'NUM'),
-                # ("Ifd_pu",              0,      'NUM'),
-                # ("Efd_pu",              0,      'NUM'),
-                # ("ExcModIndex",         0,      'NUM'),
+                ("UseGenField",         False,  'BOOL'),
                 ("Vbase",               0,      'NUM'),
                 ("Zbranch",             0,      'NUM'),
                 ]
@@ -352,12 +346,15 @@ class Test:
 # attribute class that stores details like name, type, the measuring units,
 # and a tk variable that updates with the gui
 class Attribute:
-    def __init__(self, name, value, type_, unit='NO_UNITS', *args):
+    def __init__(self, name, value, type_, *args, unit='NO_UNITS'):
         self.name = name
         self.type = type_
         self.unit = unit
+        
         if type_ == 'PATH':
             self.var = tk.StringVar(value=value)
+            self.read_only_file = args[0]
+            self.extension = args[1]
         elif type_ == 'BOOL':
             self.var = tk.BooleanVar(value=value)
         else:
