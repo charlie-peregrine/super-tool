@@ -163,9 +163,13 @@ class Test:
         self.attribute_dict = {}
         
         # default script and plot that say that this test type isn't set up yet
-        self.script = lambda: print("No run script set up for this test")
-        self.plot = lambda: print("No plot script set up for this test")
+        self.script = lambda: print(f"No run script set up for this test of type '{self.type}'")
+        self.plot = lambda: print(f"No plot script set up for this test of type '{self.type}'")
         
+        # the default measured and simulated output files to be used in the 
+        # plotting functions 
+        self.plot_sim_file = ''
+        self.plot_mes_file = ''
         
         # depending on the chosen type, give the full set of default
         # attributes for that type.
@@ -175,7 +179,7 @@ class Test:
         # [print(i) for i in self.attribute_dict.values()]
         # for k,v in kwargs:
         #     self.attribute_dict[k] = v 
-        
+    
     # depending on the current test type set the default attributes of the test 
     def test_defaults(self):
         
@@ -216,10 +220,14 @@ class Test:
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Voltage_Reference.run(self)
             
+            # set plot files to grab from
+            self.plot_sim_file = 'csv_filename'
+            self.plot_mes_file = 'mes_filename'
+            
             # set the voltage reference plotter to use for the show graphs button
             self.plot = lambda : veusz_handler.plot_voltage_reference(
-                sim_file=self['csv_filename'],
-                mes_file=self['mes_filename']
+                sim_file=self[self.plot_sim_file],
+                mes_file=self[self.plot_mes_file]
             )
             
         
@@ -244,15 +252,16 @@ class Test:
             
             self.script = lambda: Steady_State.run(self)
             
+            # set plot file to grab from, there is no measured file since
+            # steady state does the silly 1 to 1 comparison plot
+            self.plot_sim_file = 'in_filename'
+            self.plot_mes_file = ''
+            
             # set the steady state plotter to use for the show graphs button
             self.plot = lambda : veusz_handler.plot_steady_state(
-                self['out_filename']
+                self[self.plot_sim_file]
             )
             
-        else:
-            # script changed to print out the current type info as well
-            self.script = lambda: print(f"No run script set up for this test of type '{self.type}'")
-            self.plot = lambda: print(f"No plot script set up for this test of type '{self.type}'")
     
     
     # internal write method to write a test and its attributes to a file
