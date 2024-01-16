@@ -7,4 +7,5 @@ __pycache__
 *.tmp
 *.rep
 *.xcf
+config.json
 Docs/Supertool Meeting Notes 12-15-2023.docx

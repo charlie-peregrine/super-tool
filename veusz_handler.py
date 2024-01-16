@@ -3,8 +3,9 @@
 # to veusz. Also modifies the fvsz (vsz files with python format
 # blocks in them) to use the right headers and csv files
 
+from config import *
 
-VEUSZ_PATH = "C:/Program Files (x86)/Veusz/"
+#VEUSZ_PATH = config.VEUSZ_PATH # "C:/Program Files (x86)/Veusz/"
 # # importing veusz using importlib.util, not currently in use
 # try:
 #     import veusz.embed as veusz
@@ -25,8 +26,6 @@ VEUSZ_PATH = "C:/Program Files (x86)/Veusz/"
 #     print("importlib.util worked")
 
 # @TODO add veusz_path to user path, prolly done in an install script
-
-import time
 
 import subprocess
 import re
@@ -162,7 +161,7 @@ def plot_voltage_reference(sim_file='', mes_file=''):
         with open("veusz_files/.blahg.vsz", 'w') as file:
             file.write(result_text)
 
-        process = subprocess.Popen('"' + VEUSZ_PATH + 'veusz.exe" ./veusz_files/.blahg.vsz') #, shell=True)
+        process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.blahg.vsz') #, shell=True)
         
         return process
         
@@ -186,7 +185,7 @@ def plot_steady_state(out_file):
     
     with open("veusz_files/.blahg.vsz", 'w') as file:
         file.write(result_text)
-    process = subprocess.Popen('"' + VEUSZ_PATH + 'veusz.exe" ./veusz_files/.blahg.vsz') #, shell=True)
+    process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.blahg.vsz') #, shell=True)
         
     return process
         
