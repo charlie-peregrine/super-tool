@@ -40,6 +40,8 @@ class TestView(ttk.Frame):
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
 
+
+        self.trace_data = []
         # show the focused test. note that when it's used in the initializer,
         # the "no test selected" text will always be shown since no test
         # is selected yet
@@ -53,6 +55,11 @@ class TestView(ttk.Frame):
         for widget in self.frame.winfo_children():
             widget.destroy()
         
+        # clear variable tracebacks for deleted buttons
+        for var, callback in self.trace_data:
+            var.trace_remove('write', callback)
+        self.trace_data.clear()
+
         # reset the scroller to the top of the frame
         # fixes a bug where when a large frame gets reset to a very small frame
         # the scrollbar would still act like the frame was large
@@ -104,12 +111,17 @@ class TestView(ttk.Frame):
                     path_label_hover = Hovertip(path_button, attr.var.get(), hover_delay=300)
                     
                     # set up traces for when the path variables update to modify the path label
-                    # separate functions needed because lambdas don't allow assignments
-                    attr.var.trace_add('write', lambda _1, _2, _3, l=path_button, v=attr.var: 
-                                        l.configure(text=basename(v.get())))
+                    # separate functions needed for clarity
+                    def update_button(_1, _2, _3, l=path_button, v=attr.var):
+                        l.configure(text=basename(v.get()))
+                    button_cb = attr.var.trace_add('write', update_button)
+                    
                     def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
                         l.text = v.get()
-                    attr.var.trace_add('write', update_hover) 
+                    hover_cb = attr.var.trace_add('write', update_hover)
+                    
+                    self.trace_data.append((attr.var, button_cb))
+                    self.trace_data.append((attr.var, hover_cb))
                     
                     # place a select button to get a new path
                     open_path_button = ttk.Button(self.frame, text="open",
