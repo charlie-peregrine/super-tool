@@ -18,7 +18,11 @@ if __name__ == '__main__':
         print("===== pywin32 Installed!")
     
     print("===== Finding veusz =====")
-    where_output = subprocess.check_output("where veusz").decode('utf-8').strip()
+    try:
+        where_output = subprocess.check_output("where veusz").decode('utf-8').strip()
+    except subprocess.CalledProcessError:
+        where_output = ''
+    
     dir = ''
     if where_output:
         print("===== Veusz Found!")
@@ -26,13 +30,17 @@ if __name__ == '__main__':
             where_output = where_output.split('\n')[0]
         dir = askopenfilename(
                 title="Find and select veusz.exe on your computer",
-                initialdir=os.path.dirname(where_output)
+                initialdir=os.path.dirname(where_output),
+                filetypes=[("Executable", "*.exe"),
+                           ("All Files", "*.*")]
                 )
         dir = os.path.dirname(dir)
     else:
         print("===== Veusz Not Found")
         dir = askopenfilename(
-                title="Find and select veusz.exe on your computer"
+                title="Find and select veusz.exe on your computer",
+                filetypes=[("Executable", "*.exe"),
+                           ("All Files", "*.*")]
                 )
         dir = os.path.dirname(dir)
 
