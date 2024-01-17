@@ -81,6 +81,7 @@ def run(test):
 
 
     #  This opens the CSV Output File for writing
+    csvInFormat = ""
     try:
         f = open(os.path.join(project_directory,out_filename), "w", newline='')
         csvOutFile = csv.writer(f)
@@ -109,6 +110,10 @@ def run(test):
         SuperTool.fatal_error(errmsg)
 
 
+    print("csvInData: ", csvInData)
+    print("length csvInData[0][1:3]: ",len(csvInData[0][1:3]))
+    print("length csvInData[1][1:3]: ",len(csvInData[1][1:3]))
+
     # if the first line is a header line then skip it
     try:
         float(csvInData[0][0])
@@ -119,18 +124,28 @@ def run(test):
     # if the first 2 lines are set up like it was printed
     # out by the spreadsheet ( first 2 rows 1 element, 3 elements every other row)
     # then act like it works like that @TODO prompt to override?
-    if csvInData[0][0] and csvInData[0][0] and \
-        csvInData[0][1:3] == csvInData[1][1:3] == ['', '']:
+    if  (csvInData[0][1:3] == [] and csvInData[1][1:3] == []) or \
+        (csvInData[0][1:3] == ['',''] and csvInData[1][1:3] == ['','']):
+            csvInFormat = "OLD"
             Vbase = float(csvInData[0][0])
             Zbranch = float(csvInData[1][0])
+            csvRowIndex=2
+            print("csvRowIndex", csvRowIndex)
             SuperTool.print_to_pslf(f"Using Vbase and Zbranch from {in_filename}")
+    else:
+        csvInFormat = "NEW"
     
     
+    print("csvinformat: ", csvInFormat)
+
     while(TRUE):
         # sets the measured generator quantities from the csv row into local variables
         Pgen  = float(csvInData[csvRowIndex][0])
         Qgen  = float(csvInData[csvRowIndex][1])
-        Vtgen = float(csvInData[csvRowIndex][2]) / Vbase # per unitize voltage
+        if(csvInFormat=="NEW"):
+            Vtgen = float(csvInData[csvRowIndex][2]) / Vbase # per unitize voltage
+        else:
+            Vtgen = float(csvInData[csvRowIndex][2])
         
         try:
             Efdgen = float(csvInData[csvRowIndex][3])
