@@ -254,7 +254,7 @@ class Test:
             
             # set plot file to grab from, there is no measured file since
             # steady state does the silly 1 to 1 comparison plot
-            self.plot_sim_file = 'in_filename'
+            self.plot_sim_file = 'out_filename'
             self.plot_mes_file = ''
             
             # set the steady state plotter to use for the show graphs button

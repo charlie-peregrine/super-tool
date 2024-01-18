@@ -86,7 +86,7 @@ def run(test):
         f = open(os.path.join(project_directory,out_filename), "w", newline='')
         csvOutFile = csv.writer(f)
         csvHeader = ['Load Point','P (MW)','Q (MVAR)','Vt (kV)','Ef (V)','If (A)','If-sim (pu)','If-meas (pu)', 'Diff (%)', 'Abs(Diff) (%)','','Vt-meas (pu)',
-                     'Vt-sim (pu)','BusV-sched (pu)','','Ef-sim (pu)','If-sim (pu)','Ef=If?',
+                     'Vt-sim (pu)','BusV-sched (pu)','','ef-sim (pu)','if-sim (pu)','Ef=If?',
                      'If-sim (A)']
         csvOutFile.writerow(csvHeader)
     except:
