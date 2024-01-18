@@ -158,10 +158,10 @@ def plot_voltage_reference(sim_file='', mes_file=''):
 
     if result_text:
         # @TODO make the filename unique enough
-        with open("veusz_files/.blahg.vsz", 'w') as file:
+        with open("veusz_files/.graph_output.vsz", 'w') as file:
             file.write(result_text)
 
-        process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.blahg.vsz') #, shell=True)
+        process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.graph_output.vsz') #, shell=True)
         
         return process
         
