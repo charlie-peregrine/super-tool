@@ -414,3 +414,4 @@ class ProjectView(ttk.Frame):
         if temp_test != self.parent.focused_test:
             self.parent.focused_test = temp_test
             self.parent.test_frame.show_focused_test()
+            self.parent.param_frame.render()
