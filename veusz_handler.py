@@ -183,9 +183,9 @@ def plot_steady_state(out_file):
     result_text = fvsz_text.format(filename=out_file, s_header=headers[6],
                                    m_header=headers[7])
     
-    with open("veusz_files/.blahg.vsz", 'w') as file:
+    with open("veusz_files/.graph_output.vsz", 'w') as file:
         file.write(result_text)
-    process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.blahg.vsz') #, shell=True)
+    process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.graph_output.vsz') #, shell=True)
         
     return process
         
