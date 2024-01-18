@@ -30,15 +30,19 @@ class SuperTool:
         Pslf.print_to_pslf(output)
         return
     
-
+    # custom exception for supertool errors
+    class SuperToolFatalError(Exception):
+        def __init__(self, message):
+            super().__init__(message)
+    
     def fatal_error(message):
         # prints error message to pslf console and terminal window
-        string1 = "Error: "
+        string1 = "SuperToolError: "
         string2 = " Exitting python simulation..."
         message = string1+message+string2
         print(message)
         SuperTool.print_to_pslf(message)
-        exit()
+        raise SuperTool.SuperToolFatalError(message)
 
 
     def pwd():
