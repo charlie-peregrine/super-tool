@@ -269,6 +269,7 @@ class TestView(ttk.Frame):
                 type_prompt_window.destroy()
                 self.show_focused_test()
                 self.parent.proj_frame.render()
+                self.parent.param_frame.render()
 
         # add a button for creating a new test
         done_button = ttk.Button(type_prompt_window, text="Done",

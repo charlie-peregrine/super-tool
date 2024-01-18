@@ -239,10 +239,7 @@ class Test:
             ]
             
             # set the voltage reference plotter to use for the show graphs button
-            self.plot = lambda : veusz_handler.plot_voltage_reference(
-                sim_file=self[self.plot_sim_file],
-                mes_file=self[self.plot_mes_file]
-            )
+            self.plot = veusz_handler.plot_voltage_reference
             
         
         elif self.type == "Steady State":
@@ -272,9 +269,7 @@ class Test:
             self.plot_mes_file = ''
             
             # set the steady state plotter to use for the show graphs button
-            self.plot = lambda : veusz_handler.plot_steady_state(
-                self[self.plot_sim_file]
-            )
+            self.plot = veusz_handler.plot_steady_state
             
     
     

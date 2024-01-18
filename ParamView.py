@@ -28,12 +28,12 @@ class ParamView(ttk.Frame):
         # self.scroller = ScrollFrame(self)
         # self.scroll_frame = self.scroller.frame
         self.sim_widgets = {}
-        self.mes_blobs = []
+        self.mes_widgets = {}
         
         self.sim_frame = ttk.Frame(self)
-        # self.mes_frame = ttk.Frame(self)
+        self.mes_frame = ttk.Frame(self)
         self.sim_frame.grid(row=1, column=0, sticky='nesw')
-        # self.mes_frame.grid(row=2, column=0, sticky='nesw')
+        self.mes_frame.grid(row=2, column=0, sticky='nesw')
         
         self.render()
         
@@ -42,88 +42,85 @@ class ParamView(ttk.Frame):
         foc = self.parent.focused_test
         
         self.sim_frame.grid_remove()
-        # self.mes_frame.grid_remove()
+        self.mes_frame.grid_remove()
         
+        self.sim_widgets.clear()
+
+        for widget in self.sim_frame.winfo_children():
+            widget.destroy()
+        
+        def build_frame(plot_name, frame, widgets):
+            # @TODO error check for multiplication menu (support +,-,/,*)
+                
+            with open(foc[plot_name], 'r') as file:
+                header_list = [s.strip() for s in file.readline()[:-2].split(',')]
+                header_text = '\n'.join(header_list)
+                max_width = max([len(s) for s in header_list] + [20])
+                max_width = int(max_width * .75)
+            
+            
+            for i, (key, regex, longname) in enumerate(foc.header_info):
+                longname_label = ttk.Label(frame, text=longname)
+                longname_label.grid(row=1+i, column=0)
+                
+                # @TODO save user input headers instead of finding them
+                found_headers = re.findall(regex, header_text, flags=re.IGNORECASE)
+                    
+                header_dropdown = ttk.Combobox(
+                    frame, values=header_list, width=max_width, 
+                    state='readonly'
+                )
+                if found_headers:
+                    found_header = found_headers[0]
+                    header_dropdown.current(header_list.index(found_header))
+                header_dropdown.grid(row=1+i, column=1)
+                
+                expr_entry = ttk.Entry(frame, width=7)
+                expr_entry.grid(row=1+i, column=2)
+                
+                widgets[key] = (longname_label, header_dropdown, expr_entry)
+            
+            frame.grid()
+                
         
         if foc:
+            # @TODO watch foc[foc.plot_sim_file] to update sim frame if necessary
             if foc.plot_sim_file and foc[foc.plot_sim_file]:
-                # build sim frame. need:
-                    # plot that needs a header
-                    # header dropdown menu
-                    # multiplication menu (support +,-,/,*)
-                self.sim_widgets.clear()
-        
-                for widget in self.sim_frame.winfo_children():
-                    widget.destroy()
-                
-                with open(foc[foc.plot_sim_file], 'r') as file:
-                    header_list = [s.strip() for s in file.readline()[:-2].split(',')]
-                    header_text = '\n'.join(header_list)
-                    max_width = max([len(s) for s in header_list] + [20])
-                    max_width = int(max_width * .75)
-                
-                
-                for i, (key, regex, longname) in enumerate(foc.header_info):
-                    sim_label = ttk.Label(self.sim_frame, text=longname)
-                    sim_label.grid(row=1+i, column=0)
-                    
-                    # @TODO save user input headers instead of finding them
-                    found_headers = re.findall(regex, header_text, flags=re.IGNORECASE)
-                        
-                    sim_dropdown = ttk.Combobox(
-                        self.sim_frame, values=header_list, width=max_width, 
-                        state='readonly'
-                    )
-                    if found_headers:
-                        found_header = found_headers[0]
-                        sim_dropdown.current(header_list.index(found_header))
-                    sim_dropdown.grid(row=1+i, column=1)
-                    
-                    sim_entry = ttk.Entry(self.sim_frame, width=7)
-                    sim_entry.grid(row=1+i, column=2)
-                    
-                    self.sim_widgets[key] = (sim_label, sim_dropdown, sim_entry)
-                
-                self.sim_frame.grid()
-                
-                self.show_simulated_headers()
+                build_frame(foc.plot_sim_file, self.sim_frame, self.sim_widgets)
+            
+            if foc.plot_mes_file and foc[foc.plot_mes_file]:
+                build_frame(foc.plot_mes_file, self.mes_frame, self.mes_widgets)
             
             # if foc.plot_mes_file:
             #     self.show_measured_headers()
 
-    def show_simulated_headers(self):
-        foc = self.parent.focused_test
-        
-        
-
-    # def show_measured_headers(self):
-        
-    #     self.mes_blobs.clear()
-        
-    #     for widget in self.mes_frame.winfo_children():
-    #         widget.destroy()
-
-    #     self.mes_frame.grid()
-    #     for i in range(4):
-    #         l = ttk.Label(self.mes_frame, text="hey " + str(i))
-    #         l.grid(row=4+i, column=0)
-    #         self.mes_blobs.append(l)
-            
-    #         e1 = ttk.Combobox(self.mes_frame)
-    #         e1.grid(row=4+i, column=1)
-    #         self.mes_blobs.append(e1)
-            
-    #         e2 = ttk.Entry(self.mes_frame)
-    #         e2.grid(row=4+i, column=2)
-    #         self.mes_blobs.append(e2)
     
     def graph(self):
         
-        if not self.parent.focused_test:
+        foc = self.parent.focused_test
+        
+        if not foc:
             print("no focused test yet")
             return
         
-        self.parent.focused_test.plot()
+        sim_data = {}
+        if self.sim_widgets:
+            for k, (l,d,e) in self.sim_widgets.items():
+                sim_data[k] = (d.get(), e.get())
+            sim_data['file'] = (foc[foc.plot_sim_file], '')
         
+        print(sim_data)
         
+        mes_data = {}
+        if self.mes_widgets:
+            for k, (l,d,e) in self.mes_widgets.items():
+                mes_data[k] = (d.get(), e.get())
+            mes_data['file'] = (foc[foc.plot_mes_file], '')
         
+        print(mes_data)
+        
+        foc.plot(sim_dict=sim_data, mes_dict=mes_data)
+        
+    
+    def get_mes_header_info(self):
+        return {}
