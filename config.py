@@ -63,7 +63,7 @@ if __name__ == '__main__':
              message="Configuration complete!\nClick Ok to finish.")
     
 
-print("===== loading config.ini =====")
+print("===== loading config.json =====")
 try:
     config_data = json.load(open('config.json', 'r'))
 except FileNotFoundError:
@@ -73,4 +73,4 @@ except FileNotFoundError:
 
 VEUSZ_PATH = config_data['VEUSZ_PATH']
 
-print("===== config.ini loaded =====")
+print("===== config.json loaded =====")
