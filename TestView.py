@@ -183,6 +183,11 @@ class TestView(ttk.Frame):
         # print(self.parent.project)
         if self.parent.focused_test:
             
+            # @TODO Right here we should do something to check if
+            # @TODO Pslf.exe is still running with no window,
+            # @TODO because it will cause a crash because 
+            # @TODO pslf still thinks it's still got a gui but it DOESNT
+            
             # save working directory
             working_dir = os.getcwd()
             

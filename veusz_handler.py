@@ -179,13 +179,13 @@ def plot_steady_state(out_file):
     with open(out_file, 'r') as file:
         headers = [s.strip() for s in file.readline().split(',')]
 
-    # 6 -> sim, 9 -> measured
+    # 6 -> sim, 7 -> measured
     result_text = fvsz_text.format(filename=out_file, s_header=headers[6],
-                                   m_header=headers[9])
+                                   m_header=headers[7])
     
-    with open("veusz_files/.blahg.vsz", 'w') as file:
+    with open("veusz_files/.graph_output.vsz", 'w') as file:
         file.write(result_text)
-    process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.blahg.vsz') #, shell=True)
+    process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.graph_output.vsz') #, shell=True)
         
     return process
         
