@@ -35,16 +35,18 @@ class SuperTool:
         def __init__(self, message):
             super().__init__(message)
     
+    @staticmethod
     def fatal_error(message):
         # prints error message to pslf console and terminal window
-        string1 = "SuperToolError: "
-        string2 = " Exitting python simulation..."
+        string1 = "Error: "
+        string2 = "\nExitting python simulation..."
         message = string1+message+string2
         print(message)
         SuperTool.print_to_pslf(message)
         raise SuperTool.SuperToolFatalError(message)
 
 
+    @staticmethod
     def pwd():
         # print working directory and project directory
         project_directory = os.path.dirname(os.path.realpath(__file__))
@@ -55,6 +57,7 @@ class SuperTool:
         return
     
 
+    @staticmethod
     def launch_Pslf(project_directory, silent=False):
         # launches pslf gui      
         os.chdir(project_directory) # changes the python working directory to the project directory
@@ -70,12 +73,14 @@ class SuperTool:
         return
     
 
+    @staticmethod
     def psds():
         # clears the pslf dynamic memory
         ret = Pslf.clear_dyn_memory()
         return ret
 
     
+    @staticmethod
     def getf(sav_filename):
         # loads a sav file into pslf
         Pslf.print_to_pslf("getf()\n")
@@ -89,6 +94,7 @@ class SuperTool:
         return ret
     
 
+    @staticmethod
     def setf(Pgen,Qgen,MVAbase,Vgen,Vbase,Zbranch,set_flow,sav_flow,sav_name):
         Pslf.print_to_pslf("setf()\n")
         Generator[0].Mbase = MVAbase # sets generator mva base
@@ -101,6 +107,7 @@ class SuperTool:
                 Pslf.save_case(sav_name)
     
 
+    @staticmethod
     def soln(option):
         # attempts to solve the loadflow
         Pslf.print_to_pslf("soln()\n")
@@ -110,6 +117,7 @@ class SuperTool:
         return ret
     
     
+    @staticmethod
     def rdyd(file, report, setup_flag, sort_flag, read_mva_flag):
         # rdyd() equivalent - attempts to read dyd file
         Pslf.print_to_pslf("rdyd()")
@@ -119,6 +127,7 @@ class SuperTool:
         return ret
     
     
+    @staticmethod
     def init(channel_file, init_report_file, fix_bad_data, turn_off_unused_models, in_run_epcl, violation_criteria_file, load_net):
         # init() equivalent
         Pslf.print_to_pslf("init()")
@@ -128,6 +137,7 @@ class SuperTool:
         return ret
 
     
+    @staticmethod
     def turn_off_pss(dp):
         # turns off pss model in the .dyd. Argument is dp = DynamicsParameters()
         for i in range(dp.Nmodels):
@@ -137,6 +147,7 @@ class SuperTool:
         return
 
 
+    @staticmethod
     def set_gens_ID(dp):
     # this function is not yet working. I want it to read the ID of the generators in the
     # dyd file and compare it to the ID of the generators in the sav, and then return 
@@ -155,6 +166,7 @@ class SuperTool:
                 gensIndex+=1
         return
 
+    @staticmethod
     def chf_to_csv(csv_filename):
         # converts chf to csv
         ret = Pslf.channel_to_csv(True, False, "", csv_filename)
@@ -165,6 +177,7 @@ class SuperTool:
         return ret
     
 
+    @staticmethod
     def set_loadflow_parameters(Pgen,Qgen,Vgen,Vbase,Zbranch):
         # sets/solves the .save case P, Q, V, Zbranch parameters
         SuperTool.print_to_pslf("set_loadflow_parameters()")
@@ -186,6 +199,7 @@ class SuperTool:
         return
 
 
+    @staticmethod
     def adjust_bus_kV(vTarget):
         # Adjusts scheduled voltage and solve until bus voltage matches target voltage 
         # returns 0 if success, -1 if failure
@@ -218,6 +232,7 @@ class SuperTool:
         return
     
 
+    @staticmethod
     def construct_default_loadflow(sav_filename):
         # future function - builds the loadflow 
 
@@ -228,4 +243,4 @@ class SuperTool:
         Pslf.save_case(sav_filename) # Creates new sav case 
 
         return
-    
+
