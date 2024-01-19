@@ -215,8 +215,8 @@ def run(test):
                         round(Ifd_A,2)]
         else:
             # generate row to write
-            csvOutData = [csvRowIndex-1, Pgen, Qgen, round(Vtgen*Vbase,2), round(Efdgen,2), 
-                        round(Ifdgen,2), round(Ifd_pu,3), round(Ifd_pu_meas,3),'%','%',
+            csvOutData = [csvRowIndex-1, Pgen, Qgen, round(Vtgen*Vbase,2), '###', 
+                        '###', round(Ifd_pu,3), '###','###%','###%',
                         '',
                         round(Vtgen,3), round(Bus[0].Vm,3),round(Bus[1].Vsched,3),
                         '',
