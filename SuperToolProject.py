@@ -268,6 +268,12 @@ class Test:
             self.plot_sim_file = 'out_filename'
             self.plot_mes_file = ''
             
+            self.header_info = [
+                ('time', r'.*time.*', "Time (x)"),
+                ('sim',   r'.*If-sim \(pu\).*',     "Voltage (y)"),
+                ('mes',   r'.*If-meas \(pu\).*',     "P (y)")
+            ]
+            
             # set the steady state plotter to use for the show graphs button
             self.plot = veusz_handler.plot_steady_state
             

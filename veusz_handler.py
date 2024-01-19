@@ -185,21 +185,28 @@ def plot_voltage_reference(*, sim_dict={}, mes_dict={}): #sim_file='', mes_file=
         
         # process.kill()
 
-def plot_steady_state(out_file, _=None):
+def plot_steady_state(sim_dict={}, mes_dict=None):
     
-    if not out_file:
+    if not sim_dict:
         print("no file to get steady state graphs from! uh oh")
         return
+    
+    for k,v in sim_dict.items():
+        print(k, v, sim_dict[k])
+        if v[1]:
+            sim_dict[k] = '`' + v[0] + '`' + v[1]
+        elif v[0]:
+            sim_dict[k] = v[0]
+        else:
+            sim_dict[k] = 'y'
     
     with open("veusz_files/Steady_State.fvsz", 'r') as file:
         fvsz_text = file.read()
 
-    with open(out_file, 'r') as file:
-        headers = [s.strip() for s in file.readline().split(',')]
-
-    # 6 -> sim, 7 -> measured
-    result_text = fvsz_text.format(filename=out_file, s_header=headers[6],
-                                   m_header=headers[7])
+    result_text = fvsz_text.format(filename=sim_dict['file'], s_header=sim_dict['sim'],
+                                   m_header=sim_dict['mes'])
+    
+    print("If there is no if and ef supplied to the script then veusz will complain here")
     
     with open("veusz_files/.graph_output.vsz", 'w') as file:
         file.write(result_text)
