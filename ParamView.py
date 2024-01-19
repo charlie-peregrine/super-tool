@@ -39,61 +39,72 @@ class ParamView(ttk.Frame):
         
     def render(self):
         
-        foc = self.parent.focused_test
-        
-        self.sim_frame.grid_remove()
-        self.mes_frame.grid_remove()
-        
-        self.sim_widgets.clear()
+        self.render_sim_frame()
+        self.render_mes_frame()
 
+
+    def render_sim_frame(self):
+        self.sim_frame.grid_remove()
+        self.sim_widgets.clear()
         for widget in self.sim_frame.winfo_children():
             widget.destroy()
         
-        def build_frame(plot_name, frame, widgets):
-            # @TODO error check for multiplication menu (support +,-,/,*)
-                
-            with open(foc[plot_name], 'r') as file:
-                header_list = [s.strip() for s in file.readline()[:-2].split(',')]
-                header_text = '\n'.join(header_list)
-                max_width = max([len(s) for s in header_list] + [20])
-                max_width = int(max_width * .75)
-            
-            
-            for i, (key, regex, longname) in enumerate(foc.header_info):
-                longname_label = ttk.Label(frame, text=longname)
-                longname_label.grid(row=1+i, column=0)
-                
-                # @TODO save user input headers instead of finding them
-                found_headers = re.findall(regex, header_text, flags=re.IGNORECASE)
-                    
-                header_dropdown = ttk.Combobox(
-                    frame, values=header_list, width=max_width, 
-                    state='readonly'
-                )
-                if found_headers:
-                    found_header = found_headers[0]
-                    header_dropdown.current(header_list.index(found_header))
-                header_dropdown.grid(row=1+i, column=1)
-                
-                expr_entry = ttk.Entry(frame, width=7)
-                expr_entry.grid(row=1+i, column=2)
-                
-                widgets[key] = (longname_label, header_dropdown, expr_entry)
-            
-            frame.grid()
-                
+        foc = self.parent.focused_test
         
         if foc:
             # @TODO watch foc[foc.plot_sim_file] to update sim frame if necessary
             if foc.plot_sim_file and foc[foc.plot_sim_file]:
-                build_frame(foc.plot_sim_file, self.sim_frame, self.sim_widgets)
+                self.build_frame(foc.plot_sim_file, self.sim_frame, self.sim_widgets)
+    
+    def render_mes_frame(self):
+        self.mes_frame.grid_remove()
+        self.mes_widgets.clear()
+        for widget in self.mes_frame.winfo_children():
+            widget.destroy()
+        
+        foc = self.parent.focused_test
             
+        if foc:
             if foc.plot_mes_file and foc[foc.plot_mes_file]:
-                build_frame(foc.plot_mes_file, self.mes_frame, self.mes_widgets)
+                self.build_frame(foc.plot_mes_file, self.mes_frame, self.mes_widgets)
+        
             
-            # if foc.plot_mes_file:
-            #     self.show_measured_headers()
 
+    # subroutine to make building cleaner
+    def build_frame(self, plot_name, frame, widgets):
+        # @TODO error check for multiplication menu (support +,-,/,*)
+        
+        foc = self.parent.focused_test
+        
+        with open(foc[plot_name], 'r') as file:
+            header_list = [s.strip() for s in file.readline()[:-2].split(',')]
+            header_text = '\n'.join(header_list)
+            max_width = max([len(s) for s in header_list] + [20])
+            max_width = int(max_width * .75)
+        
+        
+        for i, (key, regex, longname) in enumerate(foc.header_info):
+            longname_label = ttk.Label(frame, text=longname)
+            longname_label.grid(row=1+i, column=0)
+            
+            # @TODO save user input headers instead of finding them
+            found_headers = re.findall(regex, header_text, flags=re.IGNORECASE)
+                
+            header_dropdown = ttk.Combobox(
+                frame, values=header_list, width=max_width, 
+                state='readonly'
+            )
+            if found_headers:
+                found_header = found_headers[0]
+                header_dropdown.current(header_list.index(found_header))
+            header_dropdown.grid(row=1+i, column=1)
+            
+            expr_entry = ttk.Entry(frame, width=7)
+            expr_entry.grid(row=1+i, column=2)
+            
+            widgets[key] = (longname_label, header_dropdown, expr_entry)
+        
+        frame.grid()
     
     def graph(self):
         

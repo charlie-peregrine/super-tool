@@ -311,3 +311,7 @@ class TestView(ttk.Frame):
         
         if path:
             attr.var.set(path)
+            if attr.name == self.parent.focused_test.plot_sim_file:
+                self.parent.param_frame.render_sim_frame()
+            if attr.name == self.parent.focused_test.plot_mes_file:
+                self.parent.param_frame.render_mes_frame()
