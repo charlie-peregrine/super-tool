@@ -171,6 +171,8 @@ class Test:
         self.plot_sim_file = ''
         self.plot_mes_file = ''
         
+        self.header_info = []
+        
         # depending on the chosen type, give the full set of default
         # attributes for that type.
         self.test_defaults()
@@ -224,11 +226,20 @@ class Test:
             self.plot_sim_file = 'csv_filename'
             self.plot_mes_file = 'mes_filename'
             
+            # set header info for this test type
+            # format is (key, regular expression, long name)
+            self.header_info = [
+                ('time', r'.*time.*', "Time (x)"),
+                ('vt',   r'(?=.*vt)(?=.*1)(?=.*gen).*',     "Voltage (y)"),
+                ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
+                ('qg',   r'(?=.*qg)(?=.*1)(?=.*gen).*',     "Q (y)"),
+                ('efd',  r'(?=.*efd)(?=.*1)(?=.*gen).*',    "EFD (y)"),
+                ('ifd',  r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*',    "IFD (y)"),
+                
+            ]
+            
             # set the voltage reference plotter to use for the show graphs button
-            self.plot = lambda : veusz_handler.plot_voltage_reference(
-                sim_file=self[self.plot_sim_file],
-                mes_file=self[self.plot_mes_file]
-            )
+            self.plot = veusz_handler.plot_voltage_reference
             
         
         elif self.type == "Steady State":
@@ -257,10 +268,14 @@ class Test:
             self.plot_sim_file = 'out_filename'
             self.plot_mes_file = ''
             
+            self.header_info = [
+                ('time', r'.*time.*', "Time (x)"),
+                ('sim',   r'.*If-sim \(pu\).*',     "Voltage (y)"),
+                ('mes',   r'.*If-meas \(pu\).*',     "P (y)")
+            ]
+            
             # set the steady state plotter to use for the show graphs button
-            self.plot = lambda : veusz_handler.plot_steady_state(
-                self[self.plot_sim_file]
-            )
+            self.plot = veusz_handler.plot_steady_state
             
     
     

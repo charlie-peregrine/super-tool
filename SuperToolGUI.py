@@ -9,6 +9,7 @@ import tkinter.filedialog  as fd
 from superbackend import *
 from SuperToolFrames import *
 import SuperToolProject as stp
+from config import *
 
 from ProjectView import ProjectView
 from TestView import TestView
@@ -139,6 +140,7 @@ class SuperToolGUI(tk.Tk):
             # clear test view
             self.focused_test = None
             self.test_frame.show_focused_test()
+            self.param_frame.render()
     
     # method called by ctrl+o and the file menu
     # shows a prompt allowing the user to select a pec file to open
@@ -151,6 +153,7 @@ class SuperToolGUI(tk.Tk):
             self.proj_frame.render()
             self.focused_test = None
             self.test_frame.show_focused_test()
+            self.param_frame.render()
     
     # method called in project view
     # shows a prompt for the user to rename the currently open project

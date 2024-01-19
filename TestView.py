@@ -164,8 +164,13 @@ class TestView(ttk.Frame):
                     # add the entry to a higher scoped list
                     # @TODO is attr.var necessary?
                     self.interactibles.append((entry, attr.var))
-                
             
+            # if focused.plot_sim_file:
+            #     attr = focused.attribute_dict[focused.plot_sim_file]
+            #     trace = attr.var.trace_add('write', lambda a_, b_, c_:
+            #         self.parent.param_frame.show_simulated_headers())
+            #     self.trace_data.append((attr.var, trace))
+                
         else:
             # if there's no focused test, show that no test is selected
             # @TODO probably a memory leak due to dropping the old no_test_label
@@ -202,6 +207,7 @@ class TestView(ttk.Frame):
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)
     
+    # @TODO change the comments in here oopsie
     def change_focused_test_type(self):
         
         foc = self.parent.focused_test
@@ -263,6 +269,7 @@ class TestView(ttk.Frame):
                 type_prompt_window.destroy()
                 self.show_focused_test()
                 self.parent.proj_frame.render()
+                self.parent.param_frame.render()
 
         # add a button for creating a new test
         done_button = ttk.Button(type_prompt_window, text="Done",
@@ -304,3 +311,7 @@ class TestView(ttk.Frame):
         
         if path:
             attr.var.set(path)
+            if attr.name == self.parent.focused_test.plot_sim_file:
+                self.parent.param_frame.render_sim_frame()
+            if attr.name == self.parent.focused_test.plot_mes_file:
+                self.parent.param_frame.render_mes_frame()
