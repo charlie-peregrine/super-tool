@@ -269,7 +269,6 @@ class Test:
             self.plot_mes_file = ''
             
             self.header_info = [
-                ('time', r'.*time.*', "Time (x)"),
                 ('sim',   r'.*If-sim \(pu\).*',     "Voltage (y)"),
                 ('mes',   r'.*If-meas \(pu\).*',     "P (y)")
             ]
