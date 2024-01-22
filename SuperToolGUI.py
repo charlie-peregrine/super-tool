@@ -8,7 +8,7 @@ import tkinter.filedialog  as fd
 
 from superbackend import *
 from SuperToolFrames import *
-import SuperToolProject as stp
+import Project as stp
 from config import *
 
 from ProjectView import ProjectView
