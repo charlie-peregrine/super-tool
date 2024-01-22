@@ -3,9 +3,9 @@
 # Super Tool Project. Handles reading and writing to save
 # files and storing test, unit, and plot data
 
-from Unit import *
-from Test import *
-from Attribute import *
+from supertool.SuperToolProject.Unit import Unit
+from supertool.SuperToolProject.Test import Test
+from supertool.SuperToolProject.Attribute import Attribute
 
 # main class that holds information of units and tests
 # contains title and filename of the project, as well as 

@@ -3,12 +3,13 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
-from SuperToolFrames import ScrollFrame
-from os.path import basename
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from idlelib.tooltip import Hovertip
 
+from os.path import basename
 import os
+
+from supertool.SuperToolFrames import ScrollFrame
 
 # Frame subclass for presenting and receving info regarding
 # individual tests and their attributes

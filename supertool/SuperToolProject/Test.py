@@ -1,10 +1,10 @@
 # Test.py, Charlie Jordan, 1/22/2024
 # class that contains tests for the supertool gui
 
-from pslf_scripts import Voltage_Reference, Steady_State
-import veusz_handler
+from supertool.pslf_scripts import Voltage_Reference, Steady_State
+import supertool.veusz_handler as veusz_handler
 
-from Attribute import *
+from supertool.SuperToolProject.Attribute import Attribute
 
 # test class that contains a test, its name, type, and parent unit,
 # a dictionary of attributes, and a script to run based on the type
@@ -168,6 +168,8 @@ class Test:
             if not a:
                 break
             name, val = a
+            
+            #@TODO somewhere here check if the file exists
             
             if name not in self.attribute_dict:
                 print(f"error: {name} not a valid test attribute. it will be ignored.")

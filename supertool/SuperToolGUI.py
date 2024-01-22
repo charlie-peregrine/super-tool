@@ -6,14 +6,13 @@ from tkinter import ttk
 from tkinter import simpledialog
 import tkinter.filedialog  as fd
 
-from superbackend import *
-from SuperToolFrames import *
-import Project as stp
+from supertool.SuperToolFrames import *
+import supertool.SuperToolProject.Project as stproject
 from config import *
 
-from ProjectView import ProjectView
-from TestView import TestView
-from ParamView import ParamView
+from supertool.ProjectView import ProjectView
+from supertool.TestView import TestView
+from supertool.ParamView import ParamView
 
 class SuperToolGUI(tk.Tk):
     def __init__(self):
@@ -30,7 +29,7 @@ class SuperToolGUI(tk.Tk):
 
         # project is the backend project object that the ui interacts with
         # focused_test is the test to show in the test_view panel
-        self.project = stp.Project()
+        self.project = stproject.Project()
         self.focused_test = None
         
         # run the helper methods to set up widgets and full window keybinds
@@ -105,8 +104,8 @@ class SuperToolGUI(tk.Tk):
         file_menu.add_separator()
         file_menu.add_command(label="New Unit", command=print)
         file_menu.add_command(label="New Test")
-        file_menu.add_separator()
-        file_menu.add_command(label="Open Workspace", command=open_workspace)
+        # file_menu.add_separator()
+        # file_menu.add_command(label="Open Workspace", command=open_workspace)
         file_menu.add_separator()
         file_menu.add_command(label='Exit', command=self.destroy)
 
@@ -134,7 +133,7 @@ class SuperToolGUI(tk.Tk):
         if new_project_name:
             # delete current project class
             del self.project
-            self.project = stp.Project(new_project_name)
+            self.project = stproject.Project(new_project_name)
             # re-render project pane
             self.proj_frame.render()
             # clear test view
@@ -183,8 +182,3 @@ class SuperToolGUI(tk.Tk):
         if filename:
             self.project.file_name = filename
             self.project.write_to_file_name()
-
-# make the program run if it is called as the main python file
-if __name__ == "__main__":
-    gui = SuperToolGUI()
-    gui.mainloop()

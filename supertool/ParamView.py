@@ -5,7 +5,7 @@ import re
 import tkinter as tk
 from tkinter import ttk
 
-from SuperToolFrames import ScrollFrame
+from supertool.SuperToolFrames import ScrollFrame
 
 # subclass of frame that holds the plot parameter view
 # the goal of this view is to allow the user to manipulate

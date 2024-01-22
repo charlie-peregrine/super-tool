@@ -4,10 +4,11 @@
 
 import tkinter as tk
 from tkinter import ttk
-from SuperToolFrames import ScrollFrame
 # @TODO replace messagebox and simpledialog with more robust windows
 from tkinter import messagebox
 from tkinter import simpledialog
+
+from supertool.SuperToolFrames import ScrollFrame
 
 # subclass of frame, used to hold a nested visual structure of the
 # underlying SuperToolProject object, and allow the user to manipulate

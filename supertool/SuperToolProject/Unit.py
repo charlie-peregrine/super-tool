@@ -3,7 +3,7 @@
 # contain tests
 
 
-from Test import *
+from supertool.SuperToolProject.Test import Test
 
 # class containing a unit, its information, and its tests
 class Unit:
