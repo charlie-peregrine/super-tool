@@ -269,8 +269,8 @@ class Test:
             self.plot_mes_file = ''
             
             self.header_info = [
-                ('sim',   r'.*If-sim \(pu\).*',     "Voltage (y)"),
-                ('mes',   r'.*If-meas \(pu\).*',     "P (y)")
+                ('mes',   r'.*If-meas \(pu\).*',     "Measured If (x)"),
+                ('sim',   r'.*If-sim \(pu\).*',     "Simulated If (y)")
             ]
             
             # set the steady state plotter to use for the show graphs button
