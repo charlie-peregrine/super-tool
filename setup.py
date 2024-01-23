@@ -3,12 +3,11 @@
 
 import json
 import os
-from tkinter.messagebox import showwarning, showinfo
+from tkinter.messagebox import showinfo
 
 if __name__ == '__main__':
     from tkinter.filedialog import askopenfilename
     import subprocess
-    import time
     
     try:
         import win32
@@ -57,22 +56,10 @@ if __name__ == '__main__':
     #     print("===== Veusz found on PATH!")
         
     
-    json.dump({"VEUSZ_PATH" : dir}, open('config.json', 'w'), indent=4)
+    
+    json_dict = {"VEUSZ_PATH" : dir}
+    json.dump(json_dict, open('config.json', 'w'), indent=4)
     print("Configuration Saved!")
     showinfo(title="Configuration complete",
              message="Configuration complete!\nClick Ok to finish.")
     
-
-print("===== loading config.json =====")
-try:
-    config_data = json.load(open('config.json', 'r'))
-except FileNotFoundError:
-    showwarning(title="Un-configured Installation",
-        message="No Configuration file created yet. Please run config.py first.")
-    exit()
-
-VEUSZ_PATH = config_data['VEUSZ_PATH']
-MY_ENV = os.environ.copy()
-MY_ENV["PATH"] += VEUSZ_PATH + ';'
-
-print("===== config.json loaded =====")
