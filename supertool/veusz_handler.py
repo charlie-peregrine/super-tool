@@ -179,7 +179,7 @@ def plot_voltage_reference(*, sim_dict={}, mes_dict={}): #sim_file='', mes_file=
         with open("veusz_files/.graph_output.vsz", 'w') as file:
             file.write(result_text)
 
-        process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.graph_output.vsz') #, shell=True)
+        process = subprocess.Popen('veusz.exe ./veusz_files/.graph_output.vsz', env=MY_ENV, shell=True)
         
         return process
         
@@ -210,7 +210,7 @@ def plot_steady_state(sim_dict={}, mes_dict=None):
     
     with open("veusz_files/.graph_output.vsz", 'w') as file:
         file.write(result_text)
-    process = subprocess.Popen('"' + VEUSZ_PATH + '/veusz.exe" ./veusz_files/.graph_output.vsz') #, shell=True)
+    process = subprocess.Popen('veusz.exe ./veusz_files/.graph_output.vsz', env=MY_ENV, shell=True)
         
     return process
         

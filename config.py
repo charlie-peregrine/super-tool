@@ -2,11 +2,11 @@
 
 
 import json
+import os
 from tkinter.messagebox import showwarning, showinfo
 
 if __name__ == '__main__':
     from tkinter.filedialog import askopenfilename
-    import os
     import subprocess
     import time
     
@@ -44,17 +44,17 @@ if __name__ == '__main__':
                 )
         dir = os.path.dirname(dir)
 
-    print("===== Finding Veusz on PATH =====")
-    user_path = subprocess.check_output("echo %PATH%", shell=True).decode('utf-8')
-    win_dir = dir.replace('/','\\')
-    if win_dir not in user_path:
-        print("===== Veusz not found on PATH. Prompt user.")
-        showinfo(title="Add to path",
-                    message=f"On the next window please add\n{dir}\nto your user or system path variable.")
-        print(win_dir)
-        subprocess.call(r"C:\WINDOWS\system32\rundll32.exe sysdm.cpl,EditEnvironmentVariables", shell=True)
-    else:
-        print("===== Veusz found on PATH!")
+    # print("===== Finding Veusz on PATH =====")
+    # user_path = subprocess.check_output("echo %PATH%", shell=True).decode('utf-8')
+    # win_dir = dir.replace('/','\\')
+    # if win_dir not in user_path:
+    #     print("===== Veusz not found on PATH. Prompt user.")
+    #     showinfo(title="Add to path",
+    #                 message=f"On the next window please add\n{dir}\nto your user or system path variable.")
+    #     print(win_dir)
+    #     subprocess.call(r"C:\WINDOWS\system32\rundll32.exe sysdm.cpl,EditEnvironmentVariables", shell=True)
+    # else:
+    #     print("===== Veusz found on PATH!")
         
     
     json.dump({"VEUSZ_PATH" : dir}, open('config.json', 'w'), indent=4)
@@ -72,5 +72,7 @@ except FileNotFoundError:
     exit()
 
 VEUSZ_PATH = config_data['VEUSZ_PATH']
+MY_ENV = os.environ.copy()
+MY_ENV["PATH"] += VEUSZ_PATH + ';'
 
 print("===== config.json loaded =====")
