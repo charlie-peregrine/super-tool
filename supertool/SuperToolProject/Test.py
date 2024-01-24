@@ -72,7 +72,15 @@ class Test:
 
             for a in attributes:
                 self.attribute_dict[a[0]] = Attribute(*a)
-                            
+
+            # default initialize header structures
+            keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd']
+            self.sim_headers = {}
+            self.mes_headers = {}
+            for k in keys:
+                self.sim_headers[k] = ['', '']
+                self.mes_headers[k] = ['', '']
+
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Voltage_Reference.run(self)
             

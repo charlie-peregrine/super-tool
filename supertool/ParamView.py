@@ -51,7 +51,7 @@ class ParamView(ttk.Frame):
         if foc:
             # @TODO watch foc[foc.plot_sim_file] to update sim frame if necessary
             if foc.plot_sim_file and foc[foc.plot_sim_file]:
-                self.build_frame(foc.plot_sim_file, self.sim_frame, self.sim_widgets)
+                self.build_frame(foc.plot_sim_file, self.sim_frame, self.sim_widgets, foc.sim_headers)
     
     def render_mes_frame(self):
         self.mes_frame.grid_remove()
@@ -63,12 +63,12 @@ class ParamView(ttk.Frame):
             
         if foc:
             if foc.plot_mes_file and foc[foc.plot_mes_file]:
-                self.build_frame(foc.plot_mes_file, self.mes_frame, self.mes_widgets)
+                self.build_frame(foc.plot_mes_file, self.mes_frame, self.mes_widgets, foc.mes_headers)
         
             
 
     # subroutine to make building cleaner
-    def build_frame(self, plot_name, frame, widgets):
+    def build_frame(self, plot_name, frame, widgets, test_headers):
         # @TODO error check for multiplication menu (support +,-,/,*)
         
         foc = self.parent.focused_test
@@ -84,19 +84,33 @@ class ParamView(ttk.Frame):
             longname_label = ttk.Label(frame, text=longname)
             longname_label.grid(row=1+i, column=0)
             
-            # @TODO save user input headers instead of finding them
-            found_headers = re.findall(regex, header_text, flags=re.IGNORECASE)
-                
             header_dropdown = ttk.Combobox(
                 frame, values=header_list, width=max_width, 
                 state='readonly'
             )
-            if found_headers:
-                found_header = found_headers[0]
-                header_dropdown.current(header_list.index(found_header))
+            
+            # @TODO save user input headers instead of finding them
+            
+            # try to set the header to the saved one, and if that fails
+            # try to set it to an automatically found one
+            def try_dropdown(val):
+                try:
+                    i = header_list.index(val)
+                    header_dropdown.current(i)
+                    return True
+                except ValueError:
+                    pass
+                return False
+
+            if not try_dropdown(test_headers[key][0]):
+                found_headers = re.findall(regex, header_text, flags=re.IGNORECASE)
+                if found_headers:
+                    try_dropdown(found_headers[0])
+            
             header_dropdown.grid(row=1+i, column=1)
             
             expr_entry = ttk.Entry(frame, width=7)
+            expr_entry.insert(0, test_headers[key][1])
             expr_entry.grid(row=1+i, column=2)
             
             widgets[key] = (longname_label, header_dropdown, expr_entry)
