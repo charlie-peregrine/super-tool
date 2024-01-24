@@ -6,9 +6,9 @@ from tkinter import ttk
 from tkinter import simpledialog
 import tkinter.filedialog  as fd
 
+import supertool.consts as consts
 from supertool.SuperToolFrames import *
 import supertool.SuperToolProject.Project as stproject
-from config import *
 
 from supertool.ProjectView import ProjectView
 from supertool.TestView import TestView
