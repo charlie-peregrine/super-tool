@@ -17,9 +17,6 @@ class ParamView(ttk.Frame):
         self.parent = parent
         super().__init__(self.parent, borderwidth=5, relief='groove',
                          height=100, width=100)
-
-        # param_text = ttk.Label(self, text="plot params")
-        # param_text.grid(row=0,column=0)
         
         self.graph_button = ttk.Button(self, text="Show Graphs",
                                         command=self.graph)
