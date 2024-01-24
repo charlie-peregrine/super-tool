@@ -22,9 +22,9 @@ class SetupWindow(tk.Tk):
         self.iconphoto(True, tk.PhotoImage(file="./icons/supertoolplay.png"))
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
-        
+
         self.wrap_length = 345
-                
+
         self.main_frame = ttk.Frame(self, relief="groove", borderwidth=4)
         self.main_frame.grid(sticky='nesw')
         self.main_frame.rowconfigure(0, weight=0)
@@ -58,77 +58,77 @@ class SetupWindow(tk.Tk):
         self.welcome_label = ttk.Label(self.frame0,
                 text="Welcome to the SuperTool Setup Script.\n\nClick Next to begin.")
         self.welcome_label.grid(row=0, column=0)
-        
+
         # second frame setup
         self.frame1 = ttk.Frame(self.main_frame)
         self.frame1.grid(row=2, column=0, columnspan=5, sticky='nesw')
         self.frame1.grid_remove()
         self.frame1.columnconfigure(0, weight=1)
-        
+
         self.depend_label = ttk.Label(self.frame1,
                 text="Resolving dependencies...")
         self.depend_label.grid(row=0, column=0)
-        
+
         self.depend_prog_bar = ttk.Progressbar(self.frame1,
                 mode='indeterminate', length=340)
         self.depend_prog_bar.grid(row=1, column=0) #, sticky='ew')
-        
+
         self.depend_done_label = ttk.Label(self.frame1,
                 text="Complete! Click Next to continue")
         self.depend_done_label.grid(row=2, column=0)
         self.depend_done_label.grid_remove()
-        
+
         self.depend_done = False
-        
+
         # third frame setup
         found_path = self.search_for_veusz()
-        
+
         self.frame2 = ttk.Frame(self.main_frame)
         self.frame2.grid(row=2, column=0, columnspan=5, sticky='nesw')
         self.frame2.grid_remove()
         self.frame2.columnconfigure(0, weight=1)
-        
+
         self.sel_dir_label = ttk.Label(self.frame2,
                 text="Select the directory that Veusz is installed in. " + \
                      "If Veusz is not installed, please close this " + \
                      "installer and install Veusz first.", wraplength=self.wrap_length,
                      justify="left")
         self.sel_dir_label.grid(row=0, column=0, columnspan=2)
-        
+
         self.sel_dir_warn_label = ttk.Label(self.frame2, text="",
                 wraplength=self.wrap_length)
         self.sel_dir_warn_label.grid(row=3, column=0, columnspan=2)
-        
+
         self.dir_var = tk.StringVar(self.frame2)
         self.dir_var.trace_add('write', self.validate_veusz_path)
         self.dir_var.set(found_path)
-        
-        self.sel_dir_entry = ttk.Entry(self.frame2, textvariable=self.dir_var, 
+
+        self.sel_dir_entry = ttk.Entry(self.frame2, textvariable=self.dir_var,
                 width=42)
         self.sel_dir_entry.grid(row=1, column=0, rowspan=2, sticky='e')
-                
+
         self.sel_dir_button = ttk.Button(self.frame2, text="Select Folder",
                 command=self.sel_dir_command)
         self.sel_dir_button.grid(row=1, column=1, sticky='w')
-        
+
         self.sel_dir_reset_button = ttk.Button(self.frame2, text="Reset",
                 command=lambda: self.dir_var.set(found_path))
         self.sel_dir_reset_button.grid(row=2, column=1, sticky='e')
-        
+
         # last frame setup
         self.frame3 = ttk.Frame(self.main_frame)
         self.frame3.grid(row=2, column=0, columnspan=5, sticky='nesw')
         self.frame3.grid_remove()
         self.frame3.columnconfigure(0, weight=1)
-        
+
         self.saving_label = ttk.Label(self.frame3, text="Saving Configuration...")
         self.saving_label.grid(row=0, column=0)
-        
+
         self.finished_label = ttk.Label(self.frame3,
                 text="Click Finish to complete Super Tool Setup.")
         self.finished_label.grid(row=1, column=0)
         self.finished_label.grid_remove()
-        
+
         # start running rest of the script
         self.show_frame0()
 
@@ -146,7 +146,7 @@ class SetupWindow(tk.Tk):
     def show_frame1(self, callee=None):
         if callee:
             callee.grid_remove()
-        
+
         self.frame1.grid()
         self.title_label.config(text="Install Prerequisites")
         self.left_button.grid()
@@ -154,17 +154,17 @@ class SetupWindow(tk.Tk):
                 command=lambda: self.show_frame0(self.frame1))
         self.right_button.config(text="Next >",
                 command=lambda: self.show_frame2(self.frame1))
-        
+
         if self.depend_done:
             self.right_button.config(state='normal')
         else:
             self.left_button.config(state='disabled')
             self.right_button.config(state='disabled')
             self.depend_prog_bar.start()
-            
+
             t = threading.Thread(target=self.depend_process)
             t.start()
-            
+
     # necessary for step 1, the background installer thread
     def depend_process(self):
         try:
@@ -175,19 +175,19 @@ class SetupWindow(tk.Tk):
                 subprocess.call("python -m pip install pywin32")
             except PermissionError:
                 subprocess.call("python -m pip install --user pywin32")
-                
+
         self.depend_prog_bar.config(mode='determinate', value=100)
         self.depend_prog_bar.stop()
         self.depend_done_label.grid()
         self.left_button.config(state='normal')
         self.right_button.config(state='normal')
         self.depend_done = True
-    
+
     ### step 3: find veusz folder and save that later
     def show_frame2(self, callee=None):
         if callee:
             callee.grid_remove()
-        
+
         self.frame2.grid()
         self.title_label.config(text="Find Veusz Directory")
         self.left_button.config(text="< Back",
@@ -195,10 +195,10 @@ class SetupWindow(tk.Tk):
         self.right_button.config(text="Next >",
                 command=lambda: self.show_frame3(self.frame2))
         self.validate_veusz_path()
-    
+
     # search in common locations for the veusz executable, to make it easier for
     # the user
-    def search_for_veusz(self): 
+    def search_for_veusz(self):
         keys_to_grab = ["PROGRAMFILES(X86)", "PROGRAMFILES", "APPDATA", "LOCALAPPDATA"]
         env = os.environ.copy()
         for k in keys_to_grab:
@@ -241,8 +241,8 @@ class SetupWindow(tk.Tk):
             self.sel_dir_warn_label.config(
                     text="WARNING: The selected directory does not exist.")
             self.right_button.config(state='disabled')
-    
-    # wrapper for the askdirectory function. 
+
+    # wrapper for the askdirectory function.
     def sel_dir_command(self):
         # choose the right initial directory
         init_dir = self.dir_var.get()
@@ -253,12 +253,12 @@ class SetupWindow(tk.Tk):
                 initialdir=init_dir, mustexist=True)
         if dir:
             self.dir_var.set(dir.replace("/", "\\"))
-        
+
     ### step 4: Save configuration and complete installation
     def show_frame3(self, callee=None):
         if callee:
             callee.grid_remove()
-    
+
         self.frame3.grid()
         self.title_label.config(text="Complete Installation")
         self.left_button.grid()
@@ -266,22 +266,22 @@ class SetupWindow(tk.Tk):
                 command=lambda: self.show_frame2(self.frame3))
         self.right_button.config(text="Finish",
                 command=self.destroy, state='disabled')
-        
+
         self.saving_label.config(text="Saving Configuration...")
         self.finished_label.grid_remove()
-        
+
         # save relevant info to config.json
         json_dict = {"VEUSZ_PATH" : self.dir_var.get().replace(
                 "\\", "/").rstrip(" /")}
         json.dump(json_dict, open('config.json', 'w'), indent=4)
-        
+
         # wait a little bit before finishing so the user feels
         # like the program did something
         def done():
             self.saving_label.config(text="Configuration Saved!")
             self.finished_label.grid()
             self.right_button.config(state='normal')
-            
+
         self.after(500, done)
 
 
