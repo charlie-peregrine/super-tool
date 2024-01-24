@@ -1,6 +1,8 @@
 # Test.py, Charlie Jordan, 1/22/2024
 # class that contains tests for the supertool gui
 
+import tkinter as tk
+
 from supertool.pslf_scripts import Voltage_Reference, Steady_State
 import supertool.veusz_handler as veusz_handler
 
@@ -78,8 +80,10 @@ class Test:
             self.sim_headers = {}
             self.mes_headers = {}
             for k in keys:
-                self.sim_headers[k] = ['', '']
-                self.mes_headers[k] = ['', '']
+                self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+                self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+            self.sim_headers['vt'][0].set("Time")
+            self.sim_headers['efd'][0].set("Blargo")
 
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Voltage_Reference.run(self)

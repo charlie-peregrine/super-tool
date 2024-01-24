@@ -102,15 +102,21 @@ class ParamView(ttk.Frame):
                     pass
                 return False
 
-            if not try_dropdown(test_headers[key][0]):
+            if test_headers[key][0].get() not in header_list:
+                
                 found_headers = re.findall(regex, header_text, flags=re.IGNORECASE)
                 if found_headers:
-                    try_dropdown(found_headers[0])
+                    # @TODO have tkinter say that a header got overwritten here
+                    test_headers[key][0].set(found_headers[0])
+                else:
+                    test_headers[key][0].set('')
+            header_dropdown.config(textvariable=test_headers[key][0])
+                
+            # if not try_dropdown(test_headers[key][0].get()):
             
             header_dropdown.grid(row=1+i, column=1)
             
-            expr_entry = ttk.Entry(frame, width=7)
-            expr_entry.insert(0, test_headers[key][1])
+            expr_entry = ttk.Entry(frame, width=7, textvariable=test_headers[key][1])
             expr_entry.grid(row=1+i, column=2)
             
             widgets[key] = (longname_label, header_dropdown, expr_entry)
