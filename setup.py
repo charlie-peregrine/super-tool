@@ -139,6 +139,7 @@ class SetupWindow(tk.Tk):
         if callee:
             callee.grid_remove()
         self.frame0.grid()
+        self.title_label.config(text="Installation Start")
         self.left_button.grid_remove()
         self.right_button.config(text="Next >",
                 command=lambda: self.show_frame1(self.frame0))
@@ -149,6 +150,7 @@ class SetupWindow(tk.Tk):
             callee.grid_remove()
         
         self.frame1.grid()
+        self.title_label.config(text="Install Prerequisites")
         self.left_button.grid()
         self.left_button.config(text="< Back",
                 command=lambda: self.show_frame0(self.frame1))
@@ -188,6 +190,7 @@ class SetupWindow(tk.Tk):
             callee.grid_remove()
         
         self.frame2.grid()
+        self.title_label.config(text="Find Veusz Directory")
         self.left_button.config(text="< Back",
                 command=lambda: self.show_frame1(self.frame2))
         self.right_button.config(text="Next >",
@@ -251,6 +254,7 @@ class SetupWindow(tk.Tk):
             callee.grid_remove()
     
         self.frame3.grid()
+        self.title_label.config(text="Complete Installation")
         self.left_button.grid()
         self.left_button.config(text="< Back",
                 command=lambda: self.show_frame2(self.frame3))
@@ -276,6 +280,8 @@ class SetupWindow(tk.Tk):
 try:
     setup = SetupWindow()
     setup.mainloop()
+    time.sleep(2)
+    print("Setup Script Complete! Exiting...")
 except Exception as e:
     print(traceback.print_exc())
     input("\n\nERROR FOUND! Record it somehow and then Press Enter to close")
