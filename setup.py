@@ -12,11 +12,11 @@ import traceback
 import time
 
 
-### step 0: set up window
 class SetupWindow(tk.Tk):
     def __init__(self):
         super().__init__()
 
+        ### Main window setup
         self.minsize(350, 200)
         self.title("Super Tool Setup")
         self.iconphoto(True, tk.PhotoImage(file="./icons/supertoolplay.png"))
@@ -81,9 +81,7 @@ class SetupWindow(tk.Tk):
         self.depend_done = False
         
         # third frame setup
-        
         found_path = self.search_for_veusz()
-        print(found_path, "<- found_path")
         
         self.frame2 = ttk.Frame(self.main_frame)
         self.frame2.grid(row=2, column=0, columnspan=5, sticky='nesw')
@@ -131,10 +129,10 @@ class SetupWindow(tk.Tk):
         self.finished_label.grid(row=1, column=0)
         self.finished_label.grid_remove()
         
-        # start running for real
+        # start running rest of the script
         self.show_frame0()
 
-
+    ### step 1: Say hi
     def show_frame0(self, callee=None):
         if callee:
             callee.grid_remove()
@@ -144,7 +142,7 @@ class SetupWindow(tk.Tk):
         self.right_button.config(text="Next >",
                 command=lambda: self.show_frame1(self.frame0))
 
-    ### step 1: verify win32 installed (and other pip packages?)
+    ### step 2: verify win32 installed (and other pip packages?)
     def show_frame1(self, callee=None):
         if callee:
             callee.grid_remove()
@@ -167,7 +165,7 @@ class SetupWindow(tk.Tk):
             t = threading.Thread(target=self.depend_process)
             t.start()
             
-            
+    # necessary for step 1, the background installer thread
     def depend_process(self):
         try:
             import win32
@@ -185,6 +183,7 @@ class SetupWindow(tk.Tk):
         self.right_button.config(state='normal')
         self.depend_done = True
     
+    ### step 3: find veusz folder and save that later
     def show_frame2(self, callee=None):
         if callee:
             callee.grid_remove()
@@ -197,6 +196,8 @@ class SetupWindow(tk.Tk):
                 command=lambda: self.show_frame3(self.frame2))
         self.validate_veusz_path()
     
+    # search in common locations for the veusz executable, to make it easier for
+    # the user
     def search_for_veusz(self): 
         keys_to_grab = ["PROGRAMFILES(X86)", "PROGRAMFILES", "APPDATA", "LOCALAPPDATA"]
         env = os.environ.copy()
@@ -211,6 +212,9 @@ class SetupWindow(tk.Tk):
                 pass
         return ''
 
+    # everytime the veusz directory path variable changes this function gets
+    # called to verify that it is valid, and otherwise the function
+    # will tell the user why
     def validate_veusz_path(self, a_=None, b_=None, c_=None):
         val = self.dir_var.get()
         if os.path.exists(val):
@@ -237,8 +241,10 @@ class SetupWindow(tk.Tk):
             self.sel_dir_warn_label.config(
                     text="WARNING: The selected directory does not exist.")
             self.right_button.config(state='disabled')
-        
+    
+    # wrapper for the askdirectory function. 
     def sel_dir_command(self):
+        # choose the right initial directory
         init_dir = self.dir_var.get()
         if not init_dir or not os.path.exists(init_dir):
             init_dir = "C:\\"
@@ -246,9 +252,9 @@ class SetupWindow(tk.Tk):
         dir = askdirectory(parent=self, title="Select Veusz's installation directory",
                 initialdir=init_dir, mustexist=True)
         if dir:
-            # if "veusz.exe" in os.listdir(dir):
             self.dir_var.set(dir.replace("/", "\\"))
         
+    ### step 4: Save configuration and complete installation
     def show_frame3(self, callee=None):
         if callee:
             callee.grid_remove()
@@ -264,10 +270,13 @@ class SetupWindow(tk.Tk):
         self.saving_label.config(text="Saving Configuration...")
         self.finished_label.grid_remove()
         
+        # save relevant info to config.json
         json_dict = {"VEUSZ_PATH" : self.dir_var.get().replace(
                 "\\", "/").rstrip(" /")}
         json.dump(json_dict, open('config.json', 'w'), indent=4)
         
+        # wait a little bit before finishing so the user feels
+        # like the program did something
         def done():
             self.saving_label.config(text="Configuration Saved!")
             self.finished_label.grid()
@@ -276,7 +285,7 @@ class SetupWindow(tk.Tk):
         self.after(500, done)
 
 
-### step n: run and clean up
+### step 5: run and clean up
 try:
     setup = SetupWindow()
     setup.mainloop()
