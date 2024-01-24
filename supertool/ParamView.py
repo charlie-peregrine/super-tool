@@ -75,6 +75,7 @@ class ParamView(ttk.Frame):
         
         with open(foc[plot_name], 'r') as file:
             header_list = [s.strip() for s in file.readline()[:-2].split(',')]
+            header_list = [s for s in header_list if s]
             header_text = '\n'.join(header_list)
             max_width = max([len(s) for s in header_list] + [20])
             max_width = int(max_width * .75)
@@ -112,7 +113,6 @@ class ParamView(ttk.Frame):
                     test_headers[key][0].set('')
             header_dropdown.config(textvariable=test_headers[key][0])
                 
-            # if not try_dropdown(test_headers[key][0].get()):
             
             header_dropdown.grid(row=1+i, column=1)
             

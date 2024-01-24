@@ -127,6 +127,11 @@ class Test:
             for a in attributes:
                 self.attribute_dict[a[0]] = Attribute(*a)
             
+            keys = ['mes', 'sim']
+            self.sim_headers = {}
+            for k in keys:
+                self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+            
             self.script = lambda: Steady_State.run(self)
             
             # set plot file to grab from, there is no measured file since
