@@ -23,7 +23,7 @@ class SetupWindow(tk.Tk):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         
-        global_wrap_length = 345
+        self.wrap_length = 345
                 
         self.main_frame = ttk.Frame(self, relief="groove", borderwidth=4)
         self.main_frame.grid(sticky='nesw')
@@ -93,12 +93,12 @@ class SetupWindow(tk.Tk):
         self.sel_dir_label = ttk.Label(self.frame2,
                 text="Select the directory that Veusz is installed in. " + \
                      "If Veusz is not installed, please close this " + \
-                     "installer and install Veusz first.", wraplength=global_wrap_length,
+                     "installer and install Veusz first.", wraplength=self.wrap_length,
                      justify="left")
         self.sel_dir_label.grid(row=0, column=0, columnspan=2)
         
         self.sel_dir_warn_label = ttk.Label(self.frame2, text="",
-                wraplength=global_wrap_length)
+                wraplength=self.wrap_length)
         self.sel_dir_warn_label.grid(row=3, column=0, columnspan=2)
         
         self.dir_var = tk.StringVar(self.frame2)
