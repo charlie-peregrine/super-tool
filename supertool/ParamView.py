@@ -73,6 +73,8 @@ class ParamView(ttk.Frame):
         
         foc = self.parent.focused_test
         
+        # @TODO check that file exists here or earlier (on read and on select?)
+        
         with open(foc[plot_name], 'r') as file:
             header_list = [s.strip() for s in file.readline()[:-2].split(',')]
             header_list = [s for s in header_list if s]

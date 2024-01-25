@@ -196,7 +196,7 @@ class Test:
                 break
             name, val = a
             
-            #@TODO somewhere here check if the file exists
+            #@TODO somewhere here check if the path attribute files exist
             
             if name not in self.attrs:
                 print(f"error: {name} not a valid test attribute. it will be ignored.")
@@ -236,6 +236,35 @@ class Test:
             
         
         return self, lines
+    
+    def add_attr(self, name, val):
+        if name in self.attrs:
+            type_ = self.attrs[name].type
+            match type_:
+                case 'PATH':
+                    convert_type = str      # type: ignore
+                case 'BOOL':
+                    def convert_type(b: str):
+                        if b == 'True':
+                            return True
+                        elif b == 'False':
+                            return False
+                        else:
+                            raise ValueError()
+                case 'NUM':
+                    convert_type = float    # type: ignore
+                case _:
+                    print(type_ + " is not a valid attribute type. ignoring.")
+                    return
+            
+            try:
+                self.attrs[name].var.set(convert_type(val))
+            except ValueError:
+                print(f"Could not set attribute {name} of type " + \
+                        f"{type_} to value {val} of type " + \
+                        f"{type(val).__name__}. Ignoring this attribute.")
+        else:
+            print(f"error: {name} not a valid test attribute. it will be ignored.")
     
     # overload string conversion
     def __str__(self):
