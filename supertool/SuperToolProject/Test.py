@@ -29,6 +29,9 @@ class Test:
         
         self.header_info = []
         
+        self.sim_headers = {}
+        self.mes_headers = {}
+        
         # depending on the chosen type, give the full set of default
         # attributes for that type.
         self.test_defaults()
@@ -77,8 +80,6 @@ class Test:
 
             # default initialize header structures
             keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd']
-            self.sim_headers = {}
-            self.mes_headers = {}
             for k in keys:
                 self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
                 self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
@@ -128,7 +129,6 @@ class Test:
                 self.attribute_dict[a[0]] = Attribute(*a)
             
             keys = ['mes', 'sim']
-            self.sim_headers = {}
             for k in keys:
                 self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
             
@@ -156,6 +156,16 @@ class Test:
                 ) + "\n")
         for attr in self.attribute_dict.values():
             attr.write(file)
+        # for k, [h, m] in self.sim_headers.items():
+        #     file.write("\t".join([
+        #         "1", k, h.get(), m.get()
+        #     ]) + "\n")
+        #     # print(k, h.get(), m.get(), sep='\t')
+        # for k, [h, m] in self.mes_headers.items():
+        #     file.write("\t".join([
+        #         "2", k, h.get(), m.get()
+        #     ]) + "\n")
+            # print(k, h.get(), m.get(), sep='\t')
     
     # internal read method to read in a test and its attributes from 
     # the lines of a file
