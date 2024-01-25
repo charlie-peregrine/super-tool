@@ -83,7 +83,7 @@ class TestView(ttk.Frame):
             
             # set up for loop, offset is how many rows down the big
             # list of attributes should start
-            keys = list(focused.attribute_dict.keys())
+            keys = list(focused.attrs.keys())
             offset = 2
             
             # storage for all of the interactibles so they still
@@ -93,7 +93,7 @@ class TestView(ttk.Frame):
             # for every attribute of the attribute dictionary, add
             # a line containing its name and relevant input fields
             for i in range(len(keys)):
-                attr = focused.attribute_dict[keys[i]]
+                attr = focused.attrs[keys[i]]
                 
                 # paths are shown with their name, their short name,
                 # and a button to open a file picker window. hovering
@@ -167,7 +167,7 @@ class TestView(ttk.Frame):
                     self.interactibles.append((entry, attr.var))
             
             # if focused.plot_sim_file:
-            #     attr = focused.attribute_dict[focused.plot_sim_file]
+            #     attr = focused.attrs[focused.plot_sim_file]
             #     trace = attr.var.trace_add('write', lambda a_, b_, c_:
             #         self.parent.param_frame.show_simulated_headers())
             #     self.trace_data.append((attr.var, trace))
@@ -193,7 +193,7 @@ class TestView(ttk.Frame):
             working_dir = os.getcwd()
             
             # run script
-            for k,v in self.parent.focused_test.attribute_dict.items():
+            for k,v in self.parent.focused_test.attrs.items():
                 print(k, v)
 
             self.parent.focused_test.script()

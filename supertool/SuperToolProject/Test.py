@@ -16,7 +16,7 @@ class Test:
         self.name = name
         self.type = type
         self.parent = parent
-        self.attribute_dict = {}
+        self.attrs = {}
         
         # default script and plot that say that this test type isn't set up yet
         self.script = lambda: print(f"No run script set up for this test of type '{self.type}'")
@@ -37,15 +37,15 @@ class Test:
         self.test_defaults()
         
         # @TODO this is not the right way to handle these
-        # [print(i) for i in self.attribute_dict.values()]
+        # [print(i) for i in self.attrs.values()]
         # for k,v in kwargs:
-        #     self.attribute_dict[k] = v 
+        #     self.attrs[k] = v 
     
     # depending on the current test type set the default attributes of the test 
     def test_defaults(self):
         
         # clear attribute dict. used if test_defaults is being used to change type
-        self.attribute_dict.clear()
+        self.attrs.clear()
         
         # only voltage ref set up as of yet
         if self.type == "Voltage Reference":
@@ -76,7 +76,7 @@ class Test:
             ]
 
             for a in attributes:
-                self.attribute_dict[a[0]] = Attribute(*a)
+                self.attrs[a[0]] = Attribute(*a)
 
             # default initialize header structures
             keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd']
@@ -126,7 +126,7 @@ class Test:
                 ]
             
             for a in attributes:
-                self.attribute_dict[a[0]] = Attribute(*a)
+                self.attrs[a[0]] = Attribute(*a)
             
             keys = ['mes', 'sim']
             for k in keys:
@@ -154,7 +154,7 @@ class Test:
         file.write("\t".join([
                 "T", self.name, self.type]
                 ) + "\n")
-        for attr in self.attribute_dict.values():
+        for attr in self.attrs.values():
             attr.write(file)
         # for k, [h, m] in self.sim_headers.items():
         #     file.write("\t".join([
@@ -198,10 +198,10 @@ class Test:
             
             #@TODO somewhere here check if the file exists
             
-            if name not in self.attribute_dict:
+            if name not in self.attrs:
                 print(f"error: {name} not a valid test attribute. it will be ignored.")
             else:
-                type_ = self.attribute_dict[name].type
+                type_ = self.attrs[name].type
                 match type_:
                     case 'PATH':
                         convert_type = str      # type: ignore
@@ -220,7 +220,7 @@ class Test:
                         continue
                 
                 try:
-                    self.attribute_dict[name].var.set(convert_type(val))
+                    self.attrs[name].var.set(convert_type(val))
                 except ValueError:
                     print(f"Could not set attribute {name} of type " + \
                             f"{type_} to value {val} of type " + \
@@ -228,10 +228,10 @@ class Test:
                 
                 
                 # try: # @TODO this try does not work properly
-                #     self.attribute_dict[name].var.set(val)
+                #     self.attrs[name].var.set(val)
                 # except tk.TclError:
                 #     print(f"TclError: could not set attribute {name} of type " + \
-                #         f"{self.attribute_dict[name].type} to value {val} of " + \
+                #         f"{self.attrs[name].type} to value {val} of " + \
                 #         f"type {type(val).__name__}. Ignoring this attribute.")
             
         
@@ -240,10 +240,10 @@ class Test:
     # overload string conversion
     def __str__(self):
         return "    [T {} | {} | {} ]".format(
-            self.name, self.type, len(self.attribute_dict.keys())
-            ) + "".join(["\n" + str(i) for i in self.attribute_dict.values()])
+            self.name, self.type, len(self.attrs.keys())
+            ) + "".join(["\n" + str(i) for i in self.attrs.values()])
     
     # overloading indexing operator, note that this is a get from the variable,
     # not just accessing the attribute in the dictionary
     def __getitem__(self, key):
-        return self.attribute_dict[key].var.get()
+        return self.attrs[key].var.get()
