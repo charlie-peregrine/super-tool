@@ -71,7 +71,7 @@ class ProjectView(ttk.Frame):
 
         # reset the clicked_widget to dummy_label
         self.clicked_widget = self.dummy_label
-
+        
         # main block for rendering the nested project structure
         # nesting is handled through padding in tkinter's frames primarily
         if self.proj.units:
@@ -79,10 +79,7 @@ class ProjectView(ttk.Frame):
             # @TODO sort the units better
             for unit_key in sorted(self.proj.units.keys()):
                 unit = self.proj.units[unit_key]
-                sep = ttk.Separator(frame, orient='horizontal')
-                sep.pack(fill='x')
-                #   ^ using pack here since everything is in a single column
-
+                
                 # each unit has a frame that it and its tests live in
                 unit_frame = self.build_unit_frame(unit, frame)
                 unit.frame = unit_frame
@@ -99,41 +96,36 @@ class ProjectView(ttk.Frame):
                         # type label
                         test_frame = self.build_test_frame(test, unit_frame)
                         test.frame = test_frame
-                else:
-                    # if there aren't any tests then say so
-                    test_label = ttk.Label(unit_frame, text="No Tests")
-                    test_label.pack(anchor='w', padx=10)
-
-                    # @TODO add right click on the no tests label back.
-                    # currently it only works with one of the test_label_menus
-                    # test_label_menu = tk.Menu(test_label)
-                    # def right_click_test(e):
-                    #     self.clicked_widget = e.widget
-                    #     test_label_menu.post(e.x_root, e.y_root)
-
-                    # test_label.bind("<3>", lambda e: right_click_test(e))
-                    # test_label_menu.add_command(label="new test",
-                    #                     command=self.add_test_from_no_test)
+                
         else:
-            sep = ttk.Separator(frame, orient='horizontal')
-            sep.pack(fill='x')
-
             # show no units if there are no units
-            unit_label = ttk.Label(frame, text="No Units")
-            unit_label.pack(padx=10, anchor='w')
+            self.show_no_units()
+            
 
-            # right clicking on no units allows the user to add a unit
-            unit_label_menu = tk.Menu(unit_label)
-            def right_click_unit(e):
-                self.clicked_widget = e.widget
-                unit_label_menu.post(e.x_root, e.y_root)
 
-            unit_label.bind("<3>", lambda e: right_click_unit(e))
-            unit_label_menu.add_command(label="new unit",
-                            command=self.add_unit)
+    def show_no_units(self):
+        self.no_unit_sep = ttk.Separator(
+            self.scroller.frame, orient='horizontal')
+        self.no_unit_label = ttk.Label(
+            self.scroller.frame, text="No Units")
+        self.no_unit_sep.pack(fill='x')
+        self.no_unit_label.pack(padx=10, anchor='w')
 
+        # right clicking on no units allows the user to add a unit
+        unit_label_menu = tk.Menu(self.no_unit_label)
+        def right_click_unit(e):
+            self.clicked_widget = e.widget
+            unit_label_menu.post(e.x_root, e.y_root)
+
+        self.no_unit_label.bind("<3>", lambda e: right_click_unit(e))
+        unit_label_menu.add_command(label="new unit",
+                        command=self.add_unit)
 
     def build_unit_frame(self, unit, parent_frame):
+        unit.sep = ttk.Separator(parent_frame, orient='horizontal')
+        unit.sep.pack(fill='x')
+        #   ^ using pack here since everything is in a single column
+        
         unit_frame = ttk.Frame(parent_frame, padding='10 0 0 4')
         unit_frame.pack(fill='x')
 
@@ -169,6 +161,23 @@ class ProjectView(ttk.Frame):
                         command=self.add_unit)
         unit_label_menu.add_command(label="new test",
                         command=self.add_test_from_unit)
+        
+        unit.no_tests_label = ttk.Label(unit_frame, text="No Tests")
+        if not unit.tests:
+            # if there aren't any tests then say so
+            unit.no_tests_label.pack(anchor='w', padx=10)
+
+            # @TODO add right click on the no tests label back.
+            # currently it only works with one of the test_label_menus
+            # test_label_menu = tk.Menu(test_label)
+            # def right_click_test(e):
+            #     self.clicked_widget = e.widget
+            #     test_label_menu.post(e.x_root, e.y_root)
+
+            # test_label.bind("<3>", lambda e: right_click_test(e))
+            # test_label_menu.add_command(label="new test",
+            #                     command=self.add_test_from_no_test)
+        
         return unit_frame
 
     def build_test_frame(self, test, parent_frame):
@@ -276,6 +285,9 @@ class ProjectView(ttk.Frame):
 
             test.frame.destroy()
             test.parent.remove_test(test.name)
+            if len(test.parent.tests) == 0:
+                test.parent.no_tests_label.pack(anchor='w', padx=10)
+                
 
     # method used to rename a test
     # uses a dialog box to ask for the new test name
@@ -370,10 +382,15 @@ class ProjectView(ttk.Frame):
             else:
                 err_label.grid_remove()
 
-                # add the test, destroy this window, and update the projectview
+                # add the test and update the projectview
+                # if this is the first test we need to destroy the no tests label
+                if len(unit.tests) == 0:
+                    unit.no_tests_label.pack_forget()
                 test = unit.add_test(name_var.get(), type_var.get())
                 test_frame = self.build_test_frame(test, unit.frame)
                 test.frame = test_frame
+                
+                # destroy this window
                 test_prompt_window.destroy()
 
         # add a button for creating a new test
@@ -397,8 +414,11 @@ class ProjectView(ttk.Frame):
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following unit and all of its tests:\n\n"
                 + unit.name, title="Delete Unit"):
+            unit.frame.destroy()
+            unit.sep.destroy()
             self.proj.remove_unit(unit.name)
-            self.render()
+            if len(self.proj.units) == 0:
+                self.show_no_units()
 
     # rename the clicked unit
     # @TODO handle a cancel in the askstring popup
@@ -411,7 +431,7 @@ class ProjectView(ttk.Frame):
             print("unit {} already exists. renaming unit {} failed".format(new_name, unit.name))
         else:
             self.proj.rename_unit(unit.name, new_name)
-            self.render()
+            unit.frame.children['!label']['text'] = new_name
 
     # add a unit to the project structure
     def add_unit(self):
@@ -420,8 +440,12 @@ class ProjectView(ttk.Frame):
         if unit_name in self.proj.units:
             print("unit {} already exists. creating unit {} failed".format(unit_name, unit_name))
         else:
-            self.proj.add_unit(unit_name)
-            self.render()
+            if len(self.proj.units) == 0:
+                self.no_unit_label.destroy()
+                self.no_unit_sep.destroy()
+            unit = self.proj.add_unit(unit_name)
+            unit_frame = self.build_unit_frame(unit, self.scroller.frame)
+            unit.frame = unit_frame
 
     # helper method to set the root's focused test to the clicked widget
     def focus_test(self, event):

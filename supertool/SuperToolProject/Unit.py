@@ -13,6 +13,8 @@ class Unit:
         # @TODO put more unit specific info here
         
         self.frame = None
+        self.sep = None
+        self.no_tests_label = None
         
     # add a test to this unit given a name and type
     def add_test(self, name, type_):

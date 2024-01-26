@@ -155,6 +155,7 @@ class Project:
     # add a unit to the unit dictionary
     def add_unit(self, name):
         self.units[name] = Unit(name)
+        return self.units[name]
 
     # rename a unit and update it's location in the unit dictionary
     # @TODO add error checking above this call?
