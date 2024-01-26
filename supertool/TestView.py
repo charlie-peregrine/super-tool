@@ -4,12 +4,14 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+import traceback
 from idlelib.tooltip import Hovertip
 
 from os.path import basename
 import os
 
 from supertool.SuperToolFrames import ScrollFrame
+from supertool.pslf_scripts.Super_Tool import SuperToolFatalError
 
 # Frame subclass for presenting and receving info regarding
 # individual tests and their attributes
@@ -196,7 +198,17 @@ class TestView(ttk.Frame):
             for k,v in self.parent.focused_test.attrs.items():
                 print(k, v)
 
-            self.parent.focused_test.script()
+            try:
+                self.parent.focused_test.script()
+            except SuperToolFatalError as err:
+                print("===== SuperToolFatalError while running Supertool Script - start =====\n")
+                traceback.print_exception(err)
+                print("\n===== SuperToolFatalError while running Supertool Script - end =====")
+            except Exception as err:
+                print("===== General Exception while running Supertool Script - start =====\n")
+                traceback.print_exception(err)
+                print("\n===== General Exception while running Supertool Script - end =====")
+                
             
             # return to old working directory
             os.chdir(working_dir)

@@ -17,6 +17,11 @@ import csv
 # 
 ###################################################################################################
 
+# custom exception for supertool errors
+class SuperToolFatalError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
 class SuperTool:
     def __init__():
         return    
@@ -30,10 +35,6 @@ class SuperTool:
         Pslf.print_to_pslf(output)
         return
     
-    # custom exception for supertool errors
-    class SuperToolFatalError(Exception):
-        def __init__(self, message):
-            super().__init__(message)
     
     @staticmethod
     def fatal_error(message):
@@ -43,7 +44,7 @@ class SuperTool:
         message = string1+message+string2
         print(message)
         SuperTool.print_to_pslf(message)
-        raise SuperTool.SuperToolFatalError(message)
+        raise SuperToolFatalError(message)
 
 
     @staticmethod
