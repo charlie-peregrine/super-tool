@@ -18,6 +18,8 @@ class Test:
         self.parent = parent
         self.attrs = {}
         
+        self.frame = None
+        
         # default script and plot that say that this test type isn't set up yet
         self.script = lambda: print(f"No run script set up for this test of type '{self.type}'")
         self.plot = lambda: print(f"No plot script set up for this test of type '{self.type}'")

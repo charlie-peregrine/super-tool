@@ -12,6 +12,8 @@ class Unit:
         self.tests = {}
         # @TODO put more unit specific info here
         
+        self.frame = None
+        
     # add a test to this unit given a name and type
     def add_test(self, name, type_):
         self.tests[name] = Test(name=name, type=type_)
