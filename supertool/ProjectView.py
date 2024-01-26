@@ -85,8 +85,6 @@ class ProjectView(ttk.Frame):
 
                 # each unit has a frame that it and its tests live in
                 unit_frame = self.build_unit_frame(unit, frame)
-                unit_frame.pack(fill='x')
-                
                 unit.frame = unit_frame
 
                 # show all of the unit's tests
@@ -100,8 +98,6 @@ class ProjectView(ttk.Frame):
                         # every test lives in a frame that house it and its
                         # type label
                         test_frame = self.build_test_frame(test, unit_frame)
-                        test_frame.pack(fill='x')
-                        
                         test.frame = test_frame
                 else:
                     # if there aren't any tests then say so
@@ -139,6 +135,7 @@ class ProjectView(ttk.Frame):
 
     def build_unit_frame(self, unit, parent_frame):
         unit_frame = ttk.Frame(parent_frame, padding='10 0 0 4')
+        unit_frame.pack(fill='x')
 
         # the unit_label shows the name of the unit
         # it is also how units are looked up for left and
@@ -177,7 +174,8 @@ class ProjectView(ttk.Frame):
     def build_test_frame(self, test, parent_frame):
         test_frame = ttk.Frame(parent_frame, padding="10 0 0 0",
                 borderwidth=2)
-
+        test_frame.pack(fill='x')
+        
         # same warning as with units, be very careful when
         # changing the hierarchy and names of the test labels
         # and frames
@@ -276,8 +274,8 @@ class ProjectView(ttk.Frame):
                 self.parent.test_frame.show_focused_test()
                 self.parent.param_frame.render()
 
+            test.frame.destroy()
             test.parent.remove_test(test.name)
-            self.render()
 
     # method used to rename a test
     # uses a dialog box to ask for the new test name
@@ -289,7 +287,7 @@ class ProjectView(ttk.Frame):
             print("test {} already exists. renaming test {} failed".format(new_name, test.name))
         else:
             test.parent.rename_test(test.name, new_name)
-            self.render()
+            test.frame.children['!label']['text'] = new_name
 
     ## add test methods. all 3 are wrapper for the add_test method
     def add_test_from_test(self):
@@ -373,9 +371,10 @@ class ProjectView(ttk.Frame):
                 err_label.grid_remove()
 
                 # add the test, destroy this window, and update the projectview
-                unit.add_test(name_var.get(), type_var.get())
+                test = unit.add_test(name_var.get(), type_var.get())
+                test_frame = self.build_test_frame(test, unit.frame)
+                test.frame = test_frame
                 test_prompt_window.destroy()
-                self.render()
 
         # add a button for creating a new test
         done_button = ttk.Button(test_prompt_window, text="Create New Test",

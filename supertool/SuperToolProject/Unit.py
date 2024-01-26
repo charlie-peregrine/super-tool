@@ -18,6 +18,7 @@ class Unit:
     def add_test(self, name, type_):
         self.tests[name] = Test(name=name, type=type_)
         self.tests[name].parent = self
+        return self.tests[name]
     
     # rename a test in the test dictionary and update it's location
     def rename_test(self, old, new):
