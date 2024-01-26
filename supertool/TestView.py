@@ -281,7 +281,7 @@ class TestView(ttk.Frame):
                 foc.test_defaults()
                 type_prompt_window.destroy()
                 self.show_focused_test()
-                self.parent.proj_frame.render()
+                self.parent.proj_frame.update_test_type(foc)
                 self.parent.param_frame.render()
 
         # add a button for creating a new test
