@@ -410,10 +410,12 @@ class ProjectView(ttk.Frame):
             self.proj.add_unit(unit_name)
             self.render()
 
-    # helpder method to set the root's focused test to the clicked widget  
+    # helper method to set the root's focused test to the clicked widget  
     def focus_test(self, event):
         temp_test = self.get_clicked_test_or_unit(event.widget)
         if temp_test != self.parent.focused_test:
+            # unset frame on old test
+            # set frame on new test
             self.parent.focused_test = temp_test
             self.parent.test_frame.show_focused_test()
             self.parent.param_frame.render()
