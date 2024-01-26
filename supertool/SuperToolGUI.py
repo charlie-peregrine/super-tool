@@ -163,8 +163,9 @@ class SuperToolGUI(tk.Tk):
         if new_project_name:
             # set the project name
             self.project.title = new_project_name
-            # re-render project pane
-            self.proj_frame.render()
+            
+            # change project header in project pane
+            self.proj_frame.update_proj_header()
 
 
     # method called by ctrl+shift+s and the file menu

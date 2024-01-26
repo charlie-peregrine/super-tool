@@ -268,6 +268,8 @@ class ProjectView(ttk.Frame):
             # in normal use
             raise Exception("nesting depth issue in ProjectView.get_current_test_or_unit")
 
+    def update_proj_header(self):
+        self.proj_header.config(text=self.proj.title)
 
     # @TODO make all of the dialogs custom
     # method used to delete a test
