@@ -194,10 +194,22 @@ class TestView(ttk.Frame):
             # save working directory
             working_dir = os.getcwd()
             
-            # run script
-            for k,v in self.parent.focused_test.attrs.items():
-                print(k, v)
+            try:
+                # print out every variable to terminal
+                for k,v in self.parent.focused_test.attrs.items():
+                    print(k, v)
 
+                # save project @TODO the choice to run without saving
+                self.parent.save_project()
+            # if a parameter is the wrong type or someting like that (float variable
+            # is 0.07f for example) then stop before opening pslf
+            except tk.TclError as e:
+                print()
+                traceback.print_exception(e)
+                print("ERROR: A test parameter is not valid. See above error message.")
+                return
+
+            # run script
             try:
                 self.parent.focused_test.script()
             except SuperToolFatalError as err:
