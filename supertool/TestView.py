@@ -32,6 +32,12 @@ class TestView(ttk.Frame):
         self.run_button = ttk.Button(self, image=self.img, command=self.run_simulation)
         self.run_button.grid(row=0, column=2, sticky='ne')
 
+        self.run_button.bind("<3>", lambda e:
+            self.parent.run_menu.post(e.x_root, e.y_root))
+        self.run_button_hover = Hovertip(self.run_button, hover_delay=300,
+            text="Right click to open Run Menu")
+        
+
         # Put a scroll frame in the frame
         self.scroller = ScrollFrame(self)
         self.frame = self.scroller.frame
@@ -42,7 +48,6 @@ class TestView(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
-
 
         self.trace_data = []
         # show the focused test. note that when it's used in the initializer,
@@ -182,9 +187,11 @@ class TestView(ttk.Frame):
         
     # run the backend PSLF script associated with the focused test's
     # test type
-    def run_simulation(self, *args):
+    def run_simulation(self, event=None, save_on_run=True):
         # print(self.parent.project)
         if self.parent.focused_test:
+            
+            print("save_on_run:", save_on_run)
             
             # @TODO Right here we should do something to check if
             # @TODO Pslf.exe is still running with no window,
@@ -194,10 +201,23 @@ class TestView(ttk.Frame):
             # save working directory
             working_dir = os.getcwd()
             
-            # run script
-            for k,v in self.parent.focused_test.attrs.items():
-                print(k, v)
+            try:
+                # print out every variable to terminal
+                for k,v in self.parent.focused_test.attrs.items():
+                    print(k, v)
 
+                # save project @TODO the choice to run without saving
+                if save_on_run:
+                    self.parent.save_project()
+            # if a parameter is the wrong type or someting like that (float variable
+            # is 0.07f for example) then stop before opening pslf
+            except tk.TclError as e:
+                print()
+                traceback.print_exception(e)
+                print("ERROR: A test parameter is not valid. See above error message.")
+                return
+
+            # run script
             try:
                 self.parent.focused_test.script()
             except SuperToolFatalError as err:
