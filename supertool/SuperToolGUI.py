@@ -78,6 +78,8 @@ class SuperToolGUI(tk.Tk):
     # @TODO check if these are still active in the plot popup
     def keybinds(self):
         self.bind("<F5>", self.test_frame.run_simulation)
+        self.bind("<Control-F5>", lambda e:
+            self.test_frame.run_simulation(save_on_run=False))
         self.bind("<Control-o>", self.open_project)
         self.bind("<Control-s>", self.save_project)
         self.bind("<Control-n>", self.new_project)

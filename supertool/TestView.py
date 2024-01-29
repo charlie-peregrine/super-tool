@@ -182,9 +182,11 @@ class TestView(ttk.Frame):
         
     # run the backend PSLF script associated with the focused test's
     # test type
-    def run_simulation(self, *args):
+    def run_simulation(self, event=None, save_on_run=True):
         # print(self.parent.project)
         if self.parent.focused_test:
+            
+            print("save_on_run:", save_on_run)
             
             # @TODO Right here we should do something to check if
             # @TODO Pslf.exe is still running with no window,
@@ -200,7 +202,8 @@ class TestView(ttk.Frame):
                     print(k, v)
 
                 # save project @TODO the choice to run without saving
-                self.parent.save_project()
+                if save_on_run:
+                    self.parent.save_project()
             # if a parameter is the wrong type or someting like that (float variable
             # is 0.07f for example) then stop before opening pslf
             except tk.TclError as e:
