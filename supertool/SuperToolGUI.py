@@ -51,9 +51,6 @@ class SuperToolGUI(tk.Tk):
     # helper method to create and add all of the high level widgets to the 
     # main window. also handles making each row and column resize-able
     def widgets(self):
-        # top bar menu setup
-        self.menu()
-
         ### Frame creation
         # main frame setup, row and column configure for initial size and resizeability
         self.grid_rowconfigure(0, minsize=150, weight=1)
@@ -73,6 +70,8 @@ class SuperToolGUI(tk.Tk):
         self.param_frame.grid(row=0,column=2, columnspan=1, rowspan=1, sticky="nesw")
         self.statusbar_frame.grid(row=1, column=0, columnspan=3, sticky="nesw")
 
+        # top bar menu setup
+        self.menu()
 
     # helper method to set up main window keybinds
     # @TODO check if these are still active in the plot popup
@@ -86,7 +85,8 @@ class SuperToolGUI(tk.Tk):
         self.bind("<Control-S>", self.save_as_project)
         
     # helper method to set up the main file menu at the top of the
-    # window
+    # window. The run menu is also used as a context menu for 
+    # test view.
     def menu(self):
         # create and set menu as the applications titlebar menu
         self.menubar = tk.Menu(self)
@@ -95,6 +95,9 @@ class SuperToolGUI(tk.Tk):
         # sub-menu creation
         file_menu = tk.Menu(self.menubar)
         about_menu = tk.Menu(self.menubar)
+        self.run_menu = tk.Menu(self.menubar)
+        
+        
 
         # add options to the file menu
         # accelerators don't actually do anything, they need to be set
@@ -111,12 +114,25 @@ class SuperToolGUI(tk.Tk):
         file_menu.add_separator()
         file_menu.add_command(label='Exit', command=self.destroy)
 
+        # add options to the run menu
+        self.run_menu.add_command(
+            label="Run",
+            command=self.test_frame.run_simulation,
+            accelerator="F5")
+        self.run_menu.add_command(
+            label="Run Without Saving",
+            command=lambda: self.test_frame.run_simulation(
+                save_on_run=False
+            ),
+            accelerator="ctrl+F5")
+
         # add options to the about menu
         about_menu.add_command(label="About")
         about_menu.add_command(label="Version")
         
         # add the submenus to the menu bar
         self.menubar.add_cascade(label="File", menu=file_menu)
+        self.menubar.add_cascade(label="Run", menu=self.run_menu)
         self.menubar.add_cascade(label="About", menu=about_menu)
     
     # wrapper for statusbar text setting

@@ -32,6 +32,10 @@ class TestView(ttk.Frame):
         self.run_button = ttk.Button(self, image=self.img, command=self.run_simulation)
         self.run_button.grid(row=0, column=2, sticky='ne')
 
+        self.run_button.bind("<3>", lambda e:
+            self.parent.run_menu.post(e.x_root, e.y_root))
+        
+
         # Put a scroll frame in the frame
         self.scroller = ScrollFrame(self)
         self.frame = self.scroller.frame
@@ -42,7 +46,6 @@ class TestView(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
-
 
         self.trace_data = []
         # show the focused test. note that when it's used in the initializer,
