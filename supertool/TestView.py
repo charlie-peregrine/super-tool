@@ -34,6 +34,8 @@ class TestView(ttk.Frame):
 
         self.run_button.bind("<3>", lambda e:
             self.parent.run_menu.post(e.x_root, e.y_root))
+        self.run_button_hover = Hovertip(self.run_button, hover_delay=300,
+            text="Right click to open Run Menu")
         
 
         # Put a scroll frame in the frame
