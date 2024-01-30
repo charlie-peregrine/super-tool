@@ -4,6 +4,7 @@
 import tkinter as tk
 
 from supertool.pslf_scripts import Voltage_Reference, Steady_State
+from supertool.pslf_scripts import Current_Interruption
 import supertool.veusz_handler as veusz_handler
 
 from supertool.SuperToolProject.Attribute import Attribute
@@ -155,7 +156,7 @@ class Test:
                 ("csv_filename",    '',     'PATH',     False,  "csv"),
                 ("rep_filename",    '',     'PATH',     False,  "rep"),
                 ("mes_filename",    '',     'PATH',     True,   "csv"),
-                ("tripTimeInSecs"   2.0,    'NUM'),
+                ("tripTimeInSecs",   2.0,    'NUM'),
                 ("totTimeInSec",    36,     'NUM'),
                 ("PSS_On",          False,  'BOOL'),    # 0:disable PSS model, 1: enable PSS model */
                 ("change_Pref",     True,   'BOOL'),    # 1:Change Pref after breaker opens, 0: no change */
@@ -183,7 +184,7 @@ class Test:
             #     self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
 
             # set the voltage reference runner as the script for voltage reference
-            # self.script = lambda: Current_Interruption.run(self)
+            self.script = lambda: Current_Interruption.run(self)
             
             # set plot files to grab from
             # self.plot_sim_file = 'csv_filename'
