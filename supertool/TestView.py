@@ -111,7 +111,17 @@ class TestView(ttk.Frame):
                     title_label.grid(row=i+offset, column=0, sticky='w')
                     
                     # show short name of path
-                    path_button = ttk.Button(self.frame, text=basename(attr.var.get()),
+                    def short_name(s):
+                        s2 = basename(s)
+                        ln = len(s2)
+                        max_len = 30
+                        if ln > max_len:
+                            return s2[:max_len//2] + "..." \
+                                   + s2[-(max_len//2 - 2):]
+                        else:
+                            return s2
+                    
+                    path_button = ttk.Button(self.frame, text=short_name(attr.var.get()),
                             command=lambda attr=attr: self.get_new_path(attr))
                     path_button.grid(row=i+offset, column=1, sticky='nesw')
                     
@@ -121,7 +131,7 @@ class TestView(ttk.Frame):
                     # set up traces for when the path variables update to modify the path label
                     # separate functions needed for clarity
                     def update_button(_1, _2, _3, l=path_button, v=attr.var):
-                        l.configure(text=basename(v.get()))
+                        l.configure(text=short_name(v.get()))
                     button_cb = attr.var.trace_add('write', update_button)
                     
                     def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
