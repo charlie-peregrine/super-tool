@@ -152,5 +152,3 @@ class ParamView(ttk.Frame):
         foc.plot(sim_dict=sim_data, mes_dict=mes_data)
         
     
-    def get_mes_header_info(self):
-        return {}
