@@ -205,7 +205,7 @@ class Test:
                 ('qg',   r'(?=.*qg)(?=.*1)(?=.*gen).*',     "Q (y)"),
                 ('efd',  r'(?=.*efd)(?=.*1)(?=.*gen).*',    "EFD (y)"),
                 ('ifd',  r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*',    "IFD (y)"),
-                ('freq', r'(?=.*avg)(?=.*hz).*',    "Frequency (y)")
+                ('freq', r'(?=.*spd)(?=.*1)(?=.*gen).*',    "Frequency (y)")
             ]
             
             # set the voltage reference plotter to use for the show graphs button
