@@ -183,31 +183,33 @@ class Test:
                 self.attrs[a[0]] = Attribute(*a)
 
             # default initialize header structures
-            # keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd']
-            # for k in keys:
-            #     self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
-            #     self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+            # @TODO reset these on change?
+            keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd', 'freq']
+            for k in keys:
+                self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+                self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
 
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda: Current_Interruption.run(self)
             
             # set plot files to grab from
-            # self.plot_sim_file = 'csv_filename'
-            # self.plot_mes_file = 'mes_filename'
+            self.plot_sim_file = 'csv_filename'
+            self.plot_mes_file = 'mes_filename'
             
             # set header info for this test type
             # format is (key, regular expression, long name)
-            # self.header_info = [
-            #     ('time', r'.*time.*', "Time (x)"),
-            #     ('vt',   r'(?=.*vt)(?=.*1)(?=.*gen).*',     "Voltage (y)"),
-            #     ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
-            #     ('qg',   r'(?=.*qg)(?=.*1)(?=.*gen).*',     "Q (y)"),
-            #     ('efd',  r'(?=.*efd)(?=.*1)(?=.*gen).*',    "EFD (y)"),
-            #     ('ifd',  r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*',    "IFD (y)")
-            # ]
+            self.header_info = [
+                ('time', r'.*time.*', "Time (x)"),
+                ('vt',   r'(?=.*vt)(?=.*1)(?=.*gen).*',     "Voltage (y)"),
+                ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
+                ('qg',   r'(?=.*qg)(?=.*1)(?=.*gen).*',     "Q (y)"),
+                ('efd',  r'(?=.*efd)(?=.*1)(?=.*gen).*',    "EFD (y)"),
+                ('ifd',  r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*',    "IFD (y)"),
+                ('freq', r'(?=.*avg)(?=.*hz).*',    "Frequency (y)")
+            ]
             
             # set the voltage reference plotter to use for the show graphs button
-            # self.plot = veusz_handler.plot_voltage_reference
+            self.plot = veusz_handler.plot_current_interruption
             
         
     

@@ -149,3 +149,83 @@ def plot_steady_state(sim_dict={}, mes_dict=None):
         
     return process
         
+def plot_current_interruption(*, sim_dict={}, mes_dict={}):
+    with open("veusz_files/Current_Interruption.fvsz", 'r') as file:
+        fvsz_text = file.read()
+    
+    for k,v in sim_dict.items():
+        print(k, v, sim_dict[k])
+        if v[1]:
+            sim_dict[k] = '`' + v[0] + '`' + v[1]
+        elif v[0]:
+            sim_dict[k] = v[0]
+        else:
+            sim_dict[k] = 'y'
+    
+    for k,v in mes_dict.items():
+        if v[1]:
+            mes_dict[k] = '`' + v[0] + '`' + v[1]
+        elif v[0]:
+            mes_dict[k] = v[0]
+        else:
+            mes_dict[k] = 'y'
+    # s_time, m_time, s_filename, m_filename
+    
+    if sim_dict and mes_dict:
+        result_text = fvsz_text.format(s_filename=sim_dict['file'],
+                            s_time=sim_dict['time'],
+                            s_vt=sim_dict['vt'],
+                            s_p=sim_dict['pg'],
+                            s_q=sim_dict['qg'],
+                            s_efd=sim_dict['efd'],
+                            s_ifd=sim_dict['ifd'],
+                            s_freq=sim_dict['freq'],
+                            m_filename=mes_dict['file'],
+                            m_time=mes_dict['time'],
+                            m_vt=mes_dict['vt'],
+                            m_p=mes_dict['pg'],
+                            m_q=mes_dict['qg'],
+                            m_efd=mes_dict['efd'],
+                            m_ifd=mes_dict['ifd'],
+                            m_freq=mes_dict['freq']
+                            )
+    elif sim_dict:
+        pattern = r"Add\('xy', name='Measured'(?:.*\n)+?To\('\.\.'\)\n|.*{m_filename}.*\n"
+        fvsz_text = re.sub(pattern, '', fvsz_text, flags=re.MULTILINE)
+        
+        result_text = fvsz_text.format(s_filename=sim_dict['file'],
+                            s_time=sim_dict['time'],
+                            s_vt=sim_dict['vt'],
+                            s_p=sim_dict['pg'],
+                            s_q=sim_dict['qg'],
+                            s_efd=sim_dict['efd'],
+                            s_ifd=sim_dict['ifd'],
+                            s_freq=sim_dict['freq']
+                            )
+    elif mes_dict:
+        pattern = r"Add\('xy', name='Simulated'(?:.*\n)+?To\('\.\.'\)\n|.*{s_filename}.*\n"
+        fvsz_text = re.sub(pattern, '', fvsz_text, flags=re.MULTILINE)
+        
+        result_text = fvsz_text.format(m_filename=mes_dict['file'],
+                            m_time=mes_dict['time'],
+                            m_vt=mes_dict['vt'],
+                            m_p=mes_dict['pg'],
+                            m_q=mes_dict['qg'],
+                            m_efd=mes_dict['efd'],
+                            m_ifd=mes_dict['ifd'],
+                            m_freq=mes_dict['freq']
+                            )
+    else:
+        result_text = ''
+        print("uh oh no file names")
+
+    if result_text:
+        # @TODO make the filename unique enough
+        with open("veusz_files/.graph_output.vsz", 'w') as file:
+            file.write(result_text)
+
+        process = subprocess.Popen('veusz.exe ./veusz_files/.graph_output.vsz', env=consts.MY_ENV, shell=True)
+        
+        return process
+        
+        # process.kill()
