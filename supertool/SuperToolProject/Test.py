@@ -50,6 +50,11 @@ class Test:
         # clear attribute dict. used if test_defaults is being used to change type
         self.attrs.clear()
         
+        # clear simulated and measured files so changing from a done test type 
+        # to a wip test type doesn't throw a keyerror
+        self.plot_sim_file = ''
+        self.plot_mes_file = ''
+        
         # only voltage ref set up as of yet
         if self.type == "Voltage Reference":
             print("voltage ref in test_defaults: ", self.name)
