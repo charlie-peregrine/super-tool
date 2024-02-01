@@ -49,7 +49,15 @@ class Project:
                         header_node.text = header.get()
                         
                         test_node.append(header_node)
-                    
+                
+                # record x range
+                xmin_node = ET.Element("xmin")
+                xmin_node.text = test.x_range_min.get()
+                test_node.append(xmin_node)
+                xmax_node = ET.Element("xmax")
+                xmax_node.text = test.x_range_max.get()
+                test_node.append(xmax_node)
+                
                 unit_node.append(test_node)
             root.append(unit_node)
         
@@ -118,6 +126,14 @@ class Project:
                             test.sim_headers[header_key] = header_pair
                         elif header_type == 'mes':
                             test.mes_headers[header_key] = header_pair
+                    
+                    elif attr_node.tag == 'xmin':
+                        val = none_to_str(attr_node.text)
+                        test.x_range_min.set(val)
+                        
+                    elif attr_node.tag == 'xmax':
+                        val = none_to_str(attr_node.text)
+                        test.x_range_max.set(val)
 
                 unit.tests[test.name] = test
             self.units[unit.name] = unit
