@@ -15,6 +15,7 @@ except FileNotFoundError:
     exit()
 
 VEUSZ_PATH = config_data['VEUSZ_PATH']
+HIDE_PSLF_GUI = config_data['HIDE_PSLF_GUI']
 MY_ENV = os.environ.copy()
 MY_ENV["PATH"] += VEUSZ_PATH + ';'
 

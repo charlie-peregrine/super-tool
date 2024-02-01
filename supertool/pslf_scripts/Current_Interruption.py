@@ -19,7 +19,7 @@ from supertool.pslf_scripts.Super_Tool import *
 ###################################################################################################
 
 
-def run(test):
+def run(test, no_gui=False):
 
     #--------------------------------------------------------------------------------------------------
     # Configure for your test with the following parameters
@@ -58,7 +58,7 @@ def run(test):
     # gets the project directory of this file
     project_directory = os.path.dirname(os.path.realpath(__file__))
 
-    SuperTool.launch_Pslf(project_directory)
+    SuperTool.launch_Pslf(project_directory, silent=no_gui)
 
     SuperTool.print_to_pslf("-----------------------------------------------------------------------------------------")
     SuperTool.print_to_pslf("--------------------- Starting Current Interruption Test Simulation ---------------------")

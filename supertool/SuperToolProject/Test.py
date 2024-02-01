@@ -96,7 +96,7 @@ class Test:
                 self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
 
             # set the voltage reference runner as the script for voltage reference
-            self.script = lambda: Voltage_Reference.run(self)
+            self.script = lambda no_gui: Voltage_Reference.run(self, no_gui=no_gui)
             
             # set plot files to grab from
             self.plot_sim_file = 'csv_filename'
@@ -140,7 +140,7 @@ class Test:
             for k in keys:
                 self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
             
-            self.script = lambda: Steady_State.run(self)
+            self.script = lambda no_gui: Steady_State.run(self, no_gui=no_gui)
             
             # set plot file to grab from, there is no measured file since
             # steady state does the silly 1 to 1 comparison plot
@@ -193,7 +193,7 @@ class Test:
                 self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
 
             # set the voltage reference runner as the script for voltage reference
-            self.script = lambda: Current_Interruption.run(self)
+            self.script = lambda no_gui: Current_Interruption.run(self, no_gui=no_gui)
             
             # set plot files to grab from
             self.plot_sim_file = 'csv_filename'

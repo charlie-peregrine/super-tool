@@ -1,6 +1,7 @@
 # SuperToolGUI.py, Charlie Jordan, 11/15/2023
 # main code for mocking up a gui for the super tool program
 
+import json
 import tkinter as tk
 from tkinter import ttk
 from tkinter import simpledialog
@@ -11,7 +12,7 @@ from supertool.SuperToolFrames import *
 import supertool.SuperToolProject.Project as stproject
 
 from supertool.ProjectView import ProjectView
-from supertool.TestView import TestView
+from supertool.TestView import TestView, kill_pslf
 from supertool.ParamView import ParamView
 
 class SuperToolGUI(tk.Tk):
@@ -43,6 +44,18 @@ class SuperToolGUI(tk.Tk):
         # print(self.winfo_width(), self.winfo_height())
         
         def on_quit():
+            # save use pslf gui value
+            print("===== Saving Modified Configuration Data =====")
+            try:
+                config_data = json.load(open('config.json', 'r'))
+                config_data['HIDE_PSLF_GUI'] = self.hide_pslf_gui.get()
+                json.dump(config_data, open('config.json', 'w'), indent=4)
+                print("===== Modified Configuration Data Saved =====")
+            except FileNotFoundError:
+                print("ERROR: Failed to open config.json. Runtime settings not saved.")
+            
+            # close the pslf window while we're on the way out
+            kill_pslf()
             self.destroy()
 
         self.protocol('WM_DELETE_WINDOW', on_quit)
@@ -115,16 +128,16 @@ class SuperToolGUI(tk.Tk):
         file_menu.add_command(label='Exit', command=self.destroy)
 
         # add options to the run menu
-        self.run_menu.add_command(
-            label="Run",
-            command=self.test_frame.run_simulation,
-            accelerator="F5")
-        self.run_menu.add_command(
-            label="Run Without Saving",
-            command=lambda: self.test_frame.run_simulation(
-                save_on_run=False
-            ),
+        self.run_menu.add_command(label="Run", command=self.test_frame.run_simulation, accelerator="F5")
+        self.run_menu.add_command(label="Run Without Saving",
+            command=lambda: self.test_frame.run_simulation(save_on_run=False),
             accelerator="ctrl+F5")
+        self.run_menu.add_separator()
+        # tk boolean variable for if pslf should be run with or without its gui
+        self.hide_pslf_gui = tk.BooleanVar(value=consts.HIDE_PSLF_GUI)
+        self.last_hide_pslf_gui_val = None
+        self.run_menu.add_radiobutton(label="Run PSLF with GUI", variable=self.hide_pslf_gui, value=False)
+        self.run_menu.add_radiobutton(label="Run PSLF without GUI", variable=self.hide_pslf_gui, value=True)
 
         # add options to the about menu
         about_menu.add_command(label="About")

@@ -18,7 +18,7 @@ from supertool.pslf_scripts.Super_Tool import *
 # 
 ###################################################################################################
 
-def run(test):
+def run(test, no_gui=False):
 
 #--------------------------------------------------------------------------------------------------
 # Configure for your test with the following parameters
@@ -51,7 +51,7 @@ def run(test):
     # gets the project directory of this file and initialize the PSLF instance
     project_directory = os.path.dirname(os.path.realpath(__file__))
     #os.chdir(project_directory)
-    SuperTool.launch_Pslf(project_directory, True) # @TODO add after calls and progress bar type stuff
+    SuperTool.launch_Pslf(project_directory, silent=no_gui) # @TODO add after calls and progress bar type stuff
     SuperTool.pwd()
 
     SuperTool.psds()

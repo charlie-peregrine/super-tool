@@ -1,6 +1,8 @@
 # TestView.py, Charlie Jordan, 12/5/2023
 # file to store the gui work for the test pane of the UI
 
+import signal
+import time
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -9,6 +11,10 @@ from idlelib.tooltip import Hovertip
 
 from os.path import basename
 import os
+import psutil
+import win32gui
+
+import PSLF_PYTHON
 
 from supertool.SuperToolFrames import ScrollFrame
 from supertool.pslf_scripts.Super_Tool import SuperToolFatalError
@@ -229,7 +235,49 @@ class TestView(ttk.Frame):
 
             # run script
             try:
-                self.parent.focused_test.script()
+                hide = self.parent.hide_pslf_gui.get()
+                last_hide = self.parent.last_hide_pslf_gui_val
+                if last_hide == None:
+                    print("last hide == None")
+                    self.parent.focused_test.script(hide)
+                else:
+                    
+                    if hide and last_hide:
+                        print("last hide and hide")
+                        # run normally, reuse the terminal
+                        
+                    if not hide and last_hide:
+                        print("last hide and not hide")
+                        # kill pslf (in terminal), rerun with gui
+                        kill_pslf()
+                    
+                    if hide and not last_hide:
+                        print("not last hide and hide")
+                        # kill pslf (as gui), rerun in terminal
+                        kill_pslf()
+                        
+                    if not hide and not last_hide:
+                        print("not last hide and not hide")
+                        # double check the window is still open, 
+                        def winEnumHandler(hwnd, window_open):
+                            name = win32gui.GetWindowText(hwnd)
+                            if win32gui.IsWindowVisible(hwnd) \
+                                and 'pslf' in name.lower():
+                                    print("PSLFWindow:", hex(hwnd), name)
+                                    window_open.append("name")
+                            return True
+                        open_windows = []
+                        win32gui.EnumWindows(winEnumHandler, open_windows)
+                        print("window open:", open_windows)
+                        if open_windows == "":
+                            # if window is closed but process still running, 
+                            # kill pslf then rerun with gui
+                            kill_pslf()
+                            
+                    self.parent.focused_test.script(hide)
+                
+                self.parent.last_hide_pslf_gui_val = hide
+                
             except SuperToolFatalError as err:
                 print("===== SuperToolFatalError while running Supertool Script - start =====\n")
                 traceback.print_exception(err)
@@ -358,3 +406,30 @@ class TestView(ttk.Frame):
                 self.parent.param_frame.render_sim_frame()
             if attr.name == self.parent.focused_test.plot_mes_file:
                 self.parent.param_frame.render_mes_frame()
+
+def kill_pslf():
+    for i in range(10):
+        found = False
+        for proc in psutil.process_iter():
+            try:
+                if 'pslf' in proc.name().lower():
+                    print(proc.name(), "is getting killed")
+                    found = True
+                    try:
+                        proc.kill()
+                    except psutil.AccessDenied:
+                        print("AccessDenied while trying to kill PSLF")
+                        print("Please wait for PSLF to close or kill it yourself")
+                        while True:
+                            try:
+                                time.sleep(3)
+                                proc.kill() # type: ignore
+                                break
+                            except psutil.AccessDenied:
+                                print("Retrying kill")
+                            except psutil.NoSuchProcess:
+                                break
+            except psutil.NoSuchProcess:
+                continue
+        if not found:
+            break

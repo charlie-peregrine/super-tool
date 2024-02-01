@@ -271,8 +271,10 @@ class SetupWindow(tk.Tk):
         self.finished_label.grid_remove()
 
         # save relevant info to config.json
-        json_dict = {"VEUSZ_PATH" : self.dir_var.get().replace(
-                "\\", "/").rstrip(" /")}
+        json_dict = {
+            "VEUSZ_PATH" : self.dir_var.get().replace("\\", "/").rstrip(" /"),
+            "HIDE_PSLF_GUI" : True,
+        }
         json.dump(json_dict, open('config.json', 'w'), indent=4)
 
         # wait a little bit before finishing so the user feels
