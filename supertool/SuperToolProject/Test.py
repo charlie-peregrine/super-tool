@@ -55,6 +55,9 @@ class Test:
         self.plot_sim_file = ''
         self.plot_mes_file = ''
         
+        self.x_range_min = tk.StringVar()
+        self.x_range_max = tk.StringVar()
+        
         # only voltage ref set up as of yet
         if self.type == "Voltage Reference":
             print("voltage ref in test_defaults: ", self.name)

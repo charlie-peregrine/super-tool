@@ -29,12 +29,35 @@ class ParamView(ttk.Frame):
         
         self.sim_frame = ttk.Frame(self)
         self.mes_frame = ttk.Frame(self)
-        self.sim_frame.grid(row=1, column=0, sticky='nesw')
-        self.mes_frame.grid(row=2, column=0, sticky='nesw')
+        self.min_max_frame = ttk.Frame(self)
+        self.sim_frame.grid(row=1, column=0, sticky='nesw', pady=3)
+        self.mes_frame.grid(row=2, column=0, sticky='nesw', pady=3)
+        self.min_max_frame.grid(row=3, column=0, sticky='nesw', pady=3)
+        
+        # self.foc = None
         
         self.render()
         
     def render(self):
+        # @TODO make exception for steady state test type
+        
+        self.foc = self.parent.focused_test
+        
+        for widget in self.min_max_frame.winfo_children():
+            widget.destroy()
+            
+        if self.foc:
+            min_max_label = ttk.Label(self.min_max_frame, text="X Range: ")
+            min_max_label.grid(row=0, column=0)
+            min_entry = ttk.Entry(self.min_max_frame,
+                    textvariable=self.foc.x_range_min, width=8)
+            min_entry.grid(row=0, column=1)
+            dash_label = ttk.Label(self.min_max_frame, text=" - ")
+            dash_label.grid(row=0, column=2)
+            max_entry = ttk.Entry(self.min_max_frame,
+                    textvariable=self.foc.x_range_max, width=8)
+            max_entry.grid(row=0, column=3)
+        
         
         self.render_sim_frame()
         self.render_mes_frame()
@@ -46,12 +69,10 @@ class ParamView(ttk.Frame):
         for widget in self.sim_frame.winfo_children():
             widget.destroy()
         
-        foc = self.parent.focused_test
-        
-        if foc:
+        if self.foc:
             # @TODO watch foc[foc.plot_sim_file] to update sim frame if necessary
-            if foc.plot_sim_file and foc[foc.plot_sim_file]:
-                self.build_frame(foc.plot_sim_file, self.sim_frame, self.sim_widgets, foc.sim_headers)
+            if self.foc.plot_sim_file and self.foc[self.foc.plot_sim_file]:
+                self.build_frame(self.foc.plot_sim_file, self.sim_frame, self.sim_widgets, self.foc.sim_headers)
     
     def render_mes_frame(self):
         self.mes_frame.grid_remove()
@@ -59,11 +80,9 @@ class ParamView(ttk.Frame):
         for widget in self.mes_frame.winfo_children():
             widget.destroy()
         
-        foc = self.parent.focused_test
-            
-        if foc:
-            if foc.plot_mes_file and foc[foc.plot_mes_file]:
-                self.build_frame(foc.plot_mes_file, self.mes_frame, self.mes_widgets, foc.mes_headers)
+        if self.foc:
+            if self.foc.plot_mes_file and self.foc[self.foc.plot_mes_file]:
+                self.build_frame(self.foc.plot_mes_file, self.mes_frame, self.mes_widgets, self.foc.mes_headers)
         
             
 
@@ -71,11 +90,9 @@ class ParamView(ttk.Frame):
     def build_frame(self, plot_name, frame, widgets, test_headers):
         # @TODO error check for multiplication menu (support +,-,/,*)
         
-        foc = self.parent.focused_test
-        
         # @TODO check that file exists here or earlier (on read and on select?)
         
-        with open(foc[plot_name], 'r') as file:
+        with open(self.foc[plot_name], 'r') as file:
             header_list = [s.strip() for s in file.readline()[:-2].split(',')]
             header_list = [s for s in header_list if s]
             header_text = '\n'.join(header_list)
@@ -83,7 +100,7 @@ class ParamView(ttk.Frame):
             max_width = int(max_width * .75)
         
         
-        for i, (key, regex, longname) in enumerate(foc.header_info):
+        for i, (key, regex, longname) in enumerate(self.foc.header_info):
             longname_label = ttk.Label(frame, text=longname)
             longname_label.grid(row=1+i, column=0)
             
@@ -127,28 +144,58 @@ class ParamView(ttk.Frame):
     
     def graph(self):
         
-        foc = self.parent.focused_test
-        
-        if not foc:
+        if not self.foc:
             print("no focused test yet")
             return
         
         sim_data = {}
+        sim_data['ready'] = False # is it ok to graph this data
         if self.sim_widgets:
             for k, (l,d,e) in self.sim_widgets.items():
                 sim_data[k] = (d.get(), e.get())
-            sim_data['file'] = (foc[foc.plot_sim_file], '')
+            sim_data['file'] = (self.foc[self.foc.plot_sim_file], '')
+            sim_data['ready'] = True
         
         print(sim_data)
         
         mes_data = {}
+        mes_data['ready'] = False
         if self.mes_widgets:
             for k, (l,d,e) in self.mes_widgets.items():
                 mes_data[k] = (d.get(), e.get())
-            mes_data['file'] = (foc[foc.plot_mes_file], '')
+            mes_data['file'] = (self.foc[self.foc.plot_mes_file], '')
+            mes_data['ready'] = True # is it ok to graph this data
         
         print(mes_data)
         
-        foc.plot(sim_dict=sim_data, mes_dict=mes_data)
+        x_min = self.foc.x_range_min.get()
+        if x_min.lower() == '' or x_min.lower() == 'auto':
+            sim_data['xmin'] = "'Auto'"
+            mes_data['xmin'] = "'Auto'"
+        else:
+            try:
+                x_min = float(x_min)
+                sim_data['xmin'] = x_min
+                mes_data['xmin'] = x_min
+            except ValueError:
+                print(f"X Minimum value of {x_min} is invalid, defaulting to Auto")
+                sim_data['xmin'] = "'Auto'"
+                mes_data['xmin'] = "'Auto'"
+        
+        x_max = self.foc.x_range_max.get()
+        if x_max.lower() == '' or x_max.lower() == 'auto':
+            sim_data['xmax'] = "'Auto'"
+            mes_data['xmax'] = "'Auto'"
+        else:
+            try:
+                x_max = float(x_max)
+                sim_data['xmax'] = x_max
+                mes_data['xmax'] = x_max
+            except ValueError:
+                print(f"X Maximum value of {x_max} is invalid, defaulting to Auto")
+                sim_data['xmax'] = "'Auto'"
+                mes_data['xmax'] = "'Auto'"
+        
+        self.foc.plot(sim_dict=sim_data, mes_dict=mes_data)
         
     
