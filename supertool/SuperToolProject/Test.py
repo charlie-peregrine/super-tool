@@ -59,22 +59,22 @@ class Test:
                 ("csv_filename",    '',     'PATH',     False,  "csv"),
                 ("rep_filename",    '',     'PATH',     False,  "rep"),
                 ("mes_filename",    '',     'PATH',     True,   "csv"),
-                ("StepTimeInSecs",  0,       'NUM'),
-                ("UpStepInPU",      0,       'NUM'),
-                ("DnStepInPU",      0,       'NUM'),
-                ("StepLenInSecs",   0,       'NUM'),
-                ("TotTimeInSecs",   0,      'NUM'),
+                ("StepTimeInSecs",  0.745,       'NUM'),
+                ("UpStepInPU",      0.02,       'NUM'),
+                ("DnStepInPU",      0.02,       'NUM'),
+                ("StepLenInSecs",   11.99,       'NUM'),
+                ("TotTimeInSecs",   25.735,      'NUM'),
                 ("PSS_On",          False,  'BOOL'),
-                ("SysFreqInHz",     0,      'NUM'),
-                ("SimPtsPerCycle",  0,      'NUM'),
-                ("set_loadflow",    False,  'BOOL'),
+                ("SysFreqInHz",     60,      'NUM'),
+                ("SimPtsPerCycle",  8,      'NUM'),
+                ("set_loadflow",    True,  'BOOL'),
                 ("save_loadflow",   False,  'BOOL'),
                 ("Pinit",           0,      'NUM'),   # MW
                 ("Qinit",           0,      'NUM'),   # MVAR
                 ("MVAbase",         0,      'NUM'),
                 ("Vinit",           0,      'NUM'),   # kV,
                 ("Vbase",           0,      'NUM'),   # kV,
-                ("Zbranch",         0,      'NUM'),   # pu
+                ("Zbranch",         0.05,      'NUM'),   # pu
             ]
 
             for a in attributes:
