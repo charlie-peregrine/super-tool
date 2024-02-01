@@ -47,9 +47,8 @@ class SuperToolGUI(tk.Tk):
             # save use pslf gui value
             print("===== Saving Modified Configuration Data =====")
             try:
-                config_data = json.load(open('config.json', 'r'))
-                config_data['HIDE_PSLF_GUI'] = self.hide_pslf_gui.get()
-                json.dump(config_data, open('config.json', 'w'), indent=4)
+                consts.config_data['HIDE_PSLF_GUI'] = self.hide_pslf_gui.get()
+                json.dump(consts.config_data, open('config.json', 'w'), indent=4)
                 print("===== Modified Configuration Data Saved =====")
             except FileNotFoundError:
                 print("ERROR: Failed to open config.json. Runtime settings not saved.")
