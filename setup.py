@@ -168,13 +168,13 @@ class SetupWindow(tk.Tk):
     # necessary for step 1, the background installer thread
     def depend_process(self):
         try:
-            import win32
+            import win32, psutil
             time.sleep(0.5)
         except ModuleNotFoundError:
             try:
-                subprocess.call("python -m pip install pywin32")
+                subprocess.call("python -m pip install pywin32 psutil")
             except PermissionError:
-                subprocess.call("python -m pip install --user pywin32")
+                subprocess.call("python -m pip install --user pywin32 psutil")
 
         self.depend_prog_bar.config(mode='determinate', value=100)
         self.depend_prog_bar.stop()
