@@ -2,6 +2,7 @@
 # file to store the gui work for the test pane of the UI
 
 import signal
+import threading
 import time
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -56,6 +57,9 @@ class TestView(ttk.Frame):
         self.columnconfigure(2, weight=1)
 
         self.trace_data = []
+        
+        self.thread_running = False
+        
         # show the focused test. note that when it's used in the initializer,
         # the "no test selected" text will always be shown since no test
         # is selected yet
@@ -204,15 +208,19 @@ class TestView(ttk.Frame):
     # run the backend PSLF script associated with the focused test's
     # test type
     def run_simulation(self, event=None, save_on_run=True):
-        # print(self.parent.project)
+
+        # block running here
+        if self.thread_running:
+            print("Stop Right There! A PSLF Script is already running.")
+            print("Wait until the script has completed to run again.")
+            return
+        
+        self.thread_running = True
+        self.run_button.config(state='disabled')
+        
         if self.parent.focused_test:
             
             print("save_on_run:", save_on_run)
-            
-            # @TODO Right here we should do something to check if
-            # @TODO Pslf.exe is still running with no window,
-            # @TODO because it will cause a crash because 
-            # @TODO pslf still thinks it's still got a gui but it DOESNT
             
             # save working directory
             working_dir = os.getcwd()
@@ -233,60 +241,66 @@ class TestView(ttk.Frame):
                 print("ERROR: A test parameter is not valid. See above error message.")
                 return
 
-            # run script
-            try:
-                hide = self.parent.hide_pslf_gui.get()
-                last_hide = self.parent.last_hide_pslf_gui_val
-                if last_hide == None:
-                    print("last hide == None")
-                    self.parent.focused_test.script(hide)
-                else:
-                    
-                    if hide and last_hide:
-                        print("last hide and hide")
-                        # run normally, reuse the terminal
-                        
-                    if not hide and last_hide:
-                        print("last hide and not hide")
-                        # kill pslf (in terminal), rerun with gui
+            # run script thread
+            def run_script():
+                try:
+                    hide = self.parent.hide_pslf_gui.get()
+                    last_hide = self.parent.last_hide_pslf_gui_val
+                    if last_hide == None:
+                        print("last hide == None")
                         kill_pslf()
-                    
-                    if hide and not last_hide:
-                        print("not last hide and hide")
-                        # kill pslf (as gui), rerun in terminal
-                        kill_pslf()
+                        self.parent.focused_test.script(hide)
+                    else:
                         
-                    if not hide and not last_hide:
-                        print("not last hide and not hide")
-                        # double check the window is still open, 
-                        def winEnumHandler(hwnd, window_open):
-                            name = win32gui.GetWindowText(hwnd)
-                            if win32gui.IsWindowVisible(hwnd) \
-                                and 'pslf' in name.lower():
-                                    print("PSLFWindow:", hex(hwnd), name)
-                                    window_open.append("name")
-                            return True
-                        open_windows = []
-                        win32gui.EnumWindows(winEnumHandler, open_windows)
-                        print("window open:", open_windows)
-                        if open_windows == "":
-                            # if window is closed but process still running, 
-                            # kill pslf then rerun with gui
+                        if hide and last_hide:
+                            print("last hide and hide")
+                            # run normally, reuse the terminal
+                            
+                        if not hide and last_hide:
+                            print("last hide and not hide")
+                            # kill pslf (in terminal), rerun with gui
+                            kill_pslf()
+                        
+                        if hide and not last_hide:
+                            print("not last hide and hide")
+                            # kill pslf (as gui), rerun in terminal
                             kill_pslf()
                             
-                    self.parent.focused_test.script(hide)
-                
-                self.parent.last_hide_pslf_gui_val = hide
-                
-            except SuperToolFatalError as err:
-                print("===== SuperToolFatalError while running Supertool Script - start =====\n")
-                traceback.print_exception(err)
-                print("\n===== SuperToolFatalError while running Supertool Script - end =====")
-            except Exception as err:
-                print("===== General Exception while running Supertool Script - start =====\n")
-                traceback.print_exception(err)
-                print("\n===== General Exception while running Supertool Script - end =====")
-                
+                        if not hide and not last_hide:
+                            print("not last hide and not hide")
+                            # double check the window is still open, 
+                            def winEnumHandler(hwnd, window_open):
+                                name = win32gui.GetWindowText(hwnd)
+                                if win32gui.IsWindowVisible(hwnd) \
+                                    and 'pslf' in name.lower():
+                                        print("PSLFWindow:", hex(hwnd), name)
+                                        window_open.append("name")
+                                return True
+                            open_windows = []
+                            win32gui.EnumWindows(winEnumHandler, open_windows)
+                            print("window open:", open_windows)
+                            if open_windows == "":
+                                # if window is closed but process still running, 
+                                # kill pslf then rerun with gui
+                                kill_pslf()
+                                
+                        self.parent.focused_test.script(hide)
+                    
+                    self.parent.last_hide_pslf_gui_val = hide
+                    
+                except SuperToolFatalError as err:
+                    print("===== SuperToolFatalError while running Supertool Script - start =====\n")
+                    traceback.print_exception(err)
+                    print("\n===== SuperToolFatalError while running Supertool Script - end =====")
+                except Exception as err:
+                    print("===== General Exception while running Supertool Script - start =====\n")
+                    traceback.print_exception(err)
+                    print("\n===== General Exception while running Supertool Script - end =====")
+                self.thread_running = False
+                self.run_button.config(state='normal')
+            
+            runner_thread = threading.Thread(target=run_script)
+            runner_thread.start()
             
             # return to old working directory
             os.chdir(working_dir)
