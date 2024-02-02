@@ -44,6 +44,9 @@ class SuperToolGUI(tk.Tk):
         # print(self.winfo_width(), self.winfo_height())
         
         def on_quit():
+            # close the window first
+            self.destroy()
+            
             # save use pslf gui value
             print("===== Saving Modified Configuration Data =====")
             try:
@@ -54,8 +57,9 @@ class SuperToolGUI(tk.Tk):
                 print("ERROR: Failed to open config.json. Runtime settings not saved.")
             
             # close the pslf window while we're on the way out
+            print("===== Closing PSLF =====")
             kill_pslf()
-            self.destroy()
+            print("===== PSLF Closed =====")
 
         self.protocol('WM_DELETE_WINDOW', on_quit)
         
