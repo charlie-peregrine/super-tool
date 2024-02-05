@@ -243,9 +243,10 @@ class TestView(ttk.Frame):
 
             # run script thread
             def run_script():
+                hide = self.parent.hide_pslf_gui.get()
+                last_hide = self.parent.last_hide_pslf_gui_val
+                
                 try:
-                    hide = self.parent.hide_pslf_gui.get()
-                    last_hide = self.parent.last_hide_pslf_gui_val
                     if last_hide == None:
                         print("last hide == None")
                         kill_pslf()
@@ -286,7 +287,6 @@ class TestView(ttk.Frame):
                                 
                         self.parent.focused_test.script(hide)
                     
-                    self.parent.last_hide_pslf_gui_val = hide
                     
                 except SuperToolFatalError as err:
                     print("===== SuperToolFatalError while running Supertool Script - start =====\n")
@@ -296,6 +296,8 @@ class TestView(ttk.Frame):
                     print("===== General Exception while running Supertool Script - start =====\n")
                     traceback.print_exception(err)
                     print("\n===== General Exception while running Supertool Script - end =====")
+                
+                self.parent.last_hide_pslf_gui_val = hide
                 self.thread_running = False
                 self.run_button.config(state='normal')
             
