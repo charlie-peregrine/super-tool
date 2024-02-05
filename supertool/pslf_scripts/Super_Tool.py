@@ -1,6 +1,8 @@
 from PSLF_PYTHON import *
 import csv
 
+import queue
+import threading
 
 ###################################################################################################
 #   Program: SuperTool.py
@@ -17,10 +19,48 @@ import csv
 # 
 ###################################################################################################
 
+# thread safe queue for sending user interface updates from backend scripts
+ScriptQueue = queue.Queue()
+
 # custom exception for supertool errors
 class SuperToolFatalError(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+class SuperToolMessage():
+    def __init__(self, message_type: str, message: str):
+        self.lock = threading.Lock()
+        self.type = message_type
+        self.text = message
+        # return_val is a value that needs to be passed back to the backend
+        # script's execution
+        self.return_val = None
+
+    # wait is used when the message requires the user to respond to a prompt
+    # or something else to be done synchronously
+    # after wait is called in one thread, done should be called in another to
+    # complete the exchange
+    def wait(self):
+        # acquire lock, execution in the running thread continues
+        self.lock.acquire()
+        # acquire lock again, execution pauses until another thread releases
+        self.lock.acquire()
+        # release lock in this thread, to be ready for another wait if necessary
+        self.lock.release()
+    
+    # done is used when the message requires synchronicity, for responding to
+    # prompts and such. only to be called after wait. Ideally this should only
+    # every be called inside the ScriptListener's main loop
+    def done(self):
+        # release lock
+        self.lock.release()
+    
+    # wrapper for lock.locked, to maintain encapsulation and keep naming cohesive 
+    def waiting(self):
+        return self.lock.locked()
+    
+    def __repr__(self):
+        return f"[t:{self.type}|m:\"{self.text}\"|r:{self.return_val}|L:{self.waiting()}]"
 
 class SuperTool:
     def __init__():
@@ -103,8 +143,11 @@ class SuperTool:
             SuperTool.set_loadflow_parameters(Pgen,Qgen,Vgen/Vbase,Vbase,Zbranch)
 
         if (sav_flow == TRUE):
-            sure = input("Are you sure you want to save this loadflow? This will override existing .sav file. (y/n): ")
-            if sure == "y":
+            message = SuperToolMessage('ynprompt',
+                    "Are you sure you want to save this loadflow? This will override the existing .sav file.")
+            ScriptQueue.put(message)
+            message.wait()
+            if message.return_val:
                 Pslf.save_case(sav_name)
     
 

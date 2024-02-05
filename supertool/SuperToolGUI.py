@@ -10,6 +10,7 @@ import tkinter.filedialog  as fd
 import supertool.consts as consts
 from supertool.SuperToolFrames import *
 import supertool.SuperToolProject.Project as stproject
+import supertool.ScriptListener as ScriptListener
 
 from supertool.ProjectView import ProjectView
 from supertool.TestView import TestView, kill_pslf
@@ -33,6 +34,10 @@ class SuperToolGUI(tk.Tk):
         self.project = stproject.Project()
         self.focused_test = None
         
+        self.running = True
+        self.listener = ScriptListener.ScriptListener(self)
+        self.listener.start()
+        
         # run the helper methods to set up widgets and full window keybinds
         self.widgets()
         self.keybinds()
@@ -44,7 +49,13 @@ class SuperToolGUI(tk.Tk):
         # print(self.winfo_width(), self.winfo_height())
         
         def on_quit():
-            # close the window first
+            # set running to false, indicating that the listener thread should stop
+            self.running = False
+            print("===== Waiting for ScriptListener to finish =====")
+            self.listener.join()
+            print("===== ScriptListener has finished  =====")
+            
+            # close the window
             self.destroy()
             
             # save use pslf gui value
