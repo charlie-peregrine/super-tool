@@ -222,9 +222,6 @@ class TestView(ttk.Frame):
             
             print("save_on_run:", save_on_run)
             
-            # save working directory
-            working_dir = os.getcwd()
-            
             try:
                 # print out every variable to terminal
                 for k,v in self.parent.focused_test.attrs.items():
@@ -243,6 +240,9 @@ class TestView(ttk.Frame):
 
             # run script thread
             def run_script():
+                # save working directory
+                working_dir = os.getcwd()
+            
                 hide = self.parent.hide_pslf_gui.get()
                 last_hide = self.parent.last_hide_pslf_gui_val
                 
@@ -290,22 +290,25 @@ class TestView(ttk.Frame):
                     
                 except SuperToolFatalError as err:
                     print("===== SuperToolFatalError while running Supertool Script - start =====\n")
+                    print("=== Working Directory:", os.getcwd())
                     traceback.print_exception(err)
                     print("\n===== SuperToolFatalError while running Supertool Script - end =====")
                 except Exception as err:
                     print("===== General Exception while running Supertool Script - start =====\n")
+                    print("=== Working Directory:", os.getcwd())
                     traceback.print_exception(err)
                     print("\n===== General Exception while running Supertool Script - end =====")
                 
                 self.parent.last_hide_pslf_gui_val = hide
                 self.thread_running = False
                 self.run_button.config(state='normal')
+                # return to old working directory
+                os.chdir(working_dir)
             
             runner_thread = threading.Thread(target=run_script)
             runner_thread.start()
             
-            # return to old working directory
-            os.chdir(working_dir)
+            
             
         else:
             # @TODO make this more elegant
