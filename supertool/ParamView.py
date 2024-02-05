@@ -112,19 +112,6 @@ class ParamView(ttk.Frame):
                 state='readonly'
             )
             
-            # @TODO save user input headers instead of finding them
-            
-            # try to set the header to the saved one, and if that fails
-            # try to set it to an automatically found one
-            def try_dropdown(val):
-                try:
-                    i = header_list.index(val)
-                    header_dropdown.current(i)
-                    return True
-                except ValueError:
-                    pass
-                return False
-
             if test_headers[key][0].get() not in header_list:
                 
                 found_headers = re.findall(regex, header_text, flags=re.IGNORECASE)
