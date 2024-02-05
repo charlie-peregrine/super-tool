@@ -92,8 +92,11 @@ class ParamView(ttk.Frame):
         
         # @TODO check that file exists here or earlier (on read and on select?)
         
-        with open(self.foc[plot_name], 'r') as file:
-            header_list = [s.strip() for s in file.readline()[:-2].split(',')]
+        with open(self.foc[plot_name], 'r', encoding='utf-8-sig') as file:
+            line = file.readline()
+            if line[-1] == '\n': # trim trailing newline
+                line = line[:-1]
+            header_list = [s.strip() for s in line.split(',')]
             header_list = [s for s in header_list if s]
             header_text = '\n'.join(header_list)
             max_width = max([len(s) for s in header_list] + [20])

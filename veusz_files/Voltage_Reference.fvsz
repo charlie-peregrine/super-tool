@@ -4,8 +4,8 @@
 SetCompatLevel(0)
 
 # AddImportPath('C:\\CODE\\demo super tool gui\\veusz files')
-ImportFileCSV('{s_filename}', linked=True, textdelimiter="'")
-ImportFileCSV('{m_filename}', linked=True, textdelimiter="'")
+ImportFileCSV('{s_filename}', encoding='utf-8-sig', linked=True, textdelimiter="'")
+ImportFileCSV('{m_filename}', encoding='utf-8-sig', linked=True, textdelimiter="'")
 # ImportFileCSV('C:/Users/charlie/Downloads/SampleProject/SampleFolder/Voltage_Reference_sim.csv', linked=True, textdelimiter="'")
 # ImportFileCSV('C:/Users/charlie/Downloads/SampleProject/SampleFolder/Voltage_Reference.csv', linked=True, textdelimiter="'")
 Set('colorTheme', 'default-latest')

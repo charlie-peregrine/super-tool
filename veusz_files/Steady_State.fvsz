@@ -4,7 +4,7 @@
 SetCompatLevel(0)
 
 AddImportPath('C:\\Users\\charlie\\OneDrive - Peregrine Engineering\\Desktop')
-ImportFileCSV('{filename}', linked=True)
+ImportFileCSV('{filename}', encoding='utf-8-sig', linked=True)
 Set('colorTheme', 'default-latest')
 Set('StyleSheet/axis-function/autoRange', 'next-tick')
 
