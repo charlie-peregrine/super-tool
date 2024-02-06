@@ -123,7 +123,7 @@ class SuperToolGUI(tk.Tk):
         file_menu = tk.Menu(self.menubar)
         about_menu = tk.Menu(self.menubar)
         self.run_menu = tk.Menu(self.menubar)
-        
+        self.graph_menu = tk.Menu(self.menubar)
         
 
         # add options to the file menu
@@ -153,6 +153,11 @@ class SuperToolGUI(tk.Tk):
         self.run_menu.add_radiobutton(label="Run PSLF with GUI", variable=self.hide_pslf_gui, value=False)
         self.run_menu.add_radiobutton(label="Run PSLF without GUI", variable=self.hide_pslf_gui, value=True)
 
+        # add options to the graph menu
+        self.graph_menu.add_command(label="Graph", command=self.param_frame.graph)
+        self.graph_menu.add_command(label="Graph Without Saving",
+            command=lambda: self.param_frame.graph(save_on_graph=False))
+
         # add options to the about menu
         about_menu.add_command(label="About")
         about_menu.add_command(label="Version")
@@ -160,6 +165,7 @@ class SuperToolGUI(tk.Tk):
         # add the submenus to the menu bar
         self.menubar.add_cascade(label="File", menu=file_menu)
         self.menubar.add_cascade(label="Run", menu=self.run_menu)
+        self.menubar.add_cascade(label="Graph", menu=self.graph_menu)
         self.menubar.add_cascade(label="About", menu=about_menu)
     
     # wrapper for statusbar text setting

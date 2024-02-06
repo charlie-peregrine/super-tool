@@ -5,6 +5,7 @@ import os
 import re
 import tkinter as tk
 from tkinter import ttk
+from idlelib.tooltip import Hovertip
 
 from supertool.SuperToolFrames import ScrollFrame
 
@@ -22,6 +23,11 @@ class ParamView(ttk.Frame):
         self.graph_button = ttk.Button(self, text="Show Graphs",
                                         command=self.graph)
         self.graph_button.grid(row=0, column=0)
+
+        self.graph_button.bind("<3>", lambda e:
+            self.parent.graph_menu.post(e.x_root, e.y_root))
+        self.graph_button_hover = Hovertip(self.graph_button, hover_delay=300,
+            text="Right click to open Run Menu")
 
         # self.scroller = ScrollFrame(self)
         # self.scroll_frame = self.scroller.frame
@@ -136,11 +142,15 @@ class ParamView(ttk.Frame):
         
         frame.grid()
     
-    def graph(self):
+    def graph(self, save_on_graph=True):
         
         if not self.foc:
             print("no focused test yet")
             return
+        
+        # save the project before graphing
+        if save_on_graph:
+            self.parent.save_project()
         
         sim_data = {}
         sim_data['ready'] = False # is it ok to graph this data
@@ -150,7 +160,8 @@ class ParamView(ttk.Frame):
             sim_data['file'] = (self.foc[self.foc.plot_sim_file], '')
             sim_data['ready'] = True
         
-        print(sim_data)
+        for k,v in sim_data.items():
+            print(k, v)
         
         mes_data = {}
         mes_data['ready'] = False
@@ -160,7 +171,8 @@ class ParamView(ttk.Frame):
             mes_data['file'] = (self.foc[self.foc.plot_mes_file], '')
             mes_data['ready'] = True # is it ok to graph this data
         
-        print(mes_data)
+        for k,v in mes_data.items():
+            print(k, v)
         
         x_min = self.foc.x_range_min.get()
         if x_min.lower() == '' or x_min.lower() == 'auto':
