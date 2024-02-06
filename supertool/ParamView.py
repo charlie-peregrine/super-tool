@@ -1,6 +1,7 @@
 # ParamView.py, Charlie Jordan, 1/12/2024
 # Graph Parameter modification pane of the main supertool gui window
 
+import os
 import re
 import tkinter as tk
 from tkinter import ttk
@@ -90,7 +91,10 @@ class ParamView(ttk.Frame):
     def build_frame(self, plot_name, frame, widgets, test_headers):
         # @TODO error check for multiplication menu (support +,-,/,*)
         
-        # @TODO check that file exists here or earlier (on read and on select?)
+        # @check that file exists here or earlier (on read and on select?)
+        if not os.path.exists(self.foc[plot_name]):
+            # @TODO tell the user somehow that this is bad
+            return
         
         with open(self.foc[plot_name], 'r', encoding='utf-8-sig') as file:
             line = file.readline()
