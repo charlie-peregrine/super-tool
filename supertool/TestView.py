@@ -402,7 +402,6 @@ class TestView(ttk.Frame):
     # need to pick between input and output files because the file
     # picker has different behavior depending on if it's saving or
     # opening. uses tkinter.filedialog
-    # @TODO make this better with getting the extension
     def get_new_path(self, attr):
         if attr.read_only_file:
             path = askopenfilename(
