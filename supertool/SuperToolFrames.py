@@ -97,3 +97,19 @@ class ScrollFrame(tk.Frame):
     def reset_width(self):
         if self.frame.winfo_reqwidth() != self.canvas.winfo_width():
             self.canvas.config(width=self.frame.winfo_reqwidth())
+
+# Base popup class for super tool.
+class Popup(tk.Toplevel):
+    def __init__(self, root=None, title="Popup", cnf={}, **kwargs):
+        super().__init__(root, cnf, **kwargs)
+        # grab and hold focus
+        self.transient(root)
+        self.grab_set()
+        self.focus_force()
+        
+        # set window title, size, and resizability
+        # @TODO put window in center of parent window
+        self.title(title)
+        self.geometry("+500+500")
+        self.resizable(False, False)
+        
