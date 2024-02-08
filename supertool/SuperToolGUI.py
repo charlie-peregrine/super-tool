@@ -37,6 +37,7 @@ class SuperToolGUI(tk.Tk):
         self.project = stproject.Project()
         self.focused_test = None
         
+        # setup backend listener script and its boolean signal flag
         self.running = True
         self.listener = ScriptListener.ScriptListener(self)
         self.listener.start()
@@ -197,14 +198,7 @@ class SuperToolGUI(tk.Tk):
     
     def new_project(self, e=None):
         new_proj_window = Popup(self, "New Project")
-        # @TODO @TODO @TODO make this more robust
-        # we're talking a new name, make them choose a save location immediately
-        # (don't necessarily save immediately), choose a working dir for
-        # the other files
-        # that's 1 label -> 1 entry
-        #        1+ labels, 1 entry, 1 button, folder exists logic
-        #        1+ labels, 1 entry, button, folder exists logic
-        #        also last one might need an explainer label as well
+        
         name_var = tk.StringVar(self)
         save_var = tk.StringVar(self)
         dir_var = tk.StringVar(self)
