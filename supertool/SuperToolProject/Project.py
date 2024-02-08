@@ -17,6 +17,7 @@ class Project:
     def __init__(self, title="Untitled Project", filename=''):
         self.title = title
         self.file_name = ''
+        self.working_dir = ''
         self.units = {}
     
     def write_to_file_name(self, *args):
