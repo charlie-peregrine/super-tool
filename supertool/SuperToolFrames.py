@@ -108,8 +108,10 @@ class Popup(tk.Toplevel):
         self.focus_force()
         
         # set window title, size, and resizability
-        # @TODO put window in center of parent window
         self.title(title)
-        self.geometry("+500+500")
+        # find where to put the window, trying to center
+        x_point = root.winfo_rootx() + root.winfo_width()//5
+        y_point = root.winfo_rooty() + root.winfo_height()//5
+        self.geometry(f"+{x_point}+{y_point}")
         self.resizable(False, False)
         
