@@ -62,28 +62,28 @@ class Test:
         if self.type == "Voltage Reference":
             print("voltage ref in test_defaults: ", self.name)
             attributes = [
-                ("dyd_filename",    '',     'PATH',     True,   "dyd"),
-                ("sav_filename",    '',     'PATH',     True,   "sav"),
-                ("chf_filename",    '',     'PATH',     False,  "chf"),
-                ("csv_filename",    '',     'PATH',     False,  "csv"),
-                ("rep_filename",    '',     'PATH',     False,  "rep"),
-                ("mes_filename",    '',     'PATH',     True,   "csv"),
-                ("StepTimeInSecs",  0.745,       'NUM'),
-                ("UpStepInPU",      0.02,       'NUM'),
-                ("DnStepInPU",      0.02,       'NUM'),
-                ("StepLenInSecs",   11.99,       'NUM'),
-                ("TotTimeInSecs",   25.735,      'NUM'),
-                ("PSS_On",          False,  'BOOL'),
-                ("SysFreqInHz",     60,      'NUM'),
-                ("SimPtsPerCycle",  8,      'NUM'),
-                ("set_loadflow",    True,  'BOOL'),
-                ("save_loadflow",   False,  'BOOL'),
-                ("Pinit",           0,      'NUM'),   # MW
-                ("Qinit",           0,      'NUM'),   # MVAR
-                ("MVAbase",         0,      'NUM'),
-                ("Vinit",           0,      'NUM'),   # kV,
-                ("Vbase",           0,      'NUM'),   # kV,
-                ("Zbranch",         0.05,      'NUM'),   # pu
+                ("dyd_filename",    '',     'PATH',     True,   "dyd",  "Dyn Data File",    "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "),
+                ("sav_filename",    '',     'PATH',     True,   "sav",  "Save Case File",   "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."),
+                ("chf_filename",    '',     'PATH',     False,  "chf",  "Channel File",     "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."),
+                ("csv_filename",    '',     'PATH',     False,  "csv",  "CSV - Sim Data",   "This is output file containing the simulation data, as converted to the csv format."),
+                ("rep_filename",    '',     'PATH',     False,  "rep",  "Report File",      "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."),
+                ("mes_filename",    '',     'PATH',     True,   "csv",  "CSV - Meas Data"   "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "),
+                ("StepTimeInSecs",  0.745,  'NUM',      "sec",  "Start Step Time",      "At this time in seconds (s), the Vstep is applied to the simulation run."),
+                ("UpStepInPU",      0.02,   'NUM',      "pu",   "Up Vstep size",        "At the begin time of the step, this Vstep (pu) is applied to the simulation run."),
+                ("DnStepInPU",      0.02,   'NUM',      "pu",   "Down VStep size",      "At the end time of the step, this Vstep (pu) is removed from the simulation run."),
+                ("StepLenInSecs",   11.99,  'NUM',      "sec",  "Step Length",          "This time in seconds (s) is the length of the step, after which the downstep will be applied."),
+                ("TotTimeInSecs",   25.735, 'NUM',      "sec",  "Sim run time",         "This time in seconds (s) is the total length of the simulation run."),
+                ("PSS_On",          False,  'BOOL',     "",     "PSS On?",              "If a relevant Power System Stabilizer  Model is included in the *.dyd, then unchecking this box disables the pss model in the simulation run."),
+                ("SysFreqInHz",     60,     'NUM',      "Hz",   "System Freq",          "In general, The system frequency in US is 60 Hz."),
+                ("SimPtsPerCycle",  8,      'NUM',      "",     "Sim Pts per Cycle",    "the simulation delta step is calculated as 1 / (System Frequency * Simulation Points Per Cycle). This number is usually 4 or 8"),
+                ("set_loadflow",    True,   'BOOL',     "",     "Set Loadflow?",        "Do you want to set the loadflow for this simulation run with the below values? This does not overwrite the save case, just loads initialized values in for this simulation run."),
+                ("save_loadflow",   False,  'BOOL',     "",     "Save Loadflow?",       "Do you want to save the loadflow for this simulation run with the below values? This will overwrite the values in the load flow."),
+                ("Pinit",           0,      'NUM',      "MW",   "Init Gen P",           "Initialized value of Real Power of the generator model set into the *.sav loadflow."),   # MW
+                ("Qinit",           0,      'NUM',      "MVAR", "Init Gen Q",           "Initialized value of Reactive Power of the generator model set into the *.sav loadflow."),   # MVAR
+                ("MVAbase",         0,      'NUM',      "MVA",  "Gen MVA Rating",       "MVA base of the generator, as indicated on the nameplate."),
+                ("Vinit",           0,      'NUM',      "kV",   "Init Gen Vt",          "Initialized value of terminal voltage of the generator model set into the *.sav loadflow."),   # kV,
+                ("Vbase",           0,      'NUM',      "kV",   "Gen Vt Rating",        "Terminal Voltage base of the generator, as indicated on the nameplate."),   # kV,
+                ("Zbranch",         0.05,   'NUM',      "pu",   "System Impedance",     "The impedane of the system, as seen by the unit, on a 100MVA base. Can use per unitized measured X=dV/dQ to approximate impedance."),   # pu
             ]
 
             for a in attributes:
