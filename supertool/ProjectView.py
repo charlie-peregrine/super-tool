@@ -8,7 +8,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
 
-from supertool.SuperToolFrames import ScrollFrame
+from supertool.SuperToolFrames import ScrollFrame, Popup
 
 # subclass of frame, used to hold a nested visual structure of the
 # underlying SuperToolProject object, and allow the user to manipulate
@@ -326,18 +326,8 @@ class ProjectView(ttk.Frame):
     # user for a test name and type, as well as performing error checking
     # on their input and prompting them for fixes to those errors
     def add_test(self, unit):
-        # create the add_test window and make it hold onto focus
-        test_prompt_window = tk.Toplevel(self.parent)
-        test_prompt_window.transient(self.parent)
-        test_prompt_window.grab_set()
-        test_prompt_window.focus_force()
-        # self.parent.wait_window(test_prompt_window) # not necessary?
-
-        # set window title, size, and resizability
-        test_prompt_window.title("New Test")
-        # @TODO put window in center of parent window
-        test_prompt_window.geometry("+500+500")
-        test_prompt_window.resizable(False, False)
+        # create the add_test window
+        test_prompt_window = Popup(self.parent, "New Test")
 
         ## section for putting in single gui elements
         # add test name label
