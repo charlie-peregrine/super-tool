@@ -22,4 +22,7 @@ HIDE_PSLF_GUI = config_data['HIDE_PSLF_GUI']
 MY_ENV = os.environ.copy()
 MY_ENV["PATH"] += VEUSZ_PATH + ';'
 
+# save the directory that the source code is run from
+SUPERTOOL_DIR = os.getcwd()
+
 print("===== config.json loaded =====")
