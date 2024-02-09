@@ -20,6 +20,7 @@ class Attribute:
             self.var = tk.BooleanVar(value=value)
         else:
             self.var = tk.DoubleVar(value=value)
+            self.unit = args[0]
     
     def write(self, file):
         file.write("\t".join([

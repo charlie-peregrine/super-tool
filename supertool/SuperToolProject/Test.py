@@ -67,7 +67,7 @@ class Test:
                 ("chf_filename",    '',     'PATH',     False,  "chf",  "Channel File",     "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."),
                 ("csv_filename",    '',     'PATH',     False,  "csv",  "CSV - Sim Data",   "This is output file containing the simulation data, as converted to the csv format."),
                 ("rep_filename",    '',     'PATH',     False,  "rep",  "Report File",      "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."),
-                ("mes_filename",    '',     'PATH',     True,   "csv",  "CSV - Meas Data"   "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "),
+                ("mes_filename",    '',     'PATH',     True,   "csv",  "CSV - Meas Data",   "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "),
                 ("StepTimeInSecs",  0.745,  'NUM',      "sec",  "Start Step Time",      "At this time in seconds (s), the Vstep is applied to the simulation run."),
                 ("UpStepInPU",      0.02,   'NUM',      "pu",   "Up Vstep size",        "At the begin time of the step, this Vstep (pu) is applied to the simulation run."),
                 ("DnStepInPU",      0.02,   'NUM',      "pu",   "Down VStep size",      "At the end time of the step, this Vstep (pu) is removed from the simulation run."),
@@ -120,17 +120,17 @@ class Test:
         elif self.type == "Steady State":
             print("steady state in test_defaults:", self.name)
             attributes = [
-                ("dyd_filename",        '',     'PATH',     True,   "dyd"),
-                ("sav_filename",        '',     'PATH',     True,   "sav"),
-                ("chf_filename",        '',     'PATH',     False,  "chf"),
-                ("rep_filename",        '',     'PATH',     False,  "rep"),
-                ("in_filename",         '',     'PATH',     True,   "csv"),
-                ("out_filename",        '',     'PATH',     False,  "csv"),
-                ("if_base",             0,      'NUM'),
-                ("if_res",              0,      'NUM'),
-                ("UseGenField",         False,  'BOOL'),
-                ("Vbase",               0,      'NUM'),
-                ("Zbranch",             0,      'NUM'),
+                ("dyd_filename",        '',     'PATH',     True,   "dyd",      "ss_full_name",     "ss_desc"),
+                ("sav_filename",        '',     'PATH',     True,   "sav",      "ss_full_name",     "ss_desc"),
+                ("chf_filename",        '',     'PATH',     False,  "chf",      "ss_full_name",     "ss_desc"),
+                ("rep_filename",        '',     'PATH',     False,  "rep",      "ss_full_name",     "ss_desc"),
+                ("in_filename",         '',     'PATH',     True,   "csv",      "ss_full_name",     "ss_desc"),
+                ("out_filename",        '',     'PATH',     False,  "csv",      "ss_full_name",     "ss_desc"),
+                ("if_base",             0,      'NUM',      "",                 "ss_full_name",     "ss_desc"),
+                ("if_res",              0,      'NUM',      "",                 "ss_full_name",     "ss_desc"),
+                ("UseGenField",         False,  'BOOL',                         "ss_full_name",     "ss_desc"),
+                ("Vbase",               0,      'NUM',      "",                 "ss_full_name",     "ss_desc"),
+                ("Zbranch",             0,      'NUM',      "",                 "ss_full_name",     "ss_desc"),
                 ]
             
             for a in attributes:
@@ -158,28 +158,28 @@ class Test:
         elif self.type == "Current Interruption":
             print("current interrupt in test_defaults: ", self.name)
             attributes = [
-                ("dyd_filename",    '',     'PATH',     True,   "dyd"),
-                ("sav_filename",    '',     'PATH',     True,   "sav"),
-                ("chf_filename",    '',     'PATH',     False,  "chf"),
-                ("csv_filename",    '',     'PATH',     False,  "csv"),
-                ("rep_filename",    '',     'PATH',     False,  "rep"),
-                ("mes_filename",    '',     'PATH',     True,   "csv"),
-                ("tripTimeInSecs",   2.0,    'NUM'),
-                ("totTimeInSec",    36,     'NUM'),
-                ("PSS_On",          False,  'BOOL'),    # 0:disable PSS model, 1: enable PSS model */
-                ("change_Pref",     True,   'BOOL'),    # 1:Change Pref after breaker opens, 0: no change */
-                ("offline_Pref",    0.004,  'NUM'),     # note GGOV model uses 1 as base offline while HYG3 and IEEE1 use 0 */
-                ("change_Vref",     False,  'BOOL'),    # 1:Change Vref after breaker opens, 0: no change */
-                ("offline_Vref",    0.79,   'NUM'),
-                ("AVR_On",          False,  'BOOL'),    # 0: Exciter in Manual, 1: Exciter in Auto */
-                ("set_loadflow",    False,  'BOOL'),
-                ("save_loadflow",   False,  'BOOL'),
-                ("Pinit",           0,      'NUM'),   # MW
-                ("Qinit",           0,      'NUM'),   # MVAR
-                ("MVAbase",         0,      'NUM'),
-                ("Vinit",           0,      'NUM'),   # kV,
-                ("Vbase",           0,      'NUM'),   # kV,
-                ("Zbranch",         0,      'NUM')   # pu
+                ("dyd_filename",    '',     'PATH',     True,   "dyd",      "ci_full_name",     "ci_desc"),
+                ("sav_filename",    '',     'PATH',     True,   "sav",      "ci_full_name",     "ci_desc"),
+                ("chf_filename",    '',     'PATH',     False,  "chf",      "ci_full_name",     "ci_desc"),
+                ("csv_filename",    '',     'PATH',     False,  "csv",      "ci_full_name",     "ci_desc"),
+                ("rep_filename",    '',     'PATH',     False,  "rep",      "ci_full_name",     "ci_desc"),
+                ("mes_filename",    '',     'PATH',     True,   "csv",      "ci_full_name",     "ci_desc"),
+                ("tripTimeInSecs",   2.0,    'NUM',     "",                 "ci_full_name",     "ci_desc"),
+                ("totTimeInSec",    36,     'NUM',      "",                 "ci_full_name",     "ci_desc"),
+                ("PSS_On",          False,  'BOOL',                         "ci_full_name",     "ci_desc"),    # 0:disable PSS model, 1: enable PSS model */
+                ("change_Pref",     True,   'BOOL',                         "ci_full_name",     "ci_desc"),    # 1:Change Pref after breaker opens, 0: no change */
+                ("offline_Pref",    0.004,  'NUM',      "",                 "ci_full_name",     "ci_desc"),     # note GGOV model uses 1 as base offline while HYG3 and IEEE1 use 0 */
+                ("change_Vref",     False,  'BOOL',                         "ci_full_name",     "ci_desc"),    # 1:Change Vref after breaker opens, 0: no change */
+                ("offline_Vref",    0.79,   'NUM',      "",                 "ci_full_name",     "ci_desc"),
+                ("AVR_On",          False,  'BOOL',                         "ci_full_name",     "ci_desc"),    # 0: Exciter in Manual, 1: Exciter in Auto */
+                ("set_loadflow",    False,  'BOOL',                         "ci_full_name",     "ci_desc"),
+                ("save_loadflow",   False,  'BOOL',                         "ci_full_name",     "ci_desc"),
+                ("Pinit",           0,      'NUM',      "",     "ci_full_name",     "ci_desc"),   # MW
+                ("Qinit",           0,      'NUM',      "",     "ci_full_name",     "ci_desc"),   # MVAR
+                ("MVAbase",         0,      'NUM',      "",     "ci_full_name",     "ci_desc"),
+                ("Vinit",           0,      'NUM',      "",     "ci_full_name",     "ci_desc"),   # kV,
+                ("Vbase",           0,      'NUM',      "",     "ci_full_name",     "ci_desc"),   # kV,
+                ("Zbranch",         0,      'NUM',      "",     "ci_full_name",     "ci_desc")   # pu
             ]
 
             for a in attributes:
