@@ -45,10 +45,16 @@ def run(test, no_gui=False):
 
 
     # 0 initialize 4 variables used later. NOT inputs
-    Ifd_A               = 0.0
-    Ifd_pu              = 0.0
-    Efd_pu              = 0.0
-    ExcModIndex       = 0
+    Ifd_A   = 0.0
+    
+    Ifd_pu  = 0.0
+    Efd_pu  = 0.0
+    Efe_pu  = 0.0
+    Ife_pu  = 0.0
+    Ef_pu   = 0.0
+    If_pu   = 0.0
+
+    ExcModIndex         = 0
 
 
     # gets the project directory of this file and initialize the PSLF instance
@@ -86,7 +92,7 @@ def run(test, no_gui=False):
         f = open(os.path.join(project_directory,out_filename), "w", newline='')
         csvOutFile = csv.writer(f)
         csvHeader = ['Load Point','P (MW)','Q (MVAR)','Vt (kV)','Ef (V)','If (A)','If-sim (pu)','If-meas (pu)', 'Diff (%)', 'Abs(Diff) (%)','','Vt-meas (pu)',
-                     'Vt-sim (pu)','BusV-sched (pu)','','ef-sim (pu)','if-sim (pu)','Ef=If?',
+                     'Vt-sim (pu)','BusV-sched (pu)','','Efd-sim','Ifd-sim','Efd=Ifd?','Efe-sim','Efe=Ife?','Ife-sim (pu)',
                      'If-sim (A)']
         csvOutFile.writerow(csvHeader)
     except:
@@ -168,59 +174,91 @@ def run(test, no_gui=False):
         ret = SuperTool.init(chf_filename,rep_filename,0,1,"","", 1)
 
         #  Retrieve Ifd_pu and Efd_pu for writing to output csv file
-        if(UseGenField):
-            Ifd_pu = GeneratorInitialConditions[0].Ladifd
-            Efd_pu = GeneratorInitialConditions[0].Efd
-        elif('esac' in excModName):
+        # if(UseGenField):
+
+        #initializes the exciter and generator field quantities as if it were static
+        Efd_pu  = GeneratorInitialConditions[0].Efd
+        Ifd_pu  = GeneratorInitialConditions[0].Ladifd
+        Ife_pu  = 0
+        Efe_pu  = 0
+        Ef_pu   = Efd_pu
+        If_pu   = Ifd_pu
+
+        #if it is brushless not static, then the exciter quantities are set
+        if('esac' in excModName):
             print("Excitation Type: Brushless")
-            Ifd_pu = Pslf.get_model_parameters(1,1,-1, "1 ", 1, excModName,"vfe")
-            Efd_pu = Pslf.get_model_parameters(1,1,-1, "1 ", 1, excModName,"vr")
+            Efe_pu  = Pslf.get_model_parameters(1,1,-1, "1 ", 1, excModName,"vr")
+            Ife_pu  = Pslf.get_model_parameters(1,1,-1, "1 ", 1, excModName,"vfe")
+            # if UseGenField selected, it uses the generator field for steady state analysis
+            if  UseGenField:
+                Ef_pu = Efd_pu
+                If_pu = Ifd_pu
+            else:
+                Ef_pu = Efe_pu
+                If_pu = Ife_pu
+
         elif('rexs' in excModName):
             print("Excitation Type: Brushless")
             # note that rexs model exciter field quantities have different names in model than the esac models
-            Ifd_pu = Pslf.get_model_parameters(1,1,-1, "1 ", 1, excModName,"ife")
-            Efd_pu = Pslf.get_model_parameters(1,1,-1, "1 ", 1, excModName,"vfe")
+            Efe_pu  = Pslf.get_model_parameters(1,1,-1, "1 ", 1, excModName,"vfe")
+            Ife_pu  = Pslf.get_model_parameters(1,1,-1, "1 ", 1, excModName,"ife")
+            # if UseGenField selected, it uses the generator field for steady state analysis
+            if  UseGenField:
+                Ef_pu = Efd_pu
+                If_pu = Ifd_pu
+            else:
+                Ef_pu = Efe_pu
+                If_pu = Ife_pu
+
         else:
             print("Excitation Type: Static or DC")
-            Ifd_pu = GeneratorInitialConditions[0].Ladifd
-            Efd_pu = GeneratorInitialConditions[0].Efd
+            Ifd_pu  = GeneratorInitialConditions[0].Ladifd
+            Efd_pu  = GeneratorInitialConditions[0].Efd
+            Ife_pu  = 0
+            Efe_pu  = 0
 
         # calculates Exciter Field in amps
         Ifd_A = Ifd_pu * (if_base-if_res)
 
         #calculates if simulation run is at steady state by comparing If and Ef
-        isSteadyState = ''
-        field_Error = ((Efd_pu-Ifd_pu)/Efd_pu)
-        if field_Error<0.0001:
-            isSteadyState=True
-        else:
-            isSteadyState=False
+        GenFieldSteady = ''
+        if Efd_pu==Ifd_pu: field_Error=0
+        else: field_Error = ((Efd_pu-Ifd_pu)/Efd_pu)
+        if field_Error<0.0001: GenFieldSteady=True
+        else: GenFieldSteady=False
+
+        ExcFieldSteady = ''
+
+        if Efe_pu==Ife_pu: field_Error=0
+        else: field_Error = ((Efd_pu-Ifd_pu)/Efd_pu)
+        if field_Error<0.0001: ExcFieldSteady=True
+        else: ExcFieldSteady=False
             
         
         if fields_measured:
             
             # convert measured exciter field to per unit
-            Ifd_pu_meas = (Ifdgen + if_res) / if_base
-            diff_perc = 100 * (Ifd_pu - Ifd_pu_meas) / Ifd_pu
-            abs_diff_perc = 100 * abs(Ifd_pu - Ifd_pu_meas) / Ifd_pu
+            If_pu_meas = (Ifdgen + if_res) / if_base
+            diff_perc = 100 * (If_pu - If_pu_meas) / If_pu
+            abs_diff_perc = 100 * abs(If_pu - If_pu_meas) / If_pu
 
             # generate row to write
             csvOutData = [csvRowIndex-1, Pgen, Qgen, round(Vtgen*Vbase,2), round(Efdgen,2), 
-                        round(Ifdgen,2), round(Ifd_pu,3), round(Ifd_pu_meas,3), str(round(diff_perc,2))+'%',
+                        round(Ifdgen,2), round(If_pu,3), round(If_pu_meas,3), str(round(diff_perc,2))+'%',
                         str(round(abs_diff_perc,2))+'%',
                         '', 
                         round(Vtgen,3), round(Bus[0].Vm,3), round(Bus[1].Vsched,3),
                         '',
-                        round(Efd_pu,5), round(Ifd_pu,5), isSteadyState,
+                        round(Efd_pu,3), round(Ifd_pu,3), GenFieldSteady, round(Efe_pu,3), round(Ife_pu,3), ExcFieldSteady,
                         round(Ifd_A,2)]
         else:
             # generate row to write
             csvOutData = [csvRowIndex-1, Pgen, Qgen, round(Vtgen*Vbase,2), '###', 
-                        '###', round(Ifd_pu,3), '###','###%','###%',
+                        '###', round(If_pu,3), '###','###%','###%',
                         '',
                         round(Vtgen,3), round(Bus[0].Vm,3),round(Bus[1].Vsched,3),
                         '',
-                        round(Efd_pu,5), round(Ifd_pu,5), isSteadyState,
+                        round(Efd_pu,3), round(Ifd_pu,3), GenFieldSteady, round(Efe_pu,3), round(Ife_pu,3), ExcFieldSteady,
                         round(Ifd_A,2)]
         # write to the csv
         csvOutFile.writerow(csvOutData)
