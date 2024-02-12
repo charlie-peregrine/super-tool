@@ -50,7 +50,7 @@ class Attribute:
     
     # string conversion overload
     def __str__(self):
-        return "      [A {} | {} | {} | {} ]".format(
-            self.name, self.type, self.var.get(), self.unit
+        return "      [A {} | {} | {} ]".format(
+            self.name, self.type, self.var.get()
         )
     
