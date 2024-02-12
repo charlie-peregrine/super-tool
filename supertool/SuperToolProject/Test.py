@@ -229,6 +229,8 @@ class Test:
                                 raise ValueError()
                     case 'NUM':
                         convert_type = float    # type: ignore
+                    case 'STR':
+                        convert_type = str      # type: ignore
                     case _:
                         print(type_ + " is not a valid attribute type. ignoring.")
                         continue
@@ -267,6 +269,8 @@ class Test:
                             raise ValueError()
                 case 'NUM':
                     convert_type = float    # type: ignore
+                case 'STR':
+                    convert_type = str      # type: ignore
                 case _:
                     print(type_ + " is not a valid attribute type. ignoring.")
                     return
