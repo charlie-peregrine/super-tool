@@ -68,14 +68,14 @@ class Test:
                 # print(n, str(d)[:50])
                 self.attrs[n] = Attribute(n, d)
 
+            # set the voltage reference runner as the script for voltage reference
+            self.script = lambda no_gui: Voltage_Reference.run(self, no_gui=no_gui)
+
             # default initialize header structures
             keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd']
             for k in keys:
                 self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
                 self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
-
-            # set the voltage reference runner as the script for voltage reference
-            self.script = lambda no_gui: Voltage_Reference.run(self, no_gui=no_gui)
             
             # set plot files to grab from
             self.plot_sim_file = 'csv_filename'
@@ -104,11 +104,12 @@ class Test:
                 # print(n, str(d)[:50])
                 self.attrs[n] = Attribute(n, d)
             
+            # set the voltage reference runner as the script for voltage reference
+            self.script = lambda no_gui: Steady_State.run(self, no_gui=no_gui)
+            
             keys = ['mes', 'sim']
             for k in keys:
                 self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
-            
-            self.script = lambda no_gui: Steady_State.run(self, no_gui=no_gui)
             
             # set plot file to grab from, there is no measured file since
             # steady state does the silly 1 to 1 comparison plot
@@ -131,15 +132,15 @@ class Test:
                 # print(n, str(d)[:50])
                 self.attrs[n] = Attribute(n, d)
             
+            # set the voltage reference runner as the script for voltage reference
+            self.script = lambda no_gui: Current_Interruption.run(self, no_gui=no_gui)
+
             # default initialize header structures
             # @TODO reset these on change?
             keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd', 'freq']
             for k in keys:
                 self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
                 self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
-
-            # set the voltage reference runner as the script for voltage reference
-            self.script = lambda no_gui: Current_Interruption.run(self, no_gui=no_gui)
             
             # set plot files to grab from
             self.plot_sim_file = 'csv_filename'
