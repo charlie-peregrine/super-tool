@@ -20,6 +20,8 @@ class Attribute:
         elif self.type == 'NUM':
             self.var = tk.DoubleVar(value=defaults['default'])
             self.unit = defaults['unit']
+        elif self.type == 'STR':
+            self.var = tk.StringVar(value=defaults['default'])
         else:
             raise ValueError(f"Attribute type {self.type} is not valid")
     
