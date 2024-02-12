@@ -92,8 +92,8 @@ def run(test, no_gui=False):
         f = open(os.path.join(project_directory,out_filename), "w", newline='')
         csvOutFile = csv.writer(f)
         csvHeader = ['Load Point','P (MW)','Q (MVAR)','Vt (kV)','Ef (V)','If (A)','If-sim (pu)','If-meas (pu)', 'Diff (%)', 'Abs(Diff) (%)','','Vt-meas (pu)',
-                     'Vt-sim (pu)','BusV-sched (pu)','','Efd-sim','Ifd-sim','Efd=Ifd?','Efe-sim','Efe=Ife?','Ife-sim (pu)',
-                     'If-sim (A)']
+                     'Vt-sim (pu)','BusV-sched (pu)','','Efd-sim','Ifd-sim','Efd=Ifd?','Efe-sim','Ife-sim (pu)','Efe=Ife?',
+                     '','If-sim (A)']
         csvOutFile.writerow(csvHeader)
     except:
         SuperTool.fatal_error("Unable to open output .csv file.")
@@ -250,7 +250,7 @@ def run(test, no_gui=False):
                         round(Vtgen,3), round(Bus[0].Vm,3), round(Bus[1].Vsched,3),
                         '',
                         round(Efd_pu,3), round(Ifd_pu,3), GenFieldSteady, round(Efe_pu,3), round(Ife_pu,3), ExcFieldSteady,
-                        round(Ifd_A,2)]
+                        '', round(Ifd_A,2)]
         else:
             # generate row to write
             csvOutData = [csvRowIndex-1, Pgen, Qgen, round(Vtgen*Vbase,2), '###', 
@@ -259,7 +259,7 @@ def run(test, no_gui=False):
                         round(Vtgen,3), round(Bus[0].Vm,3),round(Bus[1].Vsched,3),
                         '',
                         round(Efd_pu,3), round(Ifd_pu,3), GenFieldSteady, round(Efe_pu,3), round(Ife_pu,3), ExcFieldSteady,
-                        round(Ifd_A,2)]
+                        '', round(Ifd_A,2)]
         # write to the csv
         csvOutFile.writerow(csvOutData)
     
