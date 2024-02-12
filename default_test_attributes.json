@@ -1,0 +1,401 @@
+{
+    "vstep": {
+        "dyd_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "dyd",
+            "full_name": "Dyn Data File",
+            "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
+        },
+        "sav_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "sav",
+            "full_name": "Save Case File",
+            "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
+        },
+        "chf_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "chf",
+            "full_name": "Channel File",
+            "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
+        },
+        "csv_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "csv",
+            "full_name": "CSV - Sim Data",
+            "description": "This is output file containing the simulation data, as converted to the csv format."
+        },
+        "rep_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "rep",
+            "full_name": "Report File",
+            "description": "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+        },
+        "mes_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "csv",
+            "full_name": "CSV - Meas Data",
+            "description": "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "
+        },
+        "StepTimeInSecs": {
+            "type": "NUM",
+            "default": 0.745,
+            "unit": "sec",
+            "full_name": "Start Step Time",
+            "description": "At this time in seconds (s), the Vstep is applied to the simulation run."
+        },
+        "UpStepInPU": {
+            "type": "NUM",
+            "default": 0.02,
+            "unit": "pu",
+            "full_name": "Up Vstep size",
+            "description": "At the begin time of the step, this Vstep (pu) is applied to the simulation run."
+        },
+        "DnStepInPU": {
+            "type": "NUM",
+            "default": 0.02,
+            "unit": "pu",
+            "full_name": "Down VStep size",
+            "description": "At the end time of the step, this Vstep (pu) is removed from the simulation run."
+        },
+        "StepLenInSecs": {
+            "type": "NUM",
+            "default": 11.99,
+            "unit": "sec",
+            "full_name": "Step Length",
+            "description": "This time in seconds (s) is the length of the step, after which the downstep will be applied."
+        },
+        "TotTimeInSecs": {
+            "type": "NUM",
+            "default": 25.735,
+            "unit": "sec",
+            "full_name": "Sim run time",
+            "description": "This time in seconds (s) is the total length of the simulation run."
+        },
+        "PSS_On": {
+            "type": "BOOL",
+            "default": false,
+            "full_name": "",
+            "description": "PSS On?"
+        },
+        "SysFreqInHz": {
+            "type": "NUM",
+            "default": 60,
+            "unit": "Hz",
+            "full_name": "System Freq",
+            "description": "In general, The system frequency in US is 60 Hz."
+        },
+        "SimPtsPerCycle": {
+            "type": "NUM",
+            "default": 8,
+            "unit": "",
+            "full_name": "Sim Pts per Cycle",
+            "description": "the simulation delta step is calculated as 1 / (System Frequency * Simulation Points Per Cycle). This number is usually 4 or 8"
+        },
+        "set_loadflow": {
+            "type": "BOOL",
+            "default": true,
+            "full_name": "",
+            "description": "Set Loadflow?"
+        },
+        "save_loadflow": {
+            "type": "BOOL",
+            "default": false,
+            "full_name": "",
+            "description": "Save Loadflow?"
+        },
+        "Pinit": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "MW",
+            "full_name": "Init Gen P",
+            "description": "Initialized value of Real Power of the generator model set into the *.sav loadflow."
+        },
+        "Qinit": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "MVAR",
+            "full_name": "Init Gen Q",
+            "description": "Initialized value of Reactive Power of the generator model set into the *.sav loadflow."
+        },
+        "MVAbase": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "MVA",
+            "full_name": "Gen MVA Rating",
+            "description": "MVA base of the generator, as indicated on the nameplate."
+        },
+        "Vinit": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "kV",
+            "full_name": "Init Gen Vt",
+            "description": "Initialized value of terminal voltage of the generator model set into the *.sav loadflow."
+        },
+        "Vbase": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "kV",
+            "full_name": "Gen Vt Rating",
+            "description": "Terminal Voltage base of the generator, as indicated on the nameplate."
+        },
+        "Zbranch": {
+            "type": "NUM",
+            "default": 0.05,
+            "unit": "pu",
+            "full_name": "System Impedance",
+            "description": "The impedance of the system, as seen by the unit, on a 100MVA base. Can use per unitized measured X=dV/dQ to approximate impedance."
+        }
+    },
+    "steadystate": {
+        "dyd_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "dyd",
+            "full_name": "Dyn Data File",
+            "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
+        },
+        "sav_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "sav",
+            "full_name": "Save Case File",
+            "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
+        },
+        "chf_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "chf",
+            "full_name": "Channel File",
+            "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
+        },
+        "rep_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "rep",
+            "full_name": "Report File",
+            "description": "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+        },
+        "in_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "csv",
+            "full_name": "ss_full_name",
+            "description": "ss_desc"
+        },
+        "out_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "csv",
+            "full_name": "ss_full_name",
+            "description": "ss_desc"
+        },
+        "if_base": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "",
+            "full_name": "ss_full_name",
+            "description": "ss_desc"
+        },
+        "if_res": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "",
+            "full_name": "ss_full_name",
+            "description": "ss_desc"
+        },
+        "UseGenField": {
+            "type": "BOOL",
+            "default": false,
+            "full_name": "ss_full_name",
+            "description": "ss_desc"
+        },
+        "Vbase": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "",
+            "full_name": "Gen Vt Rating",
+            "description": "Terminal Voltage base of the generator, as indicated on the nameplate."
+        },
+        "Zbranch": {
+            "type": "NUM",
+            "default": 0.05,
+            "unit": "pu",
+            "full_name": "System Impedance",
+            "description": "The impedance of the system, as seen by the unit, on a 100MVA base. Can use per unitized measured X=dV/dQ to approximate impedance."
+        }
+    },
+    "currint": {
+        "dyd_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "dyd",
+            "full_name": "Dyn Data File",
+            "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
+        },
+        "sav_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "sav",
+            "full_name": "Save Case File",
+            "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
+        },
+        "chf_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "chf",
+            "full_name": "Channel File",
+            "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
+        },
+        "csv_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "csv",
+            "full_name": "CSV - Sim Data",
+            "description": "This is output file containing the simulation data, as converted to the csv format."
+        },
+        "rep_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": false,
+            "extension": "rep",
+            "full_name": "Report File",
+            "description": "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+        },
+        "mes_filename": {
+            "type": "PATH",
+            "default": "",
+            "read_only": true,
+            "extension": "csv",
+            "full_name": "CSV - Meas Data",
+            "description": "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "
+        },
+        "tripTimeInSecs": {
+            "type": "NUM",
+            "default": 2.0,
+            "unit": "",
+            "full_name": "ci_full_name",
+            "description": "ci_desc"
+        },
+        "totTimeInSec": {
+            "type": "NUM",
+            "default": 36,
+            "unit": "",
+            "full_name": "ci_full_name",
+            "description": "ci_desc"
+        },
+        "PSS_On": {
+            "type": "BOOL",
+            "default": false,
+            "full_name": "",
+            "description": "PSS On?"
+        },
+        "change_Pref": {
+            "type": "BOOL",
+            "default": true,
+            "full_name": "ci_full_name",
+            "description": "ci_desc"
+        },
+        "offline_Pref": {
+            "type": "NUM",
+            "default": 0.004,
+            "unit": "",
+            "full_name": "ci_full_name",
+            "description": "ci_desc"
+        },
+        "change_Vref": {
+            "type": "BOOL",
+            "default": false,
+            "full_name": "ci_full_name",
+            "description": "ci_desc"
+        },
+        "offline_Vref": {
+            "type": "NUM",
+            "default": 0.79,
+            "unit": "",
+            "full_name": "ci_full_name",
+            "description": "ci_desc"
+        },
+        "AVR_On": {
+            "type": "BOOL",
+            "default": false,
+            "full_name": "ci_full_name",
+            "description": "ci_desc"
+        },
+        "set_loadflow": {
+            "type": "BOOL",
+            "default": true,
+            "full_name": "",
+            "description": "Set Loadflow?"
+        },
+        "save_loadflow": {
+            "type": "BOOL",
+            "default": false,
+            "full_name": "",
+            "description": "Save Loadflow?"
+        },
+        "Pinit": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "MW",
+            "full_name": "Init Gen P",
+            "description": "Initialized value of Real Power of the generator model set into the *.sav loadflow."
+        },
+        "Qinit": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "MVAR",
+            "full_name": "Init Gen Q",
+            "description": "Initialized value of Reactive Power of the generator model set into the *.sav loadflow."
+        },
+        "MVAbase": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "MVA",
+            "full_name": "Gen MVA Rating",
+            "description": "MVA base of the generator, as indicated on the nameplate."
+        },
+        "Vinit": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "kV",
+            "full_name": "Init Gen Vt",
+            "description": "Initialized value of terminal voltage of the generator model set into the *.sav loadflow."
+        },
+        "Vbase": {
+            "type": "NUM",
+            "default": 0,
+            "unit": "",
+            "full_name": "Gen Vt Rating",
+            "description": "Terminal Voltage base of the generator, as indicated on the nameplate."
+        },
+        "Zbranch": {
+            "type": "NUM",
+            "default": 0.05,
+            "unit": "pu",
+            "full_name": "System Impedance",
+            "description": "The impedance of the system, as seen by the unit, on a 100MVA base. Can use per unitized measured X=dV/dQ to approximate impedance."
+        }
+    }
+}

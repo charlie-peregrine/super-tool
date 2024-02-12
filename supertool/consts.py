@@ -23,3 +23,11 @@ MY_ENV = os.environ.copy()
 MY_ENV["PATH"] += VEUSZ_PATH + ';'
 
 print("===== config.json loaded =====")
+
+print("===== loading default_test_attributes.json =====")
+
+with open("default_test_attributes.json", 'r') as file:
+    DEFAULT_TEST_ATTRIBUTES = json.load(file)
+
+print("===== default_test_attributes.json loaded =====")
+

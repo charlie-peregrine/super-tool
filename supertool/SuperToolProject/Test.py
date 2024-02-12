@@ -6,6 +6,7 @@ import tkinter as tk
 from supertool.pslf_scripts import Voltage_Reference, Steady_State
 from supertool.pslf_scripts import Current_Interruption
 import supertool.veusz_handler as veusz_handler
+import supertool.consts as consts
 
 from supertool.SuperToolProject.Attribute import Attribute
 
@@ -61,33 +62,11 @@ class Test:
         # only voltage ref set up as of yet
         if self.type == "Voltage Reference":
             print("voltage ref in test_defaults: ", self.name)
-            attributes = [
-                ("dyd_filename",    '',     'PATH',     True,   "dyd",  "Dyn Data File",    "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "),
-                ("sav_filename",    '',     'PATH',     True,   "sav",  "Save Case File",   "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."),
-                ("chf_filename",    '',     'PATH',     False,  "chf",  "Channel File",     "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."),
-                ("csv_filename",    '',     'PATH',     False,  "csv",  "CSV - Sim Data",   "This is output file containing the simulation data, as converted to the csv format."),
-                ("rep_filename",    '',     'PATH',     False,  "rep",  "Report File",      "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."),
-                ("mes_filename",    '',     'PATH',     True,   "csv",  "CSV - Meas Data",   "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "),
-                ("StepTimeInSecs",  0.745,  'NUM',      "sec",  "Start Step Time",      "At this time in seconds (s), the Vstep is applied to the simulation run."),
-                ("UpStepInPU",      0.02,   'NUM',      "pu",   "Up Vstep size",        "At the begin time of the step, this Vstep (pu) is applied to the simulation run."),
-                ("DnStepInPU",      0.02,   'NUM',      "pu",   "Down VStep size",      "At the end time of the step, this Vstep (pu) is removed from the simulation run."),
-                ("StepLenInSecs",   11.99,  'NUM',      "sec",  "Step Length",          "This time in seconds (s) is the length of the step, after which the downstep will be applied."),
-                ("TotTimeInSecs",   25.735, 'NUM',      "sec",  "Sim run time",         "This time in seconds (s) is the total length of the simulation run."),
-                ("PSS_On",          False,  'BOOL',     "",     "PSS On?",              "If a relevant Power System Stabilizer  Model is included in the *.dyd, then unchecking this box disables the pss model in the simulation run."),
-                ("SysFreqInHz",     60,     'NUM',      "Hz",   "System Freq",          "In general, The system frequency in US is 60 Hz."),
-                ("SimPtsPerCycle",  8,      'NUM',      "",     "Sim Pts per Cycle",    "the simulation delta step is calculated as 1 / (System Frequency * Simulation Points Per Cycle). This number is usually 4 or 8"),
-                ("set_loadflow",    True,   'BOOL',     "",     "Set Loadflow?",        "Do you want to set the loadflow for this simulation run with the below values? This does not overwrite the save case, just loads initialized values in for this simulation run."),
-                ("save_loadflow",   False,  'BOOL',     "",     "Save Loadflow?",       "Do you want to save the loadflow for this simulation run with the below values? This will overwrite the values in the load flow."),
-                ("Pinit",           0,      'NUM',      "MW",   "Init Gen P",           "Initialized value of Real Power of the generator model set into the *.sav loadflow."),   # MW
-                ("Qinit",           0,      'NUM',      "MVAR", "Init Gen Q",           "Initialized value of Reactive Power of the generator model set into the *.sav loadflow."),   # MVAR
-                ("MVAbase",         0,      'NUM',      "MVA",  "Gen MVA Rating",       "MVA base of the generator, as indicated on the nameplate."),
-                ("Vinit",           0,      'NUM',      "kV",   "Init Gen Vt",          "Initialized value of terminal voltage of the generator model set into the *.sav loadflow."),   # kV,
-                ("Vbase",           0,      'NUM',      "kV",   "Gen Vt Rating",        "Terminal Voltage base of the generator, as indicated on the nameplate."),   # kV,
-                ("Zbranch",         0.05,   'NUM',      "pu",   "System Impedance",     "The impedane of the system, as seen by the unit, on a 100MVA base. Can use per unitized measured X=dV/dQ to approximate impedance."),   # pu
-            ]
 
-            for a in attributes:
-                self.attrs[a[0]] = Attribute(*a)
+            # print(consts.DEFAULT_TEST_ATTRIBUTES['vstep'])
+            for n, d in consts.DEFAULT_TEST_ATTRIBUTES['vstep'].items():
+                # print(n, str(d)[:50])
+                self.attrs[n] = Attribute(n, d)
 
             # default initialize header structures
             keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd']
@@ -119,22 +98,11 @@ class Test:
         
         elif self.type == "Steady State":
             print("steady state in test_defaults:", self.name)
-            attributes = [
-                ("dyd_filename",        '',     'PATH',     True,   "dyd",      "ss_full_name",     "ss_desc"),
-                ("sav_filename",        '',     'PATH',     True,   "sav",      "ss_full_name",     "ss_desc"),
-                ("chf_filename",        '',     'PATH',     False,  "chf",      "ss_full_name",     "ss_desc"),
-                ("rep_filename",        '',     'PATH',     False,  "rep",      "ss_full_name",     "ss_desc"),
-                ("in_filename",         '',     'PATH',     True,   "csv",      "ss_full_name",     "ss_desc"),
-                ("out_filename",        '',     'PATH',     False,  "csv",      "ss_full_name",     "ss_desc"),
-                ("if_base",             0,      'NUM',      "",                 "ss_full_name",     "ss_desc"),
-                ("if_res",              0,      'NUM',      "",                 "ss_full_name",     "ss_desc"),
-                ("UseGenField",         False,  'BOOL',                         "ss_full_name",     "ss_desc"),
-                ("Vbase",               0,      'NUM',      "",                 "ss_full_name",     "ss_desc"),
-                ("Zbranch",             0,      'NUM',      "",                 "ss_full_name",     "ss_desc"),
-                ]
             
-            for a in attributes:
-                self.attrs[a[0]] = Attribute(*a)
+            # print(consts.DEFAULT_TEST_ATTRIBUTES['steadystate'])
+            for n, d in consts.DEFAULT_TEST_ATTRIBUTES['steadystate'].items():
+                # print(n, str(d)[:50])
+                self.attrs[n] = Attribute(n, d)
             
             keys = ['mes', 'sim']
             for k in keys:
@@ -157,34 +125,12 @@ class Test:
             
         elif self.type == "Current Interruption":
             print("current interrupt in test_defaults: ", self.name)
-            attributes = [
-                ("dyd_filename",    '',     'PATH',     True,   "dyd",      "ci_full_name",     "ci_desc"),
-                ("sav_filename",    '',     'PATH',     True,   "sav",      "ci_full_name",     "ci_desc"),
-                ("chf_filename",    '',     'PATH',     False,  "chf",      "ci_full_name",     "ci_desc"),
-                ("csv_filename",    '',     'PATH',     False,  "csv",      "ci_full_name",     "ci_desc"),
-                ("rep_filename",    '',     'PATH',     False,  "rep",      "ci_full_name",     "ci_desc"),
-                ("mes_filename",    '',     'PATH',     True,   "csv",      "ci_full_name",     "ci_desc"),
-                ("tripTimeInSecs",   2.0,    'NUM',     "",                 "ci_full_name",     "ci_desc"),
-                ("totTimeInSec",    36,     'NUM',      "",                 "ci_full_name",     "ci_desc"),
-                ("PSS_On",          False,  'BOOL',                         "ci_full_name",     "ci_desc"),    # 0:disable PSS model, 1: enable PSS model */
-                ("change_Pref",     True,   'BOOL',                         "ci_full_name",     "ci_desc"),    # 1:Change Pref after breaker opens, 0: no change */
-                ("offline_Pref",    0.004,  'NUM',      "",                 "ci_full_name",     "ci_desc"),     # note GGOV model uses 1 as base offline while HYG3 and IEEE1 use 0 */
-                ("change_Vref",     False,  'BOOL',                         "ci_full_name",     "ci_desc"),    # 1:Change Vref after breaker opens, 0: no change */
-                ("offline_Vref",    0.79,   'NUM',      "",                 "ci_full_name",     "ci_desc"),
-                ("AVR_On",          False,  'BOOL',                         "ci_full_name",     "ci_desc"),    # 0: Exciter in Manual, 1: Exciter in Auto */
-                ("set_loadflow",    False,  'BOOL',                         "ci_full_name",     "ci_desc"),
-                ("save_loadflow",   False,  'BOOL',                         "ci_full_name",     "ci_desc"),
-                ("Pinit",           0,      'NUM',      "",     "ci_full_name",     "ci_desc"),   # MW
-                ("Qinit",           0,      'NUM',      "",     "ci_full_name",     "ci_desc"),   # MVAR
-                ("MVAbase",         0,      'NUM',      "",     "ci_full_name",     "ci_desc"),
-                ("Vinit",           0,      'NUM',      "",     "ci_full_name",     "ci_desc"),   # kV,
-                ("Vbase",           0,      'NUM',      "",     "ci_full_name",     "ci_desc"),   # kV,
-                ("Zbranch",         0,      'NUM',      "",     "ci_full_name",     "ci_desc")   # pu
-            ]
 
-            for a in attributes:
-                self.attrs[a[0]] = Attribute(*a)
-
+            # print(consts.DEFAULT_TEST_ATTRIBUTES['currint'])
+            for n, d in consts.DEFAULT_TEST_ATTRIBUTES['currint'].items():
+                # print(n, str(d)[:50])
+                self.attrs[n] = Attribute(n, d)
+            
             # default initialize header structures
             # @TODO reset these on change?
             keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd', 'freq']
