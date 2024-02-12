@@ -104,7 +104,7 @@ class Test:
                 # print(n, str(d)[:50])
                 self.attrs[n] = Attribute(n, d)
             
-            # set the voltage reference runner as the script for voltage reference
+            # set the steady state runner as the script for steady state
             self.script = lambda no_gui: Steady_State.run(self, no_gui=no_gui)
             
             keys = ['mes', 'sim']
@@ -132,7 +132,7 @@ class Test:
                 # print(n, str(d)[:50])
                 self.attrs[n] = Attribute(n, d)
             
-            # set the voltage reference runner as the script for voltage reference
+            # set the current interruption runner as the script for current interruption
             self.script = lambda no_gui: Current_Interruption.run(self, no_gui=no_gui)
 
             # default initialize header structures
