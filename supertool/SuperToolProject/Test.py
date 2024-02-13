@@ -3,8 +3,8 @@
 
 import tkinter as tk
 
-from supertool.pslf_scripts import Voltage_Reference, Steady_State
-from supertool.pslf_scripts import Current_Interruption
+from supertool.pslf_scripts import Voltage_Reference, Steady_State, Speed_Reference
+from supertool.pslf_scripts import Current_Interruption, Load_Reference
 import supertool.veusz_handler as veusz_handler
 import supertool.consts as consts
 
@@ -158,8 +158,79 @@ class Test:
                 ('freq', r'(?=.*spd)(?=.*1)(?=.*gen).*',    "Frequency (y)")
             ]
             
-            # set the voltage reference plotter to use for the show graphs button
+            # set the current interruption plotter to use for the show graphs button
             self.plot = veusz_handler.plot_current_interruption
+        
+        elif self.type == "Load Reference":
+            print("load reference in test_defaults:", self.name)
+
+            # print(consts.DEFAULT_TEST_ATTRIBUTES['loadref'])
+            for n, d in consts.DEFAULT_TEST_ATTRIBUTES['loadref'].items():
+                # print(n, str(d)[:50])
+                self.attrs[n] = Attribute(n, d)
+            
+            # set the load reference runner as the script for load reference
+            self.script = lambda no_gui: Load_Reference.run(self, no_gui=no_gui)
+
+            # default initialize header structures
+            # @TODO reset these on change?
+            keys = ['time', 'pg', 'gate', 'head']
+            for k in keys:
+                self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+                self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+            
+            # set plot files to grab from
+            self.plot_sim_file = 'csv_filename'
+            self.plot_mes_file = 'mes_filename'
+            
+            # set header info for this test type
+            # format is (key, regular expression, long name)
+            self.header_info = [
+                ('time', r'.*time.*', "Time (x)"),
+                ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
+                ('gate', r'(?=.*gv)(?=.*1)(?=.*gen).*',     "Gate % (y)"),
+                ('head',  r'(?=.*head)(?=.*1)(?=.*gen).*',    "Head (y)"),
+            ]
+            
+            # # set the load reference plotter to use for the show graphs button
+            self.plot = veusz_handler.plot_load_reference
+        
+        elif self.type == "Speed Reference":
+            print("speed reference in test_defaults:", self.name)
+
+            # print(consts.DEFAULT_TEST_ATTRIBUTES['speedref'])
+            for n, d in consts.DEFAULT_TEST_ATTRIBUTES['speedref'].items():
+                # print(n, str(d)[:50])
+                self.attrs[n] = Attribute(n, d)
+            
+            # set the speed reference runner as the script for speed reference
+            self.script = lambda no_gui: Speed_Reference.run(self, no_gui=no_gui)
+
+            # default initialize header structures
+            # @TODO reset these on change?
+            # keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd', 'freq']
+            # for k in keys:
+            #     self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+            #     self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+            
+            # set plot files to grab from
+            self.plot_sim_file = 'csv_filename'
+            self.plot_mes_file = 'mes_filename'
+            
+            # # set header info for this test type
+            # # format is (key, regular expression, long name)
+            # self.header_info = [
+            #     ('time', r'.*time.*', "Time (x)"),
+            #     ('vt',   r'(?=.*vt)(?=.*1)(?=.*gen).*',     "Voltage (y)"),
+            #     ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
+            #     ('qg',   r'(?=.*qg)(?=.*1)(?=.*gen).*',     "Q (y)"),
+            #     ('efd',  r'(?=.*efd)(?=.*1)(?=.*gen).*',    "EFD (y)"),
+            #     ('ifd',  r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*',    "IFD (y)"),
+            #     ('freq', r'(?=.*spd)(?=.*1)(?=.*gen).*',    "Frequency (y)")
+            # ]
+            
+            # # set the speed reference plotter to use for the show graphs button
+            # self.plot = veusz_handler.plot_current_interruption
             
         
     
