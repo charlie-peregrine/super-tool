@@ -33,13 +33,6 @@ import re
 # mes_file_name = 'C:/Users/charlie/Downloads/SampleProject/SampleFolder/Voltage_Reference.csv'
 # sim_file_name = 'C:/Users/charlie/Downloads/SampleProject/SampleFolder/Voltage_Reference_sim.csv'
 
-
-# def replace_dict(d, k, m, default='y'):
-#     if d[k]:
-#         d[k] = '`' + d[k] + '`' + m
-#     else:
-#         d[k] = default
-
 def vsz_format(d):
     for k,v in d.items():
         if isinstance(v, tuple):
@@ -65,13 +58,8 @@ def plot_voltage_reference(*, sim_dict={}, mes_dict={}): #sim_file='', mes_file=
     #     else:
     #         sim_dict[k] = 'y'
     
-    # for k,v in mes_dict.items():
-    #     if v[1]:
-    #         mes_dict[k] = '`' + v[0] + '`' + v[1]
-    #     elif v[0]:
-    #         mes_dict[k] = v[0]
-    #     else:
-    #         mes_dict[k] = 'y'
+    vsz_format(sim_dict)
+    vsz_format(mes_dict)
     
     
 
@@ -144,14 +132,6 @@ def plot_steady_state(sim_dict={}, mes_dict=None):
         return
     
     vsz_format(sim_dict)
-    # for k,v in sim_dict.items():
-    #     print(k, v, sim_dict[k])
-    #     if v[1]:
-    #         sim_dict[k] = '`' + v[0] + '`' + v[1]
-    #     elif v[0]:
-    #         sim_dict[k] = v[0]
-    #     else:
-    #         sim_dict[k] = 'y'
     
     with open("veusz_files/Steady_State.fvsz", 'r') as file:
         fvsz_text = file.read()
@@ -173,24 +153,6 @@ def plot_current_interruption(*, sim_dict={}, mes_dict={}):
     
     vsz_format(sim_dict)
     vsz_format(mes_dict)
-    # for k,v in sim_dict.items():
-    #     if isinstance(v, tuple):
-    #         if v[1]:
-    #             sim_dict[k] = '`' + v[0] + '`' + v[1]
-    #         elif v[0]:
-    #             sim_dict[k] = v[0]
-    #         else:
-    #             sim_dict[k] = 'y'
-    
-    # for k,v in mes_dict.items():
-    #     if isinstance(v, tuple):
-    #         if v[1]:
-    #             mes_dict[k] = '`' + v[0] + '`' + v[1]
-    #         elif v[0]:
-    #             mes_dict[k] = v[0]
-    #         else:
-    #             mes_dict[k] = 'y'
-    # s_time, m_time, s_filename, m_filename
     
     if sim_dict['ready'] and mes_dict['ready']:
         result_text = fvsz_text.format(s_filename=sim_dict['file'],
