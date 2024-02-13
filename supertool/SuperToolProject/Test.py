@@ -208,29 +208,27 @@ class Test:
 
             # default initialize header structures
             # @TODO reset these on change?
-            # keys = ['time', 'vt', 'pg', 'qg', 'efd', 'ifd', 'freq']
-            # for k in keys:
-            #     self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
-            #     self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+            # valve -> valve position percent, freq -> perceived frequency percent
+            keys = ['time', 'pg', 'valve', 'freq']
+            for k in keys:
+                self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+                self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
             
             # set plot files to grab from
             self.plot_sim_file = 'csv_filename'
             self.plot_mes_file = 'mes_filename'
             
-            # # set header info for this test type
-            # # format is (key, regular expression, long name)
-            # self.header_info = [
-            #     ('time', r'.*time.*', "Time (x)"),
-            #     ('vt',   r'(?=.*vt)(?=.*1)(?=.*gen).*',     "Voltage (y)"),
-            #     ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
-            #     ('qg',   r'(?=.*qg)(?=.*1)(?=.*gen).*',     "Q (y)"),
-            #     ('efd',  r'(?=.*efd)(?=.*1)(?=.*gen).*',    "EFD (y)"),
-            #     ('ifd',  r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*',    "IFD (y)"),
-            #     ('freq', r'(?=.*spd)(?=.*1)(?=.*gen).*',    "Frequency (y)")
-            # ]
+            # set header info for this test type
+            # format is (key, regular expression, long name)
+            self.header_info = [
+                ('time', r'.*time.*', "Time (x)"),
+                ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
+                ('valve', r'(?=.*fsr)(?=.*1)(?=.*gov).*',    "Valve Pos % (y)"),
+                ('freq', r'(?=.*tnh)(?=.*1)(?=.*gov).*',    "Perceived Freq % (y)")
+            ]
             
             # # set the speed reference plotter to use for the show graphs button
-            # self.plot = veusz_handler.plot_current_interruption
+            self.plot = veusz_handler.plot_speed_reference
             
         
     
