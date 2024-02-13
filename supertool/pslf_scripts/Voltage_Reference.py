@@ -48,6 +48,17 @@ def run(test, no_gui=False):
 
 #--------------------------------------------------------------------------------------------------
 
+    # SimResScalar adjusts the number of points written to chf (and by extension the csv). if the total sim time is too large,
+    # we run into memory overflow error specifically with dumping a large chf to csv. Thus, the solution is to downsample the output
+    SimResScalar = round((TotTimeInSecs/250)+0.5)
+    print("SimResScalar: ", SimResScalar)
+
+    #NplotValue should be odd to reduce possiblility of simulation instability
+    NplotValue = round(SimPtsPerCycle) * SimResScalar
+    if NplotValue%2==0: NplotValue-=1
+    print("NplotValue: ", NplotValue)
+
+
     # gets the project directory of this file and initialize the PSLF instance
     project_directory = os.path.dirname(os.path.realpath(__file__))
     #os.chdir(project_directory)
@@ -64,21 +75,18 @@ def run(test, no_gui=False):
 
     # Turn off PSS if not used in the simulation
     dp = DynamicsParameters()                               # gets all the dynamics parameers
-    if(PSS_On==0):
-        SuperTool.turn_off_pss(dp)
+    if(PSS_On==0): SuperTool.turn_off_pss(dp)
 
     SuperTool.print_to_pslf("\n--- Establishing the Pre-Step State")
-    dp.Delt = 1 / (SimPtsPerCycle * SysFreqInHz)            # sets the delta time step 
-    dp.Conv_Mon = 0                                         # set to 1 to display convergence monitor
-    dp.Nplot = round(SimPtsPerCycle)                        # save data every cycle
-    dp.Nscreen = round(SysFreqInHz * SimPtsPerCycle)        #  display values on screen every 0.5 second
-    dp.Tpause = StepTimeInSecs                              # pauses at the beginning of the voltage step
+    dp.Delt = 1 / (SimPtsPerCycle * SysFreqInHz)                    # sets the delta time step 
+    dp.Conv_Mon = 0                                                 # set to 1 to display convergence monitor
+    dp.Nplot = NplotValue                                           # save data every # of cycle
+    dp.Nscreen = round(SysFreqInHz * SimPtsPerCycle) * SimResScalar #  display values on screen every 0.5 second
+    dp.Tpause = StepTimeInSecs                                      # pauses at the beginning of the voltage step
     ret = Pslf.run_dyn()
 
     SuperTool.print_to_pslf("\n--- Applying the Step")
     GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref + UpStepInPU
-    dp.Nplot = 1
-    dp.Nscreen = round(SysFreqInHz*SimPtsPerCycle)
     dp.Tpause = StepTimeInSecs + StepLenInSecs
     ret = Pslf.run_dyn()
 
@@ -98,10 +106,8 @@ def run(test, no_gui=False):
     i = Pslf.record_index(1,1,1,2,"1",1, -1)
     SuperTool.print_to_pslf("System Impedance:    ", Secdd[i].Zsecx)
 
-    if(PSS_On==1):
-        SuperTool.print_to_pslf("PSS Status:          On")
-    else:
-        SuperTool.print_to_pslf("PSS Status:          Off")
+    if(PSS_On==1): SuperTool.print_to_pslf("PSS Status:          On")
+    else: SuperTool.print_to_pslf("PSS Status:          Off")
 
 
     SuperTool.print_to_pslf("Set loadflow?        ", bool(set_loadflow))
