@@ -55,7 +55,8 @@ def run(test, no_gui=False):
 
     #NplotValue should be odd to reduce possiblility of simulation instability
     NplotValue = round(SimPtsPerCycle) * SimResScalar
-    if NplotValue%2==0: NplotValue-=1
+    if NplotValue%2 == 0:
+        NplotValue-=1
     print("NplotValue: ", NplotValue)
 
 
@@ -75,7 +76,8 @@ def run(test, no_gui=False):
 
     # Turn off PSS if not used in the simulation
     dp = DynamicsParameters()                               # gets all the dynamics parameers
-    if(PSS_On==0): SuperTool.turn_off_pss(dp)
+    if(PSS_On==0):
+        SuperTool.turn_off_pss(dp)
 
     SuperTool.print_to_pslf("\n--- Establishing the Pre-Step State")
     dp.Delt = 1 / (SimPtsPerCycle * SysFreqInHz)                    # sets the delta time step 
@@ -106,8 +108,10 @@ def run(test, no_gui=False):
     i = Pslf.record_index(1,1,1,2,"1",1, -1)
     SuperTool.print_to_pslf("System Impedance:    ", Secdd[i].Zsecx)
 
-    if(PSS_On==1): SuperTool.print_to_pslf("PSS Status:          On")
-    else: SuperTool.print_to_pslf("PSS Status:          Off")
+    if(PSS_On==1):
+        SuperTool.print_to_pslf("PSS Status:          On")
+    else:
+        SuperTool.print_to_pslf("PSS Status:          Off")
 
 
     SuperTool.print_to_pslf("Set loadflow?        ", bool(set_loadflow))
