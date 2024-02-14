@@ -409,6 +409,12 @@ class ProjectView(ttk.Frame):
         if messagebox.askyesno(message=
                 "Are you sure you want to delete the following unit and all of its tests:\n\n"
                 + unit.name, title="Delete Unit"):
+            
+            if self.parent.focused_test and self.parent.focused_test.name in unit.tests:
+                self.parent.focused_test = None
+                self.parent.test_frame.show_focused_test()
+                self.parent.param_frame.render()
+            
             unit.frame.destroy()
             unit.sep.destroy()
             self.proj.remove_unit(unit.name)
