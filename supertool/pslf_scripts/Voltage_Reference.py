@@ -51,13 +51,12 @@ def run(test, no_gui=False):
     # SimResScalar adjusts the number of points written to chf (and by extension the csv). if the total sim time is too large,
     # we run into memory overflow error specifically with dumping a large chf to csv. Thus, the solution is to downsample the output
     SimResScalar = round((TotTimeInSecs/250)+0.5)
-    print("SimResScalar: ", SimResScalar)
 
     #NplotValue should be odd to reduce possiblility of simulation instability
     NplotValue = round(SimPtsPerCycle) * SimResScalar
-    if NplotValue%2 == 0:
-        NplotValue-=1
-    print("NplotValue: ", NplotValue)
+    if NplotValue % 2 == 0:
+        NplotValue -= 1
+    print("Down-Sampling Factors - SimResScalar:", SimResScalar, "NplotValue:", NplotValue)
 
 
     # gets the project directory of this file and initialize the PSLF instance
@@ -76,7 +75,7 @@ def run(test, no_gui=False):
 
     # Turn off PSS if not used in the simulation
     dp = DynamicsParameters()                               # gets all the dynamics parameers
-    if(PSS_On==0):
+    if PSS_On:
         SuperTool.turn_off_pss(dp)
 
     SuperTool.print_to_pslf("\n--- Establishing the Pre-Step State")
@@ -101,14 +100,14 @@ def run(test, no_gui=False):
 
     SuperTool.print_to_pslf("\n-----------------------------------------------------------------------------------------")
     SuperTool.print_to_pslf("Previous Voltage Reference Step Simulation Used:")
-    SuperTool.print_to_pslf("Positive Step Size:  ", UpStepInPU," pu")
-    SuperTool.print_to_pslf("Negative Step Size:  ", DnStepInPU," pu")
+    SuperTool.print_to_pslf("Positive Step Size:  ", UpStepInPU, " pu")
+    SuperTool.print_to_pslf("Negative Step Size:  ", DnStepInPU, " pu")
 
 
     i = Pslf.record_index(1,1,1,2,"1",1, -1)
     SuperTool.print_to_pslf("System Impedance:    ", Secdd[i].Zsecx)
 
-    if(PSS_On==1):
+    if PSS_On:
         SuperTool.print_to_pslf("PSS Status:          On")
     else:
         SuperTool.print_to_pslf("PSS Status:          Off")
