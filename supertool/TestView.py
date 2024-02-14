@@ -176,7 +176,7 @@ class TestView(ttk.Frame):
                 
                 # if the attribute is a number, show it as a name, an entry, and
                 # a unit @TODO error checking on the entry
-                else:
+                elif attr.type == 'NUM':
                     # show the name
                     title_label = ttk.Label(self.frame, text=attr.name)
                     title_label.grid(row=i+offset, column=0, sticky='w')
@@ -192,6 +192,26 @@ class TestView(ttk.Frame):
                     # add the entry to a higher scoped list
                     # @TODO is attr.var necessary?
                     self.interactibles.append((entry, attr.var))
+                
+                elif attr.type == 'STR':
+                    # show the name
+                    title_label = ttk.Label(self.frame, text=attr.name)
+                    title_label.grid(row=i+offset, column=0, sticky='w')
+                    
+                    # space to enter the user's number
+                    entry = ttk.Entry(self.frame, textvariable=attr.var)
+                    entry.grid(row=i+offset, column=1)
+                    
+                    # label containing unit
+                    unit_label = ttk.Label(self.frame, text="string")
+                    unit_label.grid(row=i+offset, column=2)
+                    
+                    # add the entry to a higher scoped list
+                    # @TODO is attr.var necessary?
+                    self.interactibles.append((entry, attr.var))
+                else:
+                    raise ValueError(f"Incorrect attribute type of '{attr.type}'")
+                    
             
             # if focused.plot_sim_file:
             #     attr = focused.attrs[focused.plot_sim_file]

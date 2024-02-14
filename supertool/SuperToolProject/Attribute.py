@@ -7,19 +7,23 @@ import tkinter as tk
 # attribute class that stores details like name, type, the measuring units,
 # and a tk variable that updates with the gui
 class Attribute:
-    def __init__(self, name, value, type_, *args, unit='NO_UNITS'):
+    def __init__(self, name: str, defaults: dict):
         self.name = name
-        self.type = type_
-        self.unit = unit
+        self.type = defaults['type']
         
-        if type_ == 'PATH':
-            self.var = tk.StringVar(value=value)
-            self.read_only_file = args[0]
-            self.extension = args[1]
-        elif type_ == 'BOOL':
-            self.var = tk.BooleanVar(value=value)
+        if self.type == 'PATH':
+            self.var = tk.StringVar(value=defaults['default'])
+            self.read_only_file = defaults['read_only']
+            self.extension = defaults['extension']
+        elif self.type == 'BOOL':
+            self.var = tk.BooleanVar(value=defaults['default'])
+        elif self.type == 'NUM':
+            self.var = tk.DoubleVar(value=defaults['default'])
+            self.unit = defaults['unit']
+        elif self.type == 'STR':
+            self.var = tk.StringVar(value=defaults['default'])
         else:
-            self.var = tk.DoubleVar(value=value)
+            raise ValueError(f"Attribute type {self.type} is not valid")
     
     def write(self, file):
         file.write("\t".join([
@@ -48,7 +52,7 @@ class Attribute:
     
     # string conversion overload
     def __str__(self):
-        return "      [A {} | {} | {} | {} ]".format(
-            self.name, self.type, self.var.get(), self.unit
+        return "      [A {} | {} | {} ]".format(
+            self.name, self.type, self.var.get()
         )
     
