@@ -24,7 +24,8 @@ class Project:
         print("building xml ElementTree for writing")
         tree = ET.ElementTree(
             ET.Element("project", 
-                       {"title": self.title}))
+                       {"title": self.title,
+                        "working_dir": self.working_dir}))
         root = tree.getroot()
         for unit_name, unit in self.units.items():
             unit_node = ET.Element("unit", {"name": unit_name})
@@ -105,6 +106,11 @@ class Project:
         
         # KeyError for dict keys   v
         self.title = root.attrib['title']
+        
+        # read working directory if it exists, backwards compatibility
+        if 'working_dir' in root.attrib:
+            self.working_dir = root.attrib['working_dir']
+        
         for unit_node in root:
             unit = Unit(unit_node.attrib['name'])
             for test_node in unit_node:

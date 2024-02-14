@@ -348,6 +348,8 @@ class SuperToolGUI(tk.Tk):
     def open_project(self, e=None):
         filename = fd.askopenfilename(filetypes=[("Super Tool Project Files", "*.pec")])
         if filename:
+            del self.project
+            self.project = stproject.Project()
             self.project.file_name = filename
             self.project.read_from_file_name()
             self.proj_frame.render()
