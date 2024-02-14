@@ -442,15 +442,16 @@ class ProjectView(ttk.Frame):
     def add_unit(self):
         unit_name = simpledialog.askstring(title="New Unit",
             prompt="Enter a name for the new unit")
-        if unit_name in self.proj.units:
-            print("unit {} already exists. creating unit {} failed".format(unit_name, unit_name))
-        else:
-            if len(self.proj.units) == 0:
-                self.no_unit_label.destroy()
-                self.no_unit_sep.destroy()
-            unit = self.proj.add_unit(unit_name)
-            unit_frame = self.build_unit_frame(unit, self.scroller.frame)
-            unit.frame = unit_frame
+        if unit_name:
+            if unit_name in self.proj.units:
+                print("unit {} already exists. creating unit {} failed".format(unit_name, unit_name))
+            else:
+                if len(self.proj.units) == 0:
+                    self.no_unit_label.destroy()
+                    self.no_unit_sep.destroy()
+                unit = self.proj.add_unit(unit_name)
+                unit_frame = self.build_unit_frame(unit, self.scroller.frame)
+                unit.frame = unit_frame
 
     # helper method to set the root's focused test to the clicked widget
     def focus_test(self, event):
