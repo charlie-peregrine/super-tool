@@ -45,8 +45,19 @@ def run(test, no_gui=False):
     Vinit               = test.attrs["Vinit"].var.get()             # 14.585  # kV
     Vbase               = test.attrs["Vbase"].var.get()             # 14.5    # kV
     Zbranch             = test.attrs["Zbranch"].var.get()           # 0.09    # pu
-
+    PFtest              = False                                     # if the test is a PF test, then 
+                                                                    #   1) the pfqrg model must come before the exciter model and after the generator model in the dyd         
+                                                                    #   2) there must be no other pss model 
 #--------------------------------------------------------------------------------------------------
+
+    # Since pf model pfqrg is of type stabilizer model, pss must be enabled for an output to occur.
+    if PFtest:
+        PSS_On=True
+        print("PFtest = 1, This is a power factor step test, which uses pfqrg model and no other PSS models. Adjust UpStepInPU and DnStepInPU until the output channel pf matches measured test data. ")
+        ## add future functionality for error handling the presence of the pfqrg model? This script will likely barf if 
+        ## 1) you try to run in PF mode w/o pfqrg model in the dyd and with other stabilizer models in service
+        ## 2) you try to run in normal mode with pfqrg model. 
+        ## maybe a good way to test for this is to check for all stabilizer models, and see if the model name corresponds to the specific test mode.
 
     # SimResScalar adjusts the number of points written to chf (and by extension the csv). if the total sim time is too large,
     # we run into memory overflow error specifically with dumping a large chf to csv. Thus, the solution is to downsample the output
@@ -75,7 +86,7 @@ def run(test, no_gui=False):
 
     # Turn off PSS if not used in the simulation
     dp = DynamicsParameters()                               # gets all the dynamics parameers
-    if PSS_On:
+    if not PSS_On:
         SuperTool.turn_off_pss(dp)
 
     SuperTool.print_to_pslf("\n--- Establishing the Pre-Step State")
@@ -87,12 +98,23 @@ def run(test, no_gui=False):
     ret = Pslf.run_dyn()
 
     SuperTool.print_to_pslf("\n--- Applying the Step")
-    GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref + UpStepInPU
+    if not PFtest:
+        GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref + UpStepInPU
+    else:
+        pfqrg_ref = Pslf.get_model_parameters(1, 1, -1, "1 ", 1, "pfqrg","ref")
+        pfqrg_ref-=UpStepInPU
+        Pslf.set_model_parameters(1, 1, -1,"1 ", 1,"pfqrg","ref", pfqrg_ref)
     dp.Tpause = StepTimeInSecs + StepLenInSecs
     ret = Pslf.run_dyn()
 
     SuperTool.print_to_pslf("\n--- Removing the Step")
-    GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref - DnStepInPU
+    if not PFtest:
+        GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref - DnStepInPU
+    else:
+        pfqrg_ref = Pslf.get_model_parameters(1, 1, -1, "1 ", 1, "pfqrg","ref")
+        pfqrg_ref+=DnStepInPU
+        Pslf.set_model_parameters(1, 1, -1,"1 ", 1,"pfqrg","ref", pfqrg_ref)
+
     dp.Tpause = TotTimeInSecs
     ret = Pslf.run_dyn()
     ret = Pslf.end_dyn_run()
