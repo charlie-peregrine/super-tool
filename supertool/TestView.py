@@ -133,12 +133,19 @@ class TestView(ttk.Frame):
                     
                     path_button = ttk.Button(self.frame, text=short_name(attr.var.get()),
                             command=lambda attr=attr: self.get_new_path(attr))
+                    def clear_path(e=None, attr=attr):
+                        attr.var.set("")
+                    path_button.bind("<3>", clear_path)
                     path_button.grid(row=i+offset, column=1, sticky='nesw')
                     
                     # create hovertext for paths to show the long path instead of just the basename
-                    def blah(file_name):
-                        return self.parent.project.get_dir() + file_name
-                    path_label_hover = Hovertip(path_button, blah(attr.var.get()), hover_delay=300)
+                    def path_hover_text(attribute):
+                        if attribute.var.get() == '':
+                            return "Click to Select a file"
+                        return f"Full Path: {attribute.get()}\n" + \
+                               f"Relative Path: {attribute.var.get()}\n" + \
+                                "Right click to clear"
+                    path_label_hover = Hovertip(path_button, path_hover_text(attr), hover_delay=300)
                     
                     # set up traces for when the path variables update to modify the path label
                     # separate functions needed for clarity
@@ -146,8 +153,8 @@ class TestView(ttk.Frame):
                         l.configure(text=short_name(v.get()))
                     button_cb = attr.var.trace_add('write', update_button)
                     
-                    def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
-                        l.text = blah(v.get())
+                    def update_hover(_1, _2, _3, l=path_label_hover, a=attr):
+                        l.text = path_hover_text(a)
                     hover_cb = attr.var.trace_add('write', update_hover)
                     
                     self.trace_data.append((attr.var, button_cb))
@@ -430,14 +437,16 @@ class TestView(ttk.Frame):
                 title=f"Select input {attr.extension.upper()} file",
                 defaultextension=f"*.{attr.extension}",
                 filetypes=[(f"Input {attr.extension.upper()} File", f"*.{attr.extension}"),
-                           ("All Files", "*.*")]
+                           ("All Files", "*.*")],
+                initialdir=attr.parent.get_dir()
                 )
         else:
             path = asksaveasfilename(
                 title=f"Choose File Name and Location for Output {attr.extension.upper()} File",
                 defaultextension="*.*",
                 filetypes=[(f"PSLF Output {attr.extension.upper()} File", f"*.{attr.extension}"),
-                           ("All Files", "*.*")]
+                           ("All Files", "*.*")],
+                initialdir=attr.parent.get_dir()
                 )
         
         if path:
