@@ -32,48 +32,48 @@ def run(test, no_gui=False):
     # Configure for your test with the following parameters
     #--------------------------------------------------------------------------------------------------
 
-    dyd_filename    = test.attrs["dyd_filename"].var.get()       #"Dania71.dyd"
-    sav_filename    = test.attrs["sav_filename"].var.get()       #"urmom2.sav"
-    chf_filename    = test.attrs["chf_filename"].var.get()       #"CTG71_GOV_LC0_sim1.chf"
-    csv_filename    = test.attrs["csv_filename"].var.get()       #"CTG71_GOV_LC0_sim1.csv"
-    rep_filename    = test.attrs["rep_filename"].var.get()       #"Rep.rep"
+    dyd_filename    = test.attrs["dyd_filename"].get()       #"Dania71.dyd"
+    sav_filename    = test.attrs["sav_filename"].get()       #"urmom2.sav"
+    chf_filename    = test.attrs["chf_filename"].get()       #"CTG71_GOV_LC0_sim1.chf"
+    csv_filename    = test.attrs["csv_filename"].get()       #"CTG71_GOV_LC0_sim1.csv"
+    rep_filename    = test.attrs["rep_filename"].get()       #"Rep.rep"
 
 
-    StepTimeInSecs[1]  = test.attrs["StepTimeInSecs1"].var.get()       #107.64
-    StepTimeInSecs[2]  = test.attrs["StepTimeInSecs2"].var.get()       #107.65
-    StepTimeInSecs[3]  = test.attrs["StepTimeInSecs3"].var.get()       #172.6
-    StepTimeInSecs[4]  = test.attrs["StepTimeInSecs4"].var.get()       #172.65
-    StepTimeInSecs[5]  = test.attrs["StepTimeInSecs5"].var.get()       #200
-    TotalSimTime       = test.attrs["TotalSimTime"].var.get()       #285.12
+    StepTimeInSecs[1]  = test.attrs["StepTimeInSecs1"].get()       #107.64
+    StepTimeInSecs[2]  = test.attrs["StepTimeInSecs2"].get()       #107.65
+    StepTimeInSecs[3]  = test.attrs["StepTimeInSecs3"].get()       #172.6
+    StepTimeInSecs[4]  = test.attrs["StepTimeInSecs4"].get()       #172.65
+    StepTimeInSecs[5]  = test.attrs["StepTimeInSecs5"].get()       #200
+    TotalSimTime       = test.attrs["TotalSimTime"].get()       #285.12
 
 
-    StepSizeInPu[1]    = test.attrs["StepSizeInPu1"].var.get()       #-0.00
-    StepSizeInPu[2]    = test.attrs["StepSizeInPu2"].var.get()       #0.002589
-    StepSizeInPu[3]    = test.attrs["StepSizeInPu3"].var.get()       #0.002589 
-    StepSizeInPu[4]    = test.attrs["StepSizeInPu4"].var.get()       #0.000
-    StepSizeInPu[5]    = test.attrs["StepSizeInPu5"].var.get()       #-0.000
+    StepSizeInPu[1]    = test.attrs["StepSizeInPu1"].get()       #-0.00
+    StepSizeInPu[2]    = test.attrs["StepSizeInPu2"].get()       #0.002589
+    StepSizeInPu[3]    = test.attrs["StepSizeInPu3"].get()       #0.002589 
+    StepSizeInPu[4]    = test.attrs["StepSizeInPu4"].get()       #0.000
+    StepSizeInPu[5]    = test.attrs["StepSizeInPu5"].get()       #-0.000
 
 
-    SysFreqInHz        = test.attrs["SysFreqInHz"].var.get()       #60.00            
-    SimPtsPerCycle     = test.attrs["SimPtsPerCycle"].var.get()       #4.0  
+    SysFreqInHz        = test.attrs["SysFreqInHz"].get()       #60.00            
+    SimPtsPerCycle     = test.attrs["SimPtsPerCycle"].get()       #4.0  
 
 
-    set_loadflow       = test.attrs["set_loadflow"].var.get()       #True      # If TRUE, initializes sav case with the below parameters if FALSE, loads existing sav case.
-    save_loadflow      = test.attrs["save_loadflow"].var.get()       #False     # If TRUE, overwrites sav_filename with new set_loadflow solution. If FALSE, leaves sav_filename as is.  
+    set_loadflow       = test.attrs["set_loadflow"].get()       #True      # If TRUE, initializes sav case with the below parameters if FALSE, loads existing sav case.
+    save_loadflow      = test.attrs["save_loadflow"].get()       #False     # If TRUE, overwrites sav_filename with new set_loadflow solution. If FALSE, leaves sav_filename as is.  
 
     #----------------------------------
     # loadflow Parameters
     #----------------------------------
 
-    Pinit               = test.attrs["Pinit"].var.get()       #380.0 # MW
-    Qinit               = test.attrs["Qinit"].var.get()       #-3.19  # MVAR
-    MVAbase             = test.attrs["MVAbase"].var.get()       #579.0
+    Pinit               = test.attrs["Pinit"].get()       #380.0 # MW
+    Qinit               = test.attrs["Qinit"].get()       #-3.19  # MVAR
+    MVAbase             = test.attrs["MVAbase"].get()       #579.0
 
-    Vinit               = test.attrs["Vinit"].var.get()       #25.29  # kV
-    Vbase               = test.attrs["Vbase"].var.get()       #24.0   # kV
-    Zbranch             = test.attrs["Zbranch"].var.get()       #0.0327 # pu
+    Vinit               = test.attrs["Vinit"].get()       #25.29  # kV
+    Vbase               = test.attrs["Vbase"].get()       #24.0   # kV
+    Zbranch             = test.attrs["Zbranch"].get()       #0.0327 # pu
 
-    GenBusID			= test.attrs["GenBusID"].var.get()       #"1 "
+    GenBusID			= test.attrs["GenBusID"].get()       #"1 "
 
     #--------------------------------------------------------------------------------------------------
 

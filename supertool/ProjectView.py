@@ -2,11 +2,13 @@
 # Contains the frame for the project panel and
 # all of its derivatives
 
+import os
 import tkinter as tk
 from tkinter import ttk
 # @TODO replace messagebox and simpledialog with more robust windows
 from tkinter import messagebox
 from tkinter import simpledialog
+import tkinter.filedialog  as fd
 
 from supertool.SuperToolFrames import ScrollFrame, Popup
 
@@ -354,52 +356,128 @@ class ProjectView(ttk.Frame):
         type_dropdown.state(['readonly'])
         type_dropdown.grid(row=1, column=1, padx=4, pady=4)
 
-        # create a hidden error label that can pop up when a planned error
-        # occurs (such as an empty entry or invalid characters)
-        err_label = ttk.Label(test_prompt_window)
-        err_label.grid(row=4, column=0, columnspan=2, padx=4, pady=4)
-        err_label.grid_remove()
+        dir_label = ttk.Label(test_prompt_window,
+            text="Choose an optional subdirectory for the\n" + \
+                f"test's files to live in. Leave blank to skip.")
+        dir_label.grid(row=2, column=0)
+        
+        def dir_button_command():
+            dirname = fd.askdirectory(mustexist=True)
+            if dirname:
+                dir_var.set(dirname)
+        
+        dir_button = ttk.Button(test_prompt_window, text="Select Subdirectory",
+                                     command=dir_button_command)
+        dir_button.grid(row=2, column=1)
+        
+        dir_var = tk.StringVar()
+        dir_entry = ttk.Entry(test_prompt_window, textvariable=dir_var, width=50)
+        dir_entry.grid(row=3, column=0, columnspan=2)
+
+        
+        bottom_frame = ttk.Frame(test_prompt_window)
+        bottom_frame.grid(row=7, column=0, columnspan=2, sticky='nesw')
+        bottom_frame.columnconfigure(0, weight=1)
+        bottom_frame.columnconfigure(1, weight=1)
+
+        sep1 = ttk.Separator(test_prompt_window)
+        sep1.grid(row=4, columnspan=2, sticky='ew')
+        error_label = ttk.Label(test_prompt_window, text="Press ok to create a new test")
+        error_label.grid(row=5, columnspan=2, sticky='nesw')
+        
+        sep2 = ttk.Separator(test_prompt_window)
+        sep2.grid(row=6, columnspan=2, sticky='ew')
+        
+        
+
+        # # create a hidden error label that can pop up when a planned error
+        # # occurs (such as an empty entry or invalid characters)
+        # err_label = ttk.Label(test_prompt_window)
+        # err_label.grid(row=4, column=0, columnspan=2, padx=4, pady=4)
+        # err_label.grid_remove()
 
         # function called by the create new test button, checks that the
         # name and test entered are valid and  if so creates a new test
-        def create_test(event=None):
-            if name_var.get() == '':
-                err_label.config(text="Please enter a test name")
-                err_label.grid()
-            elif False:
-                pass # @TODO check for invalid characters, using validatecommand?
-            elif name_var.get() in unit.tests:
-                err_label.config(text=f"Test \"{name_var.get()}\" already exists")
-                err_label.grid()
-            elif type_var.get() == '':
-                err_label.config(text="Select a test type")
-                err_label.grid()
+        def ok_command(event=None):
+            test_name = name_var.get()
+            test_type = type_var.get()
+            subdir = dir_var.get()
+            message_list = []
+            
+            if test_name:
+                # @TODO check for invalid characters, using validatecommand?
+                if test_name in unit.tests:
+                    message_list.append(f"Test \"{test_name}\" already exists")
             else:
-                err_label.grid_remove()
+                message_list.append("Please enter a test name")
+            
+            if test_type == '':
+                message_list.append("Select a test type")
 
-                # add the test and update the projectview
+            if subdir:
+                if subdir[-1] in '/\\':
+                    subdir = subdir[:-1]
+                
+                if os.path.exists(subdir):
+                    # if it's not a directory, complain
+                    if not os.path.isdir(subdir):
+                        message_list.append("The entered sub-directory is not a directory.")
+                    else:
+                        subdir = os.path.relpath(subdir, self.parent.project.working_dir).replace('\\', '/')
+                else:
+                    message_list.append("The entered sub-directory does not exist.")
+            
+
+            if message_list:
+                # update the screen with errors
+                error_label.config(text="\n".join(message_list))
+                sep1.grid()
+                error_label.grid()
+            else:
+                sep1.grid_remove()
+                error_label.grid_remove()
+                
+                test_prompt_window.destroy()
+             
+                ## add the test and update the projectview
                 # if this is the first test we need to destroy the no tests label
                 if len(unit.tests) == 0:
                     unit.no_tests_label.pack_forget()
-                test = unit.add_test(name_var.get(), type_var.get())
+                
+                # add the test
+                test = unit.add_test(test_name, test_type)
+                # set the subdirectory
+                if subdir == '.':
+                    subdir = ''
+                unit.sub_dir = subdir
+                # build the test frame and save it for later
                 test_frame = self.build_test_frame(test, unit.frame)
                 test.frame = test_frame
-                
-                # destroy this window
-                test_prompt_window.destroy()
 
-        # add a button for creating a new test
-        done_button = ttk.Button(test_prompt_window, text="Create New Test",
-                                 command=create_test)
-        done_button.grid(row=3, column=0, columnspan=2, padx=4, pady=4)
+        ok_button = ttk.Button(bottom_frame, text="OK", command=ok_command)
+        ok_button.grid(row=0, column=1, sticky='e')
+        ok_button.bind("<Return>", ok_command)
+        
+        def cancel_command(e=None):
+            test_prompt_window.destroy()
+
+        cancel_button = ttk.Button(bottom_frame, text="Cancel", command=cancel_command)
+        cancel_button.grid(row=0, column=2, sticky='e')
+        cancel_button.bind("<Return>", cancel_command)
+
+        for widget in test_prompt_window.winfo_children():
+            widget.grid_configure(padx=2, pady=2)
+
+        sep1.grid_remove()
+        error_label.grid_remove()
 
         # usability keybinds to make the combobox and button interface
         # more intuitive
-        done_button.bind("<Return>", create_test)
+        ok_button.bind("<Return>", ok_command)
         name_entry.bind("<Return>", lambda e: type_dropdown.focus())
         type_dropdown.bind("<Return>", lambda e: type_dropdown.event_generate('<Down>'))
         type_dropdown.bind("<space>", lambda e: type_dropdown.event_generate('<Down>'))
-        type_dropdown.bind("<<ComboboxSelected>>", lambda e: done_button.focus())
+        type_dropdown.bind("<<ComboboxSelected>>", lambda e: dir_button.focus())
 
 
     ## @TODO make the unit methods use custom windows
@@ -436,18 +514,114 @@ class ProjectView(ttk.Frame):
 
     # add a unit to the project structure
     def add_unit(self):
-        unit_name = simpledialog.askstring(title="New Unit",
-            prompt="Enter a name for the new unit")
-        if unit_name:
-            if unit_name in self.proj.units:
-                print("unit {} already exists. creating unit {} failed".format(unit_name, unit_name))
+        unit_prompt_window = Popup(self.parent, "New Unit")
+        
+        name_label = ttk.Label(unit_prompt_window, text=f"Enter a name for the Unit:")
+        name_label.grid(row=0, column=0)
+        
+        name_var = tk.StringVar()
+        name_entry = ttk.Entry(unit_prompt_window, textvariable=name_var)
+        name_entry.grid(row=0, column=1)
+        name_entry.focus_set()
+        
+        dir_label = ttk.Label(unit_prompt_window,
+            text="Choose an optional subdirectory for the\n" + \
+                f"unit's files to live in. Leave blank to skip.")
+        dir_label.grid(row=1, column=0)
+        
+        def dir_button_command(e=None):
+            dirname = fd.askdirectory(mustexist=True)
+            if dirname:
+                dir_var.set(dirname)
+        
+        dir_button = ttk.Button(unit_prompt_window, text="Select Subdirectory",
+                                     command=dir_button_command)
+        dir_button.grid(row=1, column=1)
+        
+        dir_var = tk.StringVar()
+        dir_entry = ttk.Entry(unit_prompt_window, textvariable=dir_var, width=50)
+        dir_entry.grid(row=2, column=0, columnspan=2)
+        
+        bottom_frame = ttk.Frame(unit_prompt_window)
+        bottom_frame.grid(row=6, column=0, columnspan=2, sticky='nesw')
+        bottom_frame.columnconfigure(0, weight=1)
+        bottom_frame.columnconfigure(1, weight=1)
+        
+        def ok_command(e=None):
+            unit_name = name_var.get()
+            subdir = dir_var.get()
+            message_list = []
+            
+            if unit_name:
+                if unit_name in self.proj.units:
+                    message_list.append("A unit with this name already exists.")
+                # check for weird characters?
             else:
+                message_list.append("Please enter a name for the unit.")
+            
+            if subdir:
+                if subdir[-1] in '/\\':
+                    subdir = subdir[:-1]
+                
+                if os.path.exists(subdir):
+                    # if it's not a directory, complain
+                    if not os.path.isdir(subdir):
+                        message_list.append("The entered sub-directory is not a directory.")
+                    else:
+                        subdir = os.path.relpath(subdir, self.parent.project.working_dir).replace('\\', '/')
+                else:
+                    message_list.append("The entered sub-directory does not exist.")
+            
+            if message_list:
+                # update the screen with errors
+                error_label.config(text="\n".join(message_list))
+                sep1.grid()
+                error_label.grid()
+            else:
+                sep1.grid_remove()
+                error_label.grid_remove()
+                
+                unit_prompt_window.destroy()
+                
                 if len(self.proj.units) == 0:
                     self.no_unit_label.destroy()
                     self.no_unit_sep.destroy()
                 unit = self.proj.add_unit(unit_name)
+                
+                if subdir == '.':
+                    subdir = ''
+                unit.sub_dir = subdir
+
                 unit_frame = self.build_unit_frame(unit, self.scroller.frame)
                 unit.frame = unit_frame
+        
+        sep1 = ttk.Separator(unit_prompt_window)
+        sep1.grid(row=3, columnspan=2, sticky='ew')
+        error_label = ttk.Label(unit_prompt_window, text="Press ok to create a new units")
+        error_label.grid(row=4, columnspan=2, sticky='nesw')
+        
+        sep2 = ttk.Separator(unit_prompt_window)
+        sep2.grid(row=5, columnspan=2, sticky='ew')
+        
+        ok_button = ttk.Button(bottom_frame, text="OK", command=ok_command)
+        ok_button.grid(row=0, column=1, sticky='e')
+        
+        def cancel_command(e=None):
+            unit_prompt_window.destroy()
+
+        cancel_button = ttk.Button(bottom_frame, text="Cancel", command=cancel_command)
+        cancel_button.grid(row=0, column=2, sticky='e')
+        
+        for widget in unit_prompt_window.winfo_children():
+            widget.grid_configure(padx=2, pady=2)
+        
+        sep1.grid_remove()
+        error_label.grid_remove()
+        
+        dir_button.bind("<Return>", dir_button_command)
+        ok_button.bind("<Return>", ok_command)
+        cancel_button.bind("<Return>", cancel_command)
+        name_entry.bind("<Return>", lambda e: dir_button.focus())
 
     # helper method to set the root's focused test to the clicked widget
     def focus_test(self, event):

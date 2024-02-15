@@ -20,6 +20,8 @@ class Test:
         self.parent = parent
         self.attrs = {}
         
+        self.sub_dir = ''
+        
         self.frame = None
         
         # default script and plot that say that this test type isn't set up yet
@@ -66,7 +68,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['vstep'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['vstep'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
 
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda no_gui: Voltage_Reference.run(self, no_gui=no_gui)
@@ -102,7 +104,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['steadystate'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['steadystate'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
             
             # set the steady state runner as the script for steady state
             self.script = lambda no_gui: Steady_State.run(self, no_gui=no_gui)
@@ -130,7 +132,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['currint'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['currint'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
             
             # set the current interruption runner as the script for current interruption
             self.script = lambda no_gui: Current_Interruption.run(self, no_gui=no_gui)
@@ -167,7 +169,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['loadref'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['loadref'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
             
             # set the load reference runner as the script for load reference
             self.script = lambda no_gui: Load_Reference.run(self, no_gui=no_gui)
@@ -201,7 +203,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['speedref'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['speedref'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
             
             # set the speed reference runner as the script for speed reference
             self.script = lambda no_gui: Speed_Reference.run(self, no_gui=no_gui)
@@ -352,6 +354,13 @@ class Test:
                         f"{type(val).__name__}. Ignoring this attribute.")
         else:
             print(f"error: {name} not a valid test attribute. it will be ignored.")
+    
+    def get_dir(self):
+        if self.sub_dir:
+            end = self.sub_dir + '/'
+        else:
+            end = ''
+        return self.parent.get_dir() + end
     
     # overload string conversion
     def __str__(self):

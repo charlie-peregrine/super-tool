@@ -27,20 +27,20 @@ def run(test, no_gui=False):
     
     # @TODO savecasefiles used? UseGenField is a bool?
         # test.attrs["dyd_filename"].var.get()
-    dyd_filename        = test.attrs["dyd_filename"].var.get()       # "HCPR1.dyd"
-    sav_filename        = test.attrs["sav_filename"].var.get()       # "HCPR1_LR.sav"
-    chf_filename        = test.attrs["chf_filename"].var.get()       # "HCPR1_LR_new_sim.chf"
-    rep_filename        = test.attrs["rep_filename"].var.get()       # "Rep.rep"
-    in_filename         = test.attrs["in_filename"].var.get()        # "HCPR1_LR_IN.csv"
-    out_filename        = test.attrs["out_filename"].var.get()       # "HCPR1_LR_OUT_new.csv"
-    # out_casename        = test.attrs["out_casename"].var.get()       # "HCPR1_LR.txt"
-    if_base             = test.attrs["if_base"].var.get()            # 740
-    if_res              = test.attrs["if_res"].var.get()             # 0.0
-    # SaveCaseFiles       = test.attrs["SaveCaseFiles"].var.get()      # 0 # generally leave as 0
-    UseGenField         = test.attrs["UseGenField"].var.get()        # 0 # set this to '1' if you want to use generator field even for brushless 
-    Vbase               = test.attrs["Vbase"].var.get()
-    Zbranch             = test.attrs["Zbranch"].var.get()
-    #mva_base           = test.attrs["mva_base"].var.get()           # 145.0
+    dyd_filename        = test.attrs["dyd_filename"].get()       # "HCPR1.dyd"
+    sav_filename        = test.attrs["sav_filename"].get()       # "HCPR1_LR.sav"
+    chf_filename        = test.attrs["chf_filename"].get()       # "HCPR1_LR_new_sim.chf"
+    rep_filename        = test.attrs["rep_filename"].get()       # "Rep.rep"
+    in_filename         = test.attrs["in_filename"].get()        # "HCPR1_LR_IN.csv"
+    out_filename        = test.attrs["out_filename"].get()       # "HCPR1_LR_OUT_new.csv"
+    # out_casename        = test.attrs["out_casename"].get()       # "HCPR1_LR.txt"
+    if_base             = test.attrs["if_base"].get()            # 740
+    if_res              = test.attrs["if_res"].get()             # 0.0
+    # SaveCaseFiles       = test.attrs["SaveCaseFiles"].get()      # 0 # generally leave as 0
+    UseGenField         = test.attrs["UseGenField"].get()        # 0 # set this to '1' if you want to use generator field even for brushless 
+    Vbase               = test.attrs["Vbase"].get()
+    Zbranch             = test.attrs["Zbranch"].get()
+    #mva_base           = test.attrs["mva_base"].get()           # 145.0
 
 
 

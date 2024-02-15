@@ -136,7 +136,9 @@ class TestView(ttk.Frame):
                     path_button.grid(row=i+offset, column=1, sticky='nesw')
                     
                     # create hovertext for paths to show the long path instead of just the basename
-                    path_label_hover = Hovertip(path_button, attr.var.get(), hover_delay=300)
+                    def blah(file_name):
+                        return self.parent.project.get_dir() + file_name
+                    path_label_hover = Hovertip(path_button, blah(attr.var.get()), hover_delay=300)
                     
                     # set up traces for when the path variables update to modify the path label
                     # separate functions needed for clarity
@@ -145,7 +147,7 @@ class TestView(ttk.Frame):
                     button_cb = attr.var.trace_add('write', update_button)
                     
                     def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
-                        l.text = v.get()
+                        l.text = blah(v.get())
                     hover_cb = attr.var.trace_add('write', update_hover)
                     
                     self.trace_data.append((attr.var, button_cb))
@@ -439,7 +441,11 @@ class TestView(ttk.Frame):
                 )
         
         if path:
-            attr.var.set(path)
+            # @TODO make this include the test subdirectory
+            # @TODO make a better decision on backslashes vs slashes
+            rel_path = os.path.relpath(path, attr.parent.get_dir()).replace('\\', '/')
+            print(attr.parent.get_dir() + rel_path)
+            attr.var.set(rel_path)
             if attr.name == self.parent.focused_test.plot_sim_file:
                 self.parent.param_frame.render_sim_frame()
             if attr.name == self.parent.focused_test.plot_mes_file:

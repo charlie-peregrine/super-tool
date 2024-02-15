@@ -7,10 +7,13 @@ from supertool.SuperToolProject.Test import Test
 
 # class containing a unit, its information, and its tests
 class Unit:
-    def __init__(self, name="Untitled Unit"):
+    def __init__(self, parent, name="Untitled Unit"):
         self.name = name
         self.tests = {}
+        self.sub_dir = ''
         # @TODO put more unit specific info here
+        
+        self.parent = parent
         
         self.frame = None
         self.sep = None
@@ -61,6 +64,13 @@ class Unit:
             self.tests[t.name] = t
         
         return self, lines
+    
+    def get_dir(self):
+        if self.sub_dir:
+            end = self.sub_dir + '/'
+        else:
+            end = ''
+        return self.parent.get_dir() + end
     
     # overload string conversion
     def __str__(self):
