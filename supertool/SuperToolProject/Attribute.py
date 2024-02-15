@@ -2,6 +2,7 @@
 # houses the attribute class, which stores information
 # for tests
 
+import os
 import tkinter as tk
 
 # attribute class that stores details like name, type, the measuring units,
@@ -12,7 +13,7 @@ class Attribute:
         self.type = defaults['type']
         
         self.parent = parent
-        
+
         if self.type == 'PATH':
             self.var = tk.StringVar(value=defaults['default'])
             self.read_only_file = defaults['read_only']
@@ -53,7 +54,7 @@ class Attribute:
         
     def get(self):
         if self.type == 'PATH':
-            return self.parent.get_dir() + self.var.get()
+            return os.path.normpath(self.parent.get_dir() + self.var.get())
         elif self.type == 'BOOL':
             return self.var.get()
         elif self.type == 'NUM':
