@@ -23,6 +23,7 @@ class Test:
         self.sub_dir = ''
         
         self.frame = None
+        self.hovertext = None
         
         # default script and plot that say that this test type isn't set up yet
         self.script = lambda: print(f"No run script set up for this test of type '{self.type}'")

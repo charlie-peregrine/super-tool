@@ -141,7 +141,7 @@ class ProjectView(ttk.Frame):
         unit_label = ttk.Label(unit_frame, text=unit.name)
         unit_label.pack(anchor='w')
         
-        unit_label_hover = Hovertip(unit_label, text="Sub Directory: " + unit.sub_dir, hover_delay=300)
+        unit.hovertext = Hovertip(unit_label, text="Sub Directory: " + unit.sub_dir, hover_delay=300)
 
         # make a right click menu for the unit labels
         unit_label_menu = tk.Menu(unit_label)
@@ -206,7 +206,7 @@ class ProjectView(ttk.Frame):
             test_label_menu.post(e.x_root, e.y_root)
 
         print(test.sub_dir)
-        test_label_hover = Hovertip(test_label, text="Sub Directory: " + test.sub_dir, hover_delay=300)
+        test.hovertext = Hovertip(test_label, text="Sub Directory: " + test.sub_dir, hover_delay=300)
         
         # left clicking on a test focuses the test, showing its
         # details and attributes in the testview frame
@@ -219,6 +219,8 @@ class ProjectView(ttk.Frame):
                             command=self.delete_test)
         test_label_menu.add_command(label="rename test",
                             command=self.rename_test)
+        test_label_menu.add_command(label="change test sub-dir",
+                            command=self.set_test_sub_dir)
         test_label_menu.add_command(label="new test",
                             command=self.add_test_from_test)
 
@@ -315,6 +317,76 @@ class ProjectView(ttk.Frame):
         else:
             test.parent.rename_test(test.name, new_name)
             test.frame.children['!label']['text'] = new_name
+
+    def set_test_sub_dir(self):
+        test = self.get_clicked_test_or_unit()
+        
+        set_dir_window = BaseOkPopup(self, title="Choose a new test sub-directory")
+        
+        dir_var = tk.StringVar(self, value=test.sub_dir)
+        
+        def dir_select():
+            dirname = fd.askdirectory(mustexist=True, initialdir=test.sub_dir)
+            if dirname:
+                # @TODO add a printout of the number of paths that are valid from
+                # choosing a new directory. maybe add a verify button?
+                dir_var.set(dirname)
+        
+        def ok_command():
+            sub_dir = dir_var.get()
+            message_list = []
+            
+            if sub_dir:
+                if sub_dir[-1] in '/\\':
+                    sub_dir = sub_dir[:-1]
+                
+                if os.path.exists(sub_dir):
+                    # if it's not a directory, complain
+                    if not os.path.isdir(sub_dir):
+                        message_list.append("The entered sub-directory is not a directory.")
+                    else:
+                        sub_dir = os.path.relpath(sub_dir, test.parent.get_dir()).replace('\\', '/')
+                else:
+                    message_list.append("The entered sub-directory does not exist.")
+            else:
+                message_list.append("Please enter a sub-directory for the test.")
+        
+            if message_list:
+                # update the screen with errors
+                set_dir_window.show_errors(message_list)
+            else:
+                set_dir_window.hide_errors()
+            
+                # close the new project window
+                set_dir_window.destroy()
+                
+                if sub_dir != test.sub_dir:
+                    test.sub_dir = sub_dir
+                    # update hovertext
+                    test.hovertext.text = "Sub Directory: " + test.sub_dir
+                    if test == self.parent.focused_test:
+                        # rerender focused test to update hovertext @TODO do it better
+                        self.parent.test_frame.show_focused_test()
+        
+        def cancel_command():
+            set_dir_window.destroy()
+        
+        dir_label = ttk.Label(set_dir_window.frame,
+                text="Choose a new working directory. The project save file does not need\n" \
+                   + "to be inside the working directory, but every file necessary\n" \
+                   + "for PSLF (sav, dyd, csv) will need to be there.")
+        dir_label.grid(row=0, column=0, sticky='w', columnspan=2)
+        
+        dir_entry = ttk.Entry(set_dir_window.frame, textvariable=dir_var, width=45)
+        dir_entry.grid(row=1, column=0)
+        
+        dir_select_button = ttk.Button(set_dir_window.frame, text="Choose Folder",
+                                       command=dir_select)
+        dir_select_button.grid(row=1, column=1, sticky='ew')
+        dir_select_button.bind("<Return>", lambda e: dir_select)
+        
+        set_dir_window.wrapup(ok_command=ok_command, cancel_command=cancel_command)
+
 
     ## add test methods. all 3 are wrapper for the add_test method
     def add_test_from_test(self):
