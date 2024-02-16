@@ -264,6 +264,7 @@ class SuperToolGUI(tk.Tk):
                 self.project.working_dir = work_dir
                 # re-render project pane
                 self.proj_frame.render()
+                self.proj_frame.update_proj_header()
                 # clear test view
                 self.focused_test = None
                 self.test_frame.show_focused_test()
@@ -341,6 +342,69 @@ class SuperToolGUI(tk.Tk):
             # change project header in project pane
             self.proj_frame.update_proj_header()
 
+    def new_working_dir(self, e=None):
+        set_dir_window = BaseOkPopup(self, title="Choose a new working directory")
+        
+        dir_var = tk.StringVar(self, value=self.project.working_dir)
+        
+        def dir_select():
+            dirname = fd.askdirectory(mustexist=True, initialdir=self.project.working_dir)
+            if dirname:
+                # @TODO add a printout of the number of paths that are valid from
+                # choosing a new directory. maybe add a verify button?
+                dir_var.set(dirname)
+        
+        def ok_command():
+            work_dir = dir_var.get()
+            message_list = []
+            
+            if work_dir:
+                if work_dir[-1] in '/\\':
+                    work_dir = work_dir[:-1]
+                
+                if os.path.exists(work_dir):
+                    # if it's not a directory, complain
+                    if not os.path.isdir(work_dir):
+                        message_list.append("The entered working directory is not a directory.")
+                else:
+                    message_list.append("The entered working directory does not exist.")
+            else:
+                message_list.append("Please enter a working directory for the project.")
+        
+            if message_list:
+                # update the screen with errors
+                set_dir_window.show_errors(message_list)
+            else:
+                set_dir_window.hide_errors()
+            
+                # close the new project window
+                set_dir_window.destroy()
+                
+                if work_dir != self.project.working_dir:
+                    self.project.working_dir = work_dir
+                    self.proj_frame.update_proj_header()
+                    if self.focused_test:
+                        # rerender focused test to update hovertext @TODO do it better
+                        self.test_frame.show_focused_test()
+        
+        def cancel_command():
+            set_dir_window.destroy()
+        
+        dir_label = ttk.Label(set_dir_window.frame,
+                text="Choose a new working directory. The project save file does not need\n" \
+                   + "to be inside the working directory, but every file necessary\n" \
+                   + "for PSLF (sav, dyd, csv) will need to be there.")
+        dir_label.grid(row=0, column=0, sticky='w', columnspan=2)
+        
+        dir_entry = ttk.Entry(set_dir_window.frame, textvariable=dir_var, width=45)
+        dir_entry.grid(row=1, column=0)
+        
+        dir_select_button = ttk.Button(set_dir_window.frame, text="Choose Folder",
+                                       command=dir_select)
+        dir_select_button.grid(row=1, column=1, sticky='ew')
+        dir_select_button.bind("<Return>", lambda e: dir_select)
+        
+        set_dir_window.wrapup(ok_command=ok_command, cancel_command=cancel_command)
 
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file

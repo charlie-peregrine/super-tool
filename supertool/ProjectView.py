@@ -9,6 +9,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import simpledialog
 import tkinter.filedialog  as fd
+from idlelib.tooltip import Hovertip
 
 from supertool.SuperToolFrames import *
 
@@ -42,7 +43,10 @@ class ProjectView(ttk.Frame):
                 command=self.parent.rename_project)
         self.proj_header_menu.add_command(label="New Project",
                 command=self.parent.new_project)
-
+        self.proj_header_menu.add_command(label="Change Working Directory",
+                command=self.parent.new_working_dir)
+        self.proj_header_hover = Hovertip(self.proj_header,
+                text="Working directory: " + self.proj.working_dir, hover_delay=300)
 
         # add scrollbar frame for the project section
         self.scroller = ScrollFrame(self)
@@ -102,8 +106,6 @@ class ProjectView(ttk.Frame):
         else:
             # show no units if there are no units
             self.show_no_units()
-            
-
 
     def show_no_units(self):
         self.no_unit_sep = ttk.Separator(
@@ -220,7 +222,6 @@ class ProjectView(ttk.Frame):
         
         return test_frame
 
-
     # returns the test or unit object in the project object tree
     # correlating to the widget that the user clicked on (should be a label)
     # defaults to self.clicked_widget
@@ -275,6 +276,7 @@ class ProjectView(ttk.Frame):
 
     def update_proj_header(self):
         self.proj_header.config(text=self.proj.title)
+        self.proj_header_hover.text = "Working directory: " + self.proj.working_dir
 
     # @TODO make all of the dialogs custom
     # method used to delete a test
@@ -294,7 +296,6 @@ class ProjectView(ttk.Frame):
             test.parent.remove_test(test.name)
             if len(test.parent.tests) == 0:
                 test.parent.no_tests_label.pack(anchor='w', padx=10)
-                
 
     # method used to rename a test
     # uses a dialog box to ask for the new test name
