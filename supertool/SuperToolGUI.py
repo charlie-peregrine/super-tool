@@ -342,7 +342,7 @@ class SuperToolGUI(tk.Tk):
             # change project header in project pane
             self.proj_frame.update_proj_header()
 
-    def new_working_dir(self, e=None):
+    def set_working_dir(self, e=None):
         set_dir_window = BaseOkPopup(self, title="Choose a new working directory")
         
         dir_var = tk.StringVar(self, value=self.project.working_dir)
