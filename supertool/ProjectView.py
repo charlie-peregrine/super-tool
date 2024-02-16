@@ -10,7 +10,7 @@ from tkinter import messagebox
 from tkinter import simpledialog
 import tkinter.filedialog  as fd
 
-from supertool.SuperToolFrames import ScrollFrame, Popup
+from supertool.SuperToolFrames import *
 
 # subclass of frame, used to hold a nested visual structure of the
 # underlying SuperToolProject object, and allow the user to manipulate
@@ -329,34 +329,34 @@ class ProjectView(ttk.Frame):
     # on their input and prompting them for fixes to those errors
     def add_test(self, unit):
         # create the add_test window
-        test_prompt_window = Popup(self.parent, "New Test")
+        test_prompt_window = BaseOkPopup(self.parent, "New Test")
 
         ## section for putting in single gui elements
         # add test name label
-        name_label = ttk.Label(test_prompt_window, text="Test Name")
+        name_label = ttk.Label(test_prompt_window.frame, text="Test Name")
         name_label.grid(row=0, column=0, padx=4, pady=4)
 
         # add test name entry
-        name_var = tk.StringVar(test_prompt_window)
-        name_entry = ttk.Entry(test_prompt_window, textvariable=name_var)
+        name_var = tk.StringVar(test_prompt_window.frame)
+        name_entry = ttk.Entry(test_prompt_window.frame, textvariable=name_var)
         name_entry.grid(row=0, column=1, padx=4, pady=4)
         # give the entry keyboard focus
         name_entry.focus_set()
 
         # add test type label
-        type_label = ttk.Label(test_prompt_window, text="Test Type")
+        type_label = ttk.Label(test_prompt_window.frame, text="Test Type")
         type_label.grid(row=1, column=0, padx=4, pady=4)
 
         # add test type interactible combobox (aka dropdown menu)
-        type_var = tk.StringVar(test_prompt_window)
-        type_dropdown = ttk.Combobox(test_prompt_window, textvariable=type_var)
+        type_var = tk.StringVar(test_prompt_window.frame)
+        type_dropdown = ttk.Combobox(test_prompt_window.frame, textvariable=type_var)
         test_types = ("Voltage Reference", "Load Reference", "Current Interruption", "Speed Reference", "Steady State")
         type_dropdown['values'] = test_types
         # state = readonly makes it so the user cannot add test types
         type_dropdown.state(['readonly'])
         type_dropdown.grid(row=1, column=1, padx=4, pady=4)
 
-        dir_label = ttk.Label(test_prompt_window,
+        dir_label = ttk.Label(test_prompt_window.frame,
             text="Choose an optional subdirectory for the\n" + \
                 f"test's files to live in. Leave blank to skip.")
         dir_label.grid(row=2, column=0)
@@ -366,35 +366,13 @@ class ProjectView(ttk.Frame):
             if dirname:
                 dir_var.set(dirname)
         
-        dir_button = ttk.Button(test_prompt_window, text="Select Subdirectory",
+        dir_button = ttk.Button(test_prompt_window.frame, text="Select Subdirectory",
                                      command=dir_button_command)
         dir_button.grid(row=2, column=1)
         
         dir_var = tk.StringVar()
-        dir_entry = ttk.Entry(test_prompt_window, textvariable=dir_var, width=50)
+        dir_entry = ttk.Entry(test_prompt_window.frame, textvariable=dir_var, width=50)
         dir_entry.grid(row=3, column=0, columnspan=2)
-
-        
-        bottom_frame = ttk.Frame(test_prompt_window)
-        bottom_frame.grid(row=7, column=0, columnspan=2, sticky='nesw')
-        bottom_frame.columnconfigure(0, weight=1)
-        bottom_frame.columnconfigure(1, weight=1)
-
-        sep1 = ttk.Separator(test_prompt_window)
-        sep1.grid(row=4, columnspan=2, sticky='ew')
-        error_label = ttk.Label(test_prompt_window, text="Press ok to create a new test")
-        error_label.grid(row=5, columnspan=2, sticky='nesw')
-        
-        sep2 = ttk.Separator(test_prompt_window)
-        sep2.grid(row=6, columnspan=2, sticky='ew')
-        
-        
-
-        # # create a hidden error label that can pop up when a planned error
-        # # occurs (such as an empty entry or invalid characters)
-        # err_label = ttk.Label(test_prompt_window)
-        # err_label.grid(row=4, column=0, columnspan=2, padx=4, pady=4)
-        # err_label.grid_remove()
 
         # function called by the create new test button, checks that the
         # name and test entered are valid and  if so creates a new test
@@ -430,12 +408,9 @@ class ProjectView(ttk.Frame):
 
             if message_list:
                 # update the screen with errors
-                error_label.config(text="\n".join(message_list))
-                sep1.grid()
-                error_label.grid()
+                test_prompt_window.show_errors(message_list)
             else:
-                sep1.grid_remove()
-                error_label.grid_remove()
+                test_prompt_window.hide_errors()
                 
                 test_prompt_window.destroy()
              
@@ -454,30 +429,18 @@ class ProjectView(ttk.Frame):
                 test_frame = self.build_test_frame(test, unit.frame)
                 test.frame = test_frame
 
-        ok_button = ttk.Button(bottom_frame, text="OK", command=ok_command)
-        ok_button.grid(row=0, column=1, sticky='e')
-        ok_button.bind("<Return>", ok_command)
-        
         def cancel_command(e=None):
             test_prompt_window.destroy()
 
-        cancel_button = ttk.Button(bottom_frame, text="Cancel", command=cancel_command)
-        cancel_button.grid(row=0, column=2, sticky='e')
-        cancel_button.bind("<Return>", cancel_command)
-
-        for widget in test_prompt_window.winfo_children():
-            widget.grid_configure(padx=2, pady=2)
-
-        sep1.grid_remove()
-        error_label.grid_remove()
 
         # usability keybinds to make the combobox and button interface
         # more intuitive
-        ok_button.bind("<Return>", ok_command)
         name_entry.bind("<Return>", lambda e: type_dropdown.focus())
         type_dropdown.bind("<Return>", lambda e: type_dropdown.event_generate('<Down>'))
         type_dropdown.bind("<space>", lambda e: type_dropdown.event_generate('<Down>'))
         type_dropdown.bind("<<ComboboxSelected>>", lambda e: dir_button.focus())
+        
+        test_prompt_window.wrapup(ok_command, cancel_command)
 
 
     ## @TODO make the unit methods use custom windows
@@ -514,17 +477,17 @@ class ProjectView(ttk.Frame):
 
     # add a unit to the project structure
     def add_unit(self):
-        unit_prompt_window = Popup(self.parent, "New Unit")
+        unit_prompt_window = BaseOkPopup(self.parent, "New Unit")
         
-        name_label = ttk.Label(unit_prompt_window, text=f"Enter a name for the Unit:")
+        name_label = ttk.Label(unit_prompt_window.frame, text=f"Enter a name for the Unit:")
         name_label.grid(row=0, column=0)
         
         name_var = tk.StringVar()
-        name_entry = ttk.Entry(unit_prompt_window, textvariable=name_var)
+        name_entry = ttk.Entry(unit_prompt_window.frame, textvariable=name_var)
         name_entry.grid(row=0, column=1)
         name_entry.focus_set()
         
-        dir_label = ttk.Label(unit_prompt_window,
+        dir_label = ttk.Label(unit_prompt_window.frame,
             text="Choose an optional subdirectory for the\n" + \
                 f"unit's files to live in. Leave blank to skip.")
         dir_label.grid(row=1, column=0)
@@ -534,18 +497,13 @@ class ProjectView(ttk.Frame):
             if dirname:
                 dir_var.set(dirname)
         
-        dir_button = ttk.Button(unit_prompt_window, text="Select Subdirectory",
+        dir_button = ttk.Button(unit_prompt_window.frame, text="Select Subdirectory",
                                      command=dir_button_command)
         dir_button.grid(row=1, column=1)
         
         dir_var = tk.StringVar()
-        dir_entry = ttk.Entry(unit_prompt_window, textvariable=dir_var, width=50)
+        dir_entry = ttk.Entry(unit_prompt_window.frame, textvariable=dir_var, width=50)
         dir_entry.grid(row=2, column=0, columnspan=2)
-        
-        bottom_frame = ttk.Frame(unit_prompt_window)
-        bottom_frame.grid(row=6, column=0, columnspan=2, sticky='nesw')
-        bottom_frame.columnconfigure(0, weight=1)
-        bottom_frame.columnconfigure(1, weight=1)
         
         def ok_command(e=None):
             unit_name = name_var.get()
@@ -574,12 +532,9 @@ class ProjectView(ttk.Frame):
             
             if message_list:
                 # update the screen with errors
-                error_label.config(text="\n".join(message_list))
-                sep1.grid()
-                error_label.grid()
+                unit_prompt_window.show_errors(message_list)
             else:
-                sep1.grid_remove()
-                error_label.grid_remove()
+                unit_prompt_window.hide_errors()
                 
                 unit_prompt_window.destroy()
                 
@@ -595,32 +550,12 @@ class ProjectView(ttk.Frame):
                 unit_frame = self.build_unit_frame(unit, self.scroller.frame)
                 unit.frame = unit_frame
         
-        sep1 = ttk.Separator(unit_prompt_window)
-        sep1.grid(row=3, columnspan=2, sticky='ew')
-        error_label = ttk.Label(unit_prompt_window, text="Press ok to create a new units")
-        error_label.grid(row=4, columnspan=2, sticky='nesw')
-        
-        sep2 = ttk.Separator(unit_prompt_window)
-        sep2.grid(row=5, columnspan=2, sticky='ew')
-        
-        ok_button = ttk.Button(bottom_frame, text="OK", command=ok_command)
-        ok_button.grid(row=0, column=1, sticky='e')
-        
         def cancel_command(e=None):
             unit_prompt_window.destroy()
 
-        cancel_button = ttk.Button(bottom_frame, text="Cancel", command=cancel_command)
-        cancel_button.grid(row=0, column=2, sticky='e')
-        
-        for widget in unit_prompt_window.winfo_children():
-            widget.grid_configure(padx=2, pady=2)
-        
-        sep1.grid_remove()
-        error_label.grid_remove()
-        
+        unit_prompt_window.wrapup(ok_command, cancel_command)
+
         dir_button.bind("<Return>", dir_button_command)
-        ok_button.bind("<Return>", ok_command)
-        cancel_button.bind("<Return>", cancel_command)
         name_entry.bind("<Return>", lambda e: dir_button.focus())
 
     # helper method to set the root's focused test to the clicked widget

@@ -197,7 +197,7 @@ class SuperToolGUI(tk.Tk):
             self.param_frame.render()
     
     def new_project(self, e=None):
-        new_proj_window = Popup(self, "New Project")
+        new_proj_window = BaseOkPopup(self, "New Project")
         
         name_var = tk.StringVar(self)
         save_var = tk.StringVar(self)
@@ -248,13 +248,9 @@ class SuperToolGUI(tk.Tk):
         
             if message_list:
                 # update the screen with errors
-                error_label.config(text="\n".join(message_list))
-                sep1.grid()
-                error_label.grid()
+                new_proj_window.show_errors(message_list)
             else:
-                print(proj_name, save_file, work_dir)
-                sep1.grid_remove()
-                error_label.grid_remove()
+                new_proj_window.hide_errors()
             
                 # close the new project window
                 new_proj_window.destroy()
@@ -276,7 +272,7 @@ class SuperToolGUI(tk.Tk):
         def cancel_command(e=None):
             new_proj_window.destroy()
         
-        name_frame = ttk.Frame(new_proj_window)
+        name_frame = ttk.Frame(new_proj_window.frame)
         name_frame.grid(row=0, sticky='nesw')
         name_frame.columnconfigure(0, weight=1)
         name_frame.columnconfigure(1, weight=1)
@@ -288,7 +284,7 @@ class SuperToolGUI(tk.Tk):
         # give the entry keyboard focus
         name_entry.focus_set()
         
-        save_frame = ttk.Frame(new_proj_window)
+        save_frame = ttk.Frame(new_proj_window.frame)
         save_frame.grid(row=1, sticky='nesw')
         save_label = ttk.Label(save_frame,
                 text="Enter a save file name for the project.\nLeave blank to choose a save location later.") #, wraplength=225)
@@ -300,7 +296,7 @@ class SuperToolGUI(tk.Tk):
         save_select_button.grid(row=1, column=1, sticky='ew')
         save_select_button.bind("<Return>", save_select)
         
-        dir_frame = ttk.Frame(new_proj_window)
+        dir_frame = ttk.Frame(new_proj_window.frame)
         dir_frame.grid(row=2, sticky='nesw')
         dir_label = ttk.Label(dir_frame,
                 text="Choose a working directory. The project save file does not need\n" \
@@ -314,32 +310,7 @@ class SuperToolGUI(tk.Tk):
         dir_select_button.grid(row=1, column=1, sticky='ew')
         dir_select_button.bind("<Return>", dir_select)
         
-        sep1 = ttk.Separator(new_proj_window)
-        sep1.grid(row=3, sticky='ew')
-        error_label = ttk.Label(new_proj_window, text="Press ok to create a new project")
-        error_label.grid(row=4, sticky='nesw')
-        
-        sep2 = ttk.Separator(new_proj_window)
-        sep2.grid(row=5,sticky='ew')
-        
-        bottom_frame = ttk.Frame(new_proj_window)
-        bottom_frame.grid(row=6, sticky='nesw')
-        bottom_frame.columnconfigure(0, weight=1)
-        bottom_frame.columnconfigure(1, weight=1)
-        ok_button = ttk.Button(bottom_frame, text="OK", command=ok_command)
-        ok_button.grid(row=0, column=1, sticky='e', padx=2)
-        ok_button.bind("<Return>", ok_command)
-        cancel_button = ttk.Button(bottom_frame,
-                text="Cancel",
-                command=cancel_command)
-        cancel_button.grid(row=0, column=2, sticky='e', padx=2)
-        cancel_button.bind("<Return>", cancel_command)
-        
-        for widget in new_proj_window.winfo_children():
-            widget.grid_configure(padx=2, pady=2) #configure(, padding='5 5 5 5')
-        
-        sep1.grid_remove()
-        error_label.grid_remove()
+        new_proj_window.wrapup(ok_command=ok_command, cancel_command=cancel_command)
         
         
     # method called by ctrl+o and the file menu
