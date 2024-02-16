@@ -45,6 +45,7 @@ class ProjectView(ttk.Frame):
                 command=self.parent.new_project)
         self.proj_header_menu.add_command(label="Change Working Directory",
                 command=self.parent.set_working_dir)
+        
         self.proj_header_hover = Hovertip(self.proj_header,
                 text="Working directory: " + self.proj.working_dir, hover_delay=300)
 
@@ -139,6 +140,8 @@ class ProjectView(ttk.Frame):
         # widget hierarchy and labeling of the units and tests
         unit_label = ttk.Label(unit_frame, text=unit.name)
         unit_label.pack(anchor='w')
+        
+        unit_label_hover = Hovertip(unit_label, text="Sub Directory: " + unit.sub_dir, hover_delay=300)
 
         # make a right click menu for the unit labels
         unit_label_menu = tk.Menu(unit_label)
@@ -202,6 +205,9 @@ class ProjectView(ttk.Frame):
             self.clicked_widget = e.widget
             test_label_menu.post(e.x_root, e.y_root)
 
+        print(test.sub_dir)
+        test_label_hover = Hovertip(test_label, text="Sub Directory: " + test.sub_dir, hover_delay=300)
+        
         # left clicking on a test focuses the test, showing its
         # details and attributes in the testview frame
         test_label.bind("<1>", self.focus_test)
@@ -276,6 +282,7 @@ class ProjectView(ttk.Frame):
 
     def update_proj_header(self):
         self.proj_header.config(text=self.proj.title)
+        print(self.parent.project.working_dir)
         self.proj_header_hover.text = "Working directory: " + self.proj.working_dir
 
     # @TODO make all of the dialogs custom
@@ -402,7 +409,7 @@ class ProjectView(ttk.Frame):
                     if not os.path.isdir(subdir):
                         message_list.append("The entered sub-directory is not a directory.")
                     else:
-                        subdir = os.path.relpath(subdir, self.parent.project.working_dir).replace('\\', '/')
+                        subdir = os.path.relpath(subdir, unit.get_dir()).replace('\\', '/')
                 else:
                     message_list.append("The entered sub-directory does not exist.")
             
@@ -425,7 +432,7 @@ class ProjectView(ttk.Frame):
                 # set the subdirectory
                 if subdir == '.':
                     subdir = ''
-                unit.sub_dir = subdir
+                test.sub_dir = subdir
                 # build the test frame and save it for later
                 test_frame = self.build_test_frame(test, unit.frame)
                 test.frame = test_frame

@@ -112,17 +112,20 @@ class Project:
         # read working directory if it exists, backwards compatibility
         if 'working_dir' in root.attrib:
             self.working_dir = root.attrib['working_dir']
+            print("working dir:", self.working_dir)
         
         for unit_node in root:
             unit = Unit(self, unit_node.attrib['name'])
             if 'subdir' in unit_node.attrib:
                 unit.sub_dir = unit_node.attrib['subdir']
+                print("unit dir:", unit.sub_dir)
             for test_node in unit_node:
                 test = Test(name=test_node.attrib['name'],
                             type=test_node.attrib['type'],
                             parent=unit)
                 if 'subdir' in test_node.attrib:
                     test.sub_dir = test_node.attrib['subdir']
+                    print("test dir:", test.sub_dir)
                 for attr_node in test_node:
                     # print(unit_node.attrib, test_node.attrib, attr_node.attrib, attr_node.text)
                     

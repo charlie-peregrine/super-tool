@@ -96,7 +96,15 @@ class TestView(ttk.Frame):
                                           command=self.change_focused_test_type)
             self.type_button.grid(row=1, column=1, sticky='e')
             
-            
+            # self.sub_dir_label = ttk.Label(self.frame, text="Sub-Directory")
+            # self.sub_dir_label.grid(row=2, column=0)
+            # self.sub_dir_val_label = ttk.Label(self.frame,
+            #         text=focused.sub_dir + "haaa", wraplength=40)
+            # print("sub dir:", focused.sub_dir)
+            # self.sub_dir_val_label.grid(row=2, column=1)
+            # self.sub_dir_button = ttk.Button(self.frame,
+            #         text="Change")
+            # self.sub_dir_button.grid(row=2, column=2)
             
             # set up for loop, offset is how many rows down the big
             # list of attributes should start

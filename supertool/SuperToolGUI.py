@@ -325,6 +325,7 @@ class SuperToolGUI(tk.Tk):
             self.project.file_name = filename
             self.project.read_from_file_name()
             self.proj_frame.render()
+            self.proj_frame.update_proj_header()
             self.focused_test = None
             self.test_frame.show_focused_test()
             self.param_frame.render()
