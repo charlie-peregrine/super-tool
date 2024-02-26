@@ -433,7 +433,10 @@ class TestView(ttk.Frame):
         
     # @TODO needs typechecking
     def open_path(self, attr):
-        os.startfile(attr.var.get())
+        if attr.var.get():
+            os.startfile(attr.get())
+        else:
+            print("No file to open!!!! uh oh")
     
     # get a new path for path type attributes
     # need to pick between input and output files because the file
