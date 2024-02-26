@@ -164,6 +164,8 @@ class ProjectView(ttk.Frame):
                         command=self.delete_unit)
         unit_label_menu.add_command(label="rename unit",
                         command=self.rename_unit)
+        unit_label_menu.add_command(label="change unit sub-dir",
+                            command=self.set_unit_sub_dir)
         unit_label_menu.add_command(label="new unit",
                         command=self.add_unit)
         unit_label_menu.add_command(label="new test",
@@ -552,6 +554,76 @@ class ProjectView(ttk.Frame):
         else:
             self.proj.rename_unit(unit.name, new_name)
             unit.frame.children['!label']['text'] = new_name
+
+    def set_unit_sub_dir(self):
+        unit = self.get_clicked_test_or_unit()
+        
+        set_dir_window = BaseOkPopup(self, title="Choose a new unit sub-directory")
+        
+        dir_var = tk.StringVar(self, value=unit.get_dir())
+        
+        def dir_select():
+            dirname = fd.askdirectory(mustexist=True, initialdir=unit.get_dir())
+            if dirname:
+                # @TODO add a printout of the number of paths that are valid from
+                # choosing a new directory. maybe add a verify button?
+                dir_var.set(dirname)
+        
+        def ok_command():
+            sub_dir = dir_var.get()
+            message_list = []
+            
+            if sub_dir:
+                if sub_dir[-1] in '/\\':
+                    sub_dir = sub_dir[:-1]
+                
+                if os.path.exists(sub_dir):
+                    # if it's not a directory, complain
+                    if not os.path.isdir(sub_dir):
+                        message_list.append("The entered sub-directory is not a directory.")
+                    else:
+                        sub_dir = os.path.relpath(sub_dir, unit.parent.get_dir()).replace('\\', '/')
+                else:
+                    message_list.append("The entered sub-directory does not exist.")
+            else:
+                message_list.append("Please enter a sub-directory for the unit.")
+        
+            if message_list:
+                # update the screen with errors
+                set_dir_window.show_errors(message_list)
+            else:
+                set_dir_window.hide_errors()
+            
+                # close the new project window
+                set_dir_window.destroy()
+                
+                if sub_dir != unit.sub_dir:
+                    unit.sub_dir = sub_dir
+                    # update hovertext
+                    unit.hovertext.text = "Sub Directory: " + unit.sub_dir
+                    if self.parent.focused_test.name in unit.tests:
+                        # rerender focused test to update hovertext @TODO do it better
+                        self.parent.test_frame.show_focused_test()
+        
+        def cancel_command():
+            set_dir_window.destroy()
+        
+        dir_label = ttk.Label(set_dir_window.frame,
+                text="Choose a new sub-directory. Ideally all necessary\n" \
+                    + "simulation data files (dyd, sav, csv, etc.) should be\n" \
+                    + "somewhere in the sub-directory or below it.")
+        dir_label.grid(row=0, column=0, sticky='w', columnspan=2)
+        
+        dir_entry = ttk.Entry(set_dir_window.frame, textvariable=dir_var, width=45)
+        dir_entry.grid(row=1, column=0)
+        
+        dir_select_button = ttk.Button(set_dir_window.frame, text="Choose Folder",
+                                       command=dir_select)
+        dir_select_button.grid(row=1, column=1, sticky='ew')
+        dir_select_button.bind("<Return>", lambda e: dir_select)
+        
+        set_dir_window.wrapup(ok_command=ok_command, cancel_command=cancel_command)
+
 
     # add a unit to the project structure
     def add_unit(self):
