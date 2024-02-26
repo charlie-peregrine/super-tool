@@ -323,10 +323,10 @@ class ProjectView(ttk.Frame):
         
         set_dir_window = BaseOkPopup(self, title="Choose a new test sub-directory")
         
-        dir_var = tk.StringVar(self, value=test.sub_dir)
+        dir_var = tk.StringVar(self, value=test.get_dir())
         
         def dir_select():
-            dirname = fd.askdirectory(mustexist=True, initialdir=test.sub_dir)
+            dirname = fd.askdirectory(mustexist=True, initialdir=test.get_dir())
             if dirname:
                 # @TODO add a printout of the number of paths that are valid from
                 # choosing a new directory. maybe add a verify button?
@@ -372,8 +372,8 @@ class ProjectView(ttk.Frame):
             set_dir_window.destroy()
         
         dir_label = ttk.Label(set_dir_window.frame,
-                text="Choose a new sub-directory. Ideally all necessary" \
-                    + "simulation data (dyd, sav, csv, etc.) should be" \
+                text="Choose a new sub-directory. Ideally all necessary\n" \
+                    + "simulation data (dyd, sav, csv, etc.) should be\n" \
                     + "somewhere in the sub-directory.")
         dir_label.grid(row=0, column=0, sticky='w', columnspan=2)
         
