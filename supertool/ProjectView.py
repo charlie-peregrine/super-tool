@@ -372,9 +372,9 @@ class ProjectView(ttk.Frame):
             set_dir_window.destroy()
         
         dir_label = ttk.Label(set_dir_window.frame,
-                text="Choose a new working directory. The project save file does not need\n" \
-                   + "to be inside the working directory, but every file necessary\n" \
-                   + "for PSLF (sav, dyd, csv) will need to be there.")
+                text="Choose a new sub-directory. Ideally all necessary" \
+                    + "simulation data (dyd, sav, csv, etc.) should be" \
+                    + "somewhere in the sub-directory.")
         dir_label.grid(row=0, column=0, sticky='w', columnspan=2)
         
         dir_entry = ttk.Entry(set_dir_window.frame, textvariable=dir_var, width=45)
@@ -386,7 +386,6 @@ class ProjectView(ttk.Frame):
         dir_select_button.bind("<Return>", lambda e: dir_select)
         
         set_dir_window.wrapup(ok_command=ok_command, cancel_command=cancel_command)
-
 
     ## add test methods. all 3 are wrapper for the add_test method
     def add_test_from_test(self):
@@ -521,7 +520,6 @@ class ProjectView(ttk.Frame):
         type_dropdown.bind("<<ComboboxSelected>>", lambda e: dir_button.focus())
         
         test_prompt_window.wrapup(ok_command, cancel_command)
-
 
     ## @TODO make the unit methods use custom windows
     # delete the clicked unit
