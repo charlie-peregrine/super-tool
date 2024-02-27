@@ -262,6 +262,7 @@ class SuperToolGUI(tk.Tk):
                     self.project.file_name = save_file
                     self.save_project()
                 self.project.working_dir = work_dir
+                self.set_project
                 # re-render project pane
                 self.proj_frame.render()
                 self.proj_frame.update_proj_header()
@@ -320,16 +321,24 @@ class SuperToolGUI(tk.Tk):
     def open_project(self, e=None):
         filename = fd.askopenfilename(filetypes=[("Super Tool Project Files", "*.pec")])
         if filename:
-            del self.project
-            self.project = stproject.Project()
-            self.project.file_name = filename
-            self.project.read_from_file_name()
-            self.proj_frame.render()
-            self.proj_frame.update_proj_header()
-            self.focused_test = None
-            self.test_frame.show_focused_test()
-            self.param_frame.render()
-    
+            p = stproject.Project()
+            p.file_name = filename
+            p.read_from_file_name()
+            
+            if not p.working_dir or not os.path.exists(p.working_dir):
+                self.prompt_for_new_working_dir(proj=p)
+            else:
+                self.set_project(p)
+            
+    def set_project(self, proj):
+        del self.project
+        self.project = proj
+        self.proj_frame.render()
+        self.proj_frame.update_proj_header()
+        self.focused_test = None
+        self.test_frame.show_focused_test()
+        self.param_frame.render()
+        
     # method called in project view
     # shows a prompt for the user to rename the currently open project
     def rename_project(self, e=None):
@@ -343,10 +352,16 @@ class SuperToolGUI(tk.Tk):
             # change project header in project pane
             self.proj_frame.update_proj_header()
 
-    def set_working_dir(self, e=None):
+    def prompt_for_new_working_dir(self, e=None, proj=None):
+        
+        print(proj.__repr__())
+        print(self.project.__repr__())
+        if proj == None:
+            proj = self.project
+        
         set_dir_window = BaseOkPopup(self, title="Choose a new working directory")
         
-        dir_var = tk.StringVar(self, value=self.project.working_dir)
+        dir_var = tk.StringVar(self, value=proj.working_dir)
         
         def dir_select():
             dirname = fd.askdirectory(mustexist=True, initialdir=self.project.working_dir)
@@ -355,7 +370,7 @@ class SuperToolGUI(tk.Tk):
                 # choosing a new directory. maybe add a verify button?
                 dir_var.set(dirname)
         
-        def ok_command():
+        def ok_command(proj=proj):
             work_dir = dir_var.get()
             message_list = []
             
@@ -381,12 +396,18 @@ class SuperToolGUI(tk.Tk):
                 # close the new project window
                 set_dir_window.destroy()
                 
-                if work_dir != self.project.working_dir:
-                    self.project.working_dir = work_dir
-                    self.proj_frame.update_proj_header()
-                    if self.focused_test:
-                        # rerender focused test to update hovertext @TODO do it better
-                        self.test_frame.show_focused_test()
+                print(proj.__repr__())
+                print(self.project.__repr__())
+                
+                if work_dir != proj.working_dir:
+                    proj.working_dir = work_dir
+                    if proj != self.project:
+                        self.set_project(proj)
+                    # else:
+                self.proj_frame.update_proj_header()
+                if self.focused_test:
+                    # rerender focused test to update hovertext @TODO do it better
+                    self.test_frame.show_focused_test()
         
         def cancel_command():
             set_dir_window.destroy()

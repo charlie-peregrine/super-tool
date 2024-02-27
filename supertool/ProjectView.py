@@ -44,7 +44,7 @@ class ProjectView(ttk.Frame):
         self.proj_header_menu.add_command(label="New Project",
                 command=self.parent.new_project)
         self.proj_header_menu.add_command(label="Change Working Directory",
-                command=self.parent.set_working_dir)
+                command=self.parent.prompt_for_new_working_dir)
         
         self.proj_header_hover = Hovertip(self.proj_header,
                 text="Working directory: " + self.proj.working_dir, hover_delay=300)

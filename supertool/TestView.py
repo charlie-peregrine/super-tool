@@ -174,8 +174,8 @@ class TestView(ttk.Frame):
                             else:
                                 # check that the parent directory exists
                                 print(attribute.parent.get_dir())
-                                print(os.path.exists(attribute.parent.get_dir()))
-                                if not os.path.exists(attribute.parent.get_dir()):
+                                print(os.path.exists(os.path.dirname(attribute.get())))
+                                if not os.path.exists(os.path.dirname(attribute.get())):
                                     return  "This file cannot be generated at this location.\n" + \
                                             "This is likely an issue with the working, unit,\n" + \
                                             "or test sub-directories being malformed.\n" + \
@@ -197,7 +197,7 @@ class TestView(ttk.Frame):
                                     l.configure(style="badpath.TButton")
                                     return
                             else:
-                                if not os.path.exists(a.parent.get_dir()):
+                                if not os.path.exists(os.path.dirname(a.get())):
                                     l.configure(style="badpath.TButton")
                                     return
                         l.configure(style="TButton")
