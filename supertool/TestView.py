@@ -474,8 +474,7 @@ class TestView(ttk.Frame):
         type_dropdown.bind("<space>", lambda e: type_dropdown.event_generate('<Down>'))
         type_dropdown.bind("<<ComboboxSelected>>", lambda e: done_button.focus())
         
-        
-    # @TODO needs typechecking
+    # @TODO needs typechecking?
     def open_path(self, attr):
         if attr.var.get():
             os.startfile(attr.get())
@@ -505,11 +504,20 @@ class TestView(ttk.Frame):
                 )
         
         if path:
-            # @TODO make this include the test subdirectory
             # @TODO make a better decision on backslashes vs slashes
             rel_path = os.path.relpath(path, attr.parent.get_dir()).replace('\\', '/')
-            print(attr.parent.get_dir() + rel_path)
+            print(attr.parent.get_dir() + " + " + rel_path)
             attr.var.set(rel_path)
+            
+            # autofill pslf output file names if they're not already filled in
+            if attr.name == "sav_filename":
+                attrs = attr.parent.attrs
+                for a in attrs.values():
+                    if a.type == "PATH" and not a.read_only_file and not a.var.get():
+                        path = os.path.basename(attr.var.get())
+                        root, ext = os.path.splitext(path)
+                        a.var.set(root + "." + a.extension)
+            
             if attr.name == self.parent.focused_test.plot_sim_file:
                 self.parent.param_frame.render_sim_frame()
             if attr.name == self.parent.focused_test.plot_mes_file:
