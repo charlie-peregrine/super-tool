@@ -98,11 +98,12 @@ class ParamView(ttk.Frame):
         # @TODO error check for multiplication menu (support +,-,/,*)
         
         # @check that file exists here or earlier (on read and on select?)
-        if not os.path.exists(self.foc[plot_name]):
+        if not os.path.exists(self.foc.attrs[plot_name].get()):
             # @TODO tell the user somehow that this is bad
+            print(self.foc.attrs[plot_name].get(), "does not exist")
             return
         
-        with open(self.foc[plot_name], 'r', encoding='utf-8-sig') as file:
+        with open(self.foc.attrs[plot_name].get(), 'r', encoding='utf-8-sig') as file:
             line = file.readline()
             if line[-1] == '\n': # trim trailing newline
                 line = line[:-1]
