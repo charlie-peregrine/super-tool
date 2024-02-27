@@ -160,12 +160,12 @@ class TestView(ttk.Frame):
                         if attribute.var.get() == '':
                             return "Click to Select a file"
                         else:
-                            print(attribute.get())
-                            print("RO:", attribute.read_only_file, end=' - ')
+                            # print(attribute.get())
+                            # print("RO:", attribute.read_only_file, end=' - ')
                             if attribute.read_only_file:
                                 # check that the file itself exists
-                                print(attribute.get())
-                                print(os.path.exists(attribute.get()))
+                                # print(attribute.get())
+                                # print(os.path.exists(attribute.get()))
                                 if not os.path.exists(attribute.get()):
                                     return f"This file does not exist at this location.\n" + \
                                            f"Full Path: {attribute.get()}\n" + \
@@ -173,8 +173,8 @@ class TestView(ttk.Frame):
                                             "Right click to clear or click to re-select a file" 
                             else:
                                 # check that the parent directory exists
-                                print(attribute.parent.get_dir())
-                                print(os.path.exists(os.path.dirname(attribute.get())))
+                                # print(attribute.parent.get_dir())
+                                # print(os.path.exists(os.path.dirname(attribute.get())))
                                 if not os.path.exists(os.path.dirname(attribute.get())):
                                     return  "This file cannot be generated at this location.\n" + \
                                             "This is likely an issue with the working, unit,\n" + \
