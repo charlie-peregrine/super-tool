@@ -256,20 +256,15 @@ class SuperToolGUI(tk.Tk):
                 new_proj_window.destroy()
                 
                 # delete current project class
-                del self.project
-                self.project = stproject.Project(proj_name) # @TODO set work directory and save file name
+                p = stproject.Project(proj_name) # @TODO set work directory and save file name
+                p.working_dir = work_dir
                 if save_file:
-                    self.project.file_name = save_file
+                    p.file_name = save_file
+                
+                self.set_project(p)
+                if save_file:
                     self.save_project()
-                self.project.working_dir = work_dir
-                self.set_project
-                # re-render project pane
-                self.proj_frame.render()
-                self.proj_frame.update_proj_header()
-                # clear test view
-                self.focused_test = None
-                self.test_frame.show_focused_test()
-                self.param_frame.render()
+                
         
         def cancel_command(e=None):
             new_proj_window.destroy()
@@ -333,8 +328,10 @@ class SuperToolGUI(tk.Tk):
     def set_project(self, proj):
         del self.project
         self.project = proj
+        # re-render project pane
         self.proj_frame.render()
         self.proj_frame.update_proj_header()
+        # clear test view
         self.focused_test = None
         self.test_frame.show_focused_test()
         self.param_frame.render()
