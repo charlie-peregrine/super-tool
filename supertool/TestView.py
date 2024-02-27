@@ -6,6 +6,7 @@ import threading
 import time
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.font
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import traceback
 from idlelib.tooltip import Hovertip
@@ -83,6 +84,13 @@ class TestView(ttk.Frame):
         # the scrollbar would still act like the frame was large
         self.scroller.scroll_to_top()
         
+        style = ttk.Style()
+        
+        # create style for path buttons with paths that don't exist 
+        button_font = tkinter.font.nametofont(style.lookup('TButton', 'font'))
+        style.configure('badpath.TButton', foreground='red',
+            font=(button_font.cget('family'), button_font.cget('size'), 'bold'))
+        
         focused = self.parent.focused_test
         if focused: # if there is a focused test
             # put labels and buttons for the top of the scrollable frame
@@ -141,15 +149,39 @@ class TestView(ttk.Frame):
                     
                     path_button = ttk.Button(self.frame, text=short_name(attr.var.get()),
                             command=lambda attr=attr: self.get_new_path(attr))
+                    path_button.grid(row=i+offset, column=1, sticky='nesw')
+                    
                     def clear_path(e=None, attr=attr):
                         attr.var.set("")
                     path_button.bind("<3>", clear_path)
-                    path_button.grid(row=i+offset, column=1, sticky='nesw')
                     
                     # create hovertext for paths to show the long path instead of just the basename
                     def path_hover_text(attribute):
                         if attribute.var.get() == '':
                             return "Click to Select a file"
+                        else:
+                            print(attribute.get())
+                            print("RO:", attribute.read_only_file, end=' - ')
+                            if attribute.read_only_file:
+                                # check that the file itself exists
+                                print(attribute.get())
+                                print(os.path.exists(attribute.get()))
+                                if not os.path.exists(attribute.get()):
+                                    return f"This file does not exist at this location.\n" + \
+                                           f"Full Path: {attribute.get()}\n" + \
+                                           f"Relative Path: {attribute.var.get()}\n" + \
+                                            "Right click to clear or click to re-select a file" 
+                            else:
+                                # check that the parent directory exists
+                                print(attribute.parent.get_dir())
+                                print(os.path.exists(attribute.parent.get_dir()))
+                                if not os.path.exists(attribute.parent.get_dir()):
+                                    return  "This file cannot be generated at this location.\n" + \
+                                            "This is likely an issue with the working, unit,\n" + \
+                                            "or test sub-directories being malformed.\n" + \
+                                           f"Full Path: {attribute.get()}\n" + \
+                                           f"Relative Path: {attribute.var.get()}\n" + \
+                                            "Right click to clear or click to re-select a file" 
                         return f"Full Path: {attribute.get()}\n" + \
                                f"Relative Path: {attribute.var.get()}\n" + \
                                 "Right click to clear"
@@ -157,11 +189,21 @@ class TestView(ttk.Frame):
                     
                     # set up traces for when the path variables update to modify the path label
                     # separate functions needed for clarity
-                    def update_button(_1, _2, _3, l=path_button, v=attr.var):
-                        l.configure(text=short_name(v.get()))
+                    def update_button(_1=None, _2=None, _3=None, l=path_button, a=attr):
+                        l.configure(text=short_name(a.var.get()))
+                        l.configure(style="TButton")
+                        if a.var.get():
+                            if a.read_only_file:
+                                if not os.path.exists(a.get()):
+                                    l.configure(style="badpath.TButton")
+                            else:
+                                if not os.path.exists(a.parent.get_dir()):
+                                    l.configure(style="badpath.TButton")
+
+                    update_button()
                     button_cb = attr.var.trace_add('write', update_button)
                     
-                    def update_hover(_1, _2, _3, l=path_label_hover, a=attr):
+                    def update_hover(_1=None, _2=None, _3=None, l=path_label_hover, a=attr):
                         l.text = path_hover_text(a)
                     hover_cb = attr.var.trace_add('write', update_hover)
                     
