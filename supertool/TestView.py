@@ -191,14 +191,16 @@ class TestView(ttk.Frame):
                     # separate functions needed for clarity
                     def update_button(_1=None, _2=None, _3=None, l=path_button, a=attr):
                         l.configure(text=short_name(a.var.get()))
-                        l.configure(style="TButton")
                         if a.var.get():
                             if a.read_only_file:
                                 if not os.path.exists(a.get()):
                                     l.configure(style="badpath.TButton")
+                                    return
                             else:
                                 if not os.path.exists(a.parent.get_dir()):
                                     l.configure(style="badpath.TButton")
+                                    return
+                        l.configure(style="TButton")
 
                     update_button()
                     button_cb = attr.var.trace_add('write', update_button)
