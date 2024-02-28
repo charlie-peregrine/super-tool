@@ -98,11 +98,12 @@ class ParamView(ttk.Frame):
         # @TODO error check for multiplication menu (support +,-,/,*)
         
         # @check that file exists here or earlier (on read and on select?)
-        if not os.path.exists(self.foc[plot_name]):
+        if not os.path.exists(self.foc.attrs[plot_name].get()):
             # @TODO tell the user somehow that this is bad
+            print(self.foc.attrs[plot_name].get(), "does not exist")
             return
         
-        with open(self.foc[plot_name], 'r', encoding='utf-8-sig') as file:
+        with open(self.foc.attrs[plot_name].get(), 'r', encoding='utf-8-sig') as file:
             line = file.readline()
             if line[-1] == '\n': # trim trailing newline
                 line = line[:-1]
@@ -155,7 +156,7 @@ class ParamView(ttk.Frame):
         sim_data = {}
         sim_data['ready'] = False # is it ok to graph this data
         if self.sim_widgets:
-            for k, (l,d,e) in self.sim_widgets.items():
+            for k, (_,d,e) in self.sim_widgets.items():
                 sim_data[k] = (d.get(), e.get())
             sim_data['file'] = (self.foc[self.foc.plot_sim_file], '')
             sim_data['ready'] = True
@@ -166,7 +167,7 @@ class ParamView(ttk.Frame):
         mes_data = {}
         mes_data['ready'] = False
         if self.mes_widgets:
-            for k, (l,d,e) in self.mes_widgets.items():
+            for k, (_,d,e) in self.mes_widgets.items():
                 mes_data[k] = (d.get(), e.get())
             mes_data['file'] = (self.foc[self.foc.plot_mes_file], '')
             mes_data['ready'] = True # is it ok to graph this data

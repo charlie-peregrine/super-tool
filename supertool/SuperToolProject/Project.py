@@ -16,21 +16,25 @@ from supertool.SuperToolProject.Attribute import Attribute
 class Project:
     def __init__(self, title="Untitled Project", filename=''):
         self.title = title
-        self.file_name = ''
+        self.file_name = filename
+        self.working_dir = ''
         self.units = {}
     
     def write_to_file_name(self, *args):
         print("building xml ElementTree for writing")
         tree = ET.ElementTree(
             ET.Element("project", 
-                       {"title": self.title}))
+                       {"title": self.title,
+                        "working_dir": self.working_dir}))
         root = tree.getroot()
         for unit_name, unit in self.units.items():
-            unit_node = ET.Element("unit", {"name": unit_name})
+            unit_node = ET.Element("unit", {"name": unit_name,
+                                            "subdir": unit.sub_dir})
             for test_name, test in unit.tests.items():
                 test_node = ET.Element("test", 
                                        {"name": test_name,
-                                        "type": test.type})
+                                        "type": test.type,
+                                        "subdir": test.sub_dir})
                 for attr_name, attr in test.attrs.items():
                     attr_node = ET.Element("attr",
                                            {"name": attr_name})
@@ -104,12 +108,24 @@ class Project:
         
         # KeyError for dict keys   v
         self.title = root.attrib['title']
+        
+        # read working directory if it exists, backwards compatibility
+        if 'working_dir' in root.attrib:
+            self.working_dir = root.attrib['working_dir']
+            print("working dir:", self.working_dir)
+        
         for unit_node in root:
-            unit = Unit(unit_node.attrib['name'])
+            unit = Unit(self, unit_node.attrib['name'])
+            if 'subdir' in unit_node.attrib:
+                unit.sub_dir = unit_node.attrib['subdir']
+                print("unit dir:", unit.sub_dir)
             for test_node in unit_node:
                 test = Test(name=test_node.attrib['name'],
                             type=test_node.attrib['type'],
                             parent=unit)
+                if 'subdir' in test_node.attrib:
+                    test.sub_dir = test_node.attrib['subdir']
+                    print("test dir:", test.sub_dir)
                 for attr_node in test_node:
                     # print(unit_node.attrib, test_node.attrib, attr_node.attrib, attr_node.text)
                     
@@ -163,14 +179,14 @@ class Project:
         print(self)
         
         while lines:
-            u, lines = Unit().read(lines)
+            u, lines = Unit(self).read(lines)
             if not u:
                 break
             self.units[u.name] = u
 
     # add a unit to the unit dictionary
     def add_unit(self, name):
-        self.units[name] = Unit(name)
+        self.units[name] = Unit(self, name)
         return self.units[name]
 
     # rename a unit and update it's location in the unit dictionary
@@ -185,6 +201,15 @@ class Project:
     def remove_unit(self, name):
         del self.units[name].tests
         del self.units[name]
+
+    # return the working directory in a nice way
+    # @TODO error checking for no working directory?
+    def get_dir(self):
+        if self.working_dir:
+            return self.working_dir + '/'
+        else:
+            return ''
+            
 
     # printout for the project and all of its subsections
     # overloads str(project) and print(project)

@@ -20,7 +20,10 @@ class Test:
         self.parent = parent
         self.attrs = {}
         
+        self.sub_dir = ''
+        
         self.frame = None
+        self.hovertext = None
         
         # default script and plot that say that this test type isn't set up yet
         self.script = lambda: print(f"No run script set up for this test of type '{self.type}'")
@@ -66,7 +69,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['vstep'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['vstep'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
 
             # set the voltage reference runner as the script for voltage reference
             self.script = lambda no_gui: Voltage_Reference.run(self, no_gui=no_gui)
@@ -102,7 +105,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['steadystate'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['steadystate'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
             
             # set the steady state runner as the script for steady state
             self.script = lambda no_gui: Steady_State.run(self, no_gui=no_gui)
@@ -130,7 +133,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['currint'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['currint'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
             
             # set the current interruption runner as the script for current interruption
             self.script = lambda no_gui: Current_Interruption.run(self, no_gui=no_gui)
@@ -167,7 +170,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['loadref'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['loadref'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
             
             # set the load reference runner as the script for load reference
             self.script = lambda no_gui: Load_Reference.run(self, no_gui=no_gui)
@@ -201,7 +204,7 @@ class Test:
             # print(consts.DEFAULT_TEST_ATTRIBUTES['speedref'])
             for n, d in consts.DEFAULT_TEST_ATTRIBUTES['speedref'].items():
                 # print(n, str(d)[:50])
-                self.attrs[n] = Attribute(n, d)
+                self.attrs[n] = Attribute(self, n, d)
             
             # set the speed reference runner as the script for speed reference
             self.script = lambda no_gui: Speed_Reference.run(self, no_gui=no_gui)
@@ -281,61 +284,26 @@ class Test:
             
             #@TODO somewhere here check if the path attribute files exist
             
-            if name not in self.attrs:
-                print(f"error: {name} not a valid test attribute. it will be ignored.")
-            else:
-                type_ = self.attrs[name].type
-                match type_:
-                    case 'PATH':
-                        convert_type = str      # type: ignore
-                    case 'BOOL':
-                        def convert_type(b: str):
-                            if b == 'True':
-                                return True
-                            elif b == 'False':
-                                return False
-                            else:
-                                raise ValueError()
-                    case 'NUM':
-                        convert_type = float    # type: ignore
-                    case 'STR':
-                        convert_type = str      # type: ignore
-                    case _:
-                        print(type_ + " is not a valid attribute type. ignoring.")
-                        continue
-                
-                try:
-                    self.attrs[name].var.set(convert_type(val))
-                except ValueError:
-                    print(f"Could not set attribute {name} of type " + \
-                            f"{type_} to value {val} of type " + \
-                            f"{type(val).__name__}. Ignoring this attribute.")
-                
-                
-                # try: # @TODO this try does not work properly
-                #     self.attrs[name].var.set(val)
-                # except tk.TclError:
-                #     print(f"TclError: could not set attribute {name} of type " + \
-                #         f"{self.attrs[name].type} to value {val} of " + \
-                #         f"type {type(val).__name__}. Ignoring this attribute.")
-            
+            self.add_attr(name, val)            
         
         return self, lines
     
     def add_attr(self, name, val):
+        def str2bool(b: str):
+            if b == 'True':
+                return True
+            elif b == 'False':
+                return False
+            else:
+                raise ValueError()
+        
         if name in self.attrs:
             type_ = self.attrs[name].type
             match type_:
                 case 'PATH':
                     convert_type = str      # type: ignore
                 case 'BOOL':
-                    def convert_type(b: str):
-                        if b == 'True':
-                            return True
-                        elif b == 'False':
-                            return False
-                        else:
-                            raise ValueError()
+                    convert_type = str2bool
                 case 'NUM':
                     convert_type = float    # type: ignore
                 case 'STR':
@@ -352,6 +320,20 @@ class Test:
                         f"{type(val).__name__}. Ignoring this attribute.")
         else:
             print(f"error: {name} not a valid test attribute. it will be ignored.")
+            
+            # try: # @TODO this try does not work properly
+            #     self.attrs[name].var.set(val)
+            # except tk.TclError:
+            #     print(f"TclError: could not set attribute {name} of type " + \
+            #         f"{self.attrs[name].type} to value {val} of " + \
+            #         f"type {type(val).__name__}. Ignoring this attribute.")
+    
+    def get_dir(self):
+        if self.sub_dir:
+            end = self.sub_dir + '/'
+        else:
+            end = ''
+        return self.parent.get_dir() + end
     
     # overload string conversion
     def __str__(self):

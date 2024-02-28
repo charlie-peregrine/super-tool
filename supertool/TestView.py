@@ -6,6 +6,7 @@ import threading
 import time
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.font
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import traceback
 from idlelib.tooltip import Hovertip
@@ -83,6 +84,13 @@ class TestView(ttk.Frame):
         # the scrollbar would still act like the frame was large
         self.scroller.scroll_to_top()
         
+        style = ttk.Style()
+        
+        # create style for path buttons with paths that don't exist 
+        button_font = tkinter.font.nametofont(style.lookup('TButton', 'font'))
+        style.configure('badpath.TButton', foreground='red',
+            font=(button_font.cget('family'), button_font.cget('size'), 'bold'))
+        
         focused = self.parent.focused_test
         if focused: # if there is a focused test
             # put labels and buttons for the top of the scrollable frame
@@ -96,11 +104,18 @@ class TestView(ttk.Frame):
                                           command=self.change_focused_test_type)
             self.type_button.grid(row=1, column=1, sticky='e')
             
-            
+            # self.sub_dir_label = ttk.Label(self.frame, text="Sub-Directory")
+            # self.sub_dir_label.grid(row=2, column=0)
+            # self.sub_dir_val_label = ttk.Label(self.frame,
+            #         text=focused.sub_dir + "haaa", wraplength=40)
+            # print("sub dir:", focused.sub_dir)
+            # self.sub_dir_val_label.grid(row=2, column=1)
+            # self.sub_dir_button = ttk.Button(self.frame,
+            #         text="Change")
+            # self.sub_dir_button.grid(row=2, column=2)
             
             # set up for loop, offset is how many rows down the big
             # list of attributes should start
-            keys = list(focused.attrs.keys())
             offset = 2
             
             # storage for all of the interactibles so they still
@@ -109,8 +124,8 @@ class TestView(ttk.Frame):
             
             # for every attribute of the attribute dictionary, add
             # a line containing its name and relevant input fields
-            for i in range(len(keys)):
-                attr = focused.attrs[keys[i]]
+            for i, key in enumerate(focused.attrs): # range(len(keys)):
+                attr = focused.attrs[key]
                 
                 # paths are shown with their name, their short name,
                 # and a button to open a file picker window. hovering
@@ -135,17 +150,62 @@ class TestView(ttk.Frame):
                             command=lambda attr=attr: self.get_new_path(attr))
                     path_button.grid(row=i+offset, column=1, sticky='nesw')
                     
+                    def clear_path(e=None, attr=attr):
+                        attr.var.set("")
+                    path_button.bind("<3>", clear_path)
+                    
                     # create hovertext for paths to show the long path instead of just the basename
-                    path_label_hover = Hovertip(path_button, attr.var.get(), hover_delay=300)
+                    def path_hover_text(attribute):
+                        if attribute.var.get() == '':
+                            return "Click to Select a file"
+                        else:
+                            # print(attribute.get())
+                            # print("RO:", attribute.read_only_file, end=' - ')
+                            if attribute.read_only_file:
+                                # check that the file itself exists
+                                # print(attribute.get())
+                                # print(os.path.exists(attribute.get()))
+                                if not os.path.exists(attribute.get()):
+                                    return f"This file does not exist at this location.\n" + \
+                                           f"Full Path: {attribute.get()}\n" + \
+                                           f"Relative Path: {attribute.var.get()}\n" + \
+                                            "Right click to clear or click to re-select a file" 
+                            else:
+                                # check that the parent directory exists
+                                # print(attribute.parent.get_dir())
+                                # print(os.path.exists(os.path.dirname(attribute.get())))
+                                if not os.path.exists(os.path.dirname(attribute.get())):
+                                    return  "This file cannot be generated at this location.\n" + \
+                                            "This is likely an issue with the working, unit,\n" + \
+                                            "or test sub-directories being malformed.\n" + \
+                                           f"Full Path: {attribute.get()}\n" + \
+                                           f"Relative Path: {attribute.var.get()}\n" + \
+                                            "Right click to clear or click to re-select a file" 
+                        return f"Full Path: {attribute.get()}\n" + \
+                               f"Relative Path: {attribute.var.get()}\n" + \
+                                "Right click to clear"
+                    path_label_hover = Hovertip(path_button, path_hover_text(attr), hover_delay=300)
                     
                     # set up traces for when the path variables update to modify the path label
                     # separate functions needed for clarity
-                    def update_button(_1, _2, _3, l=path_button, v=attr.var):
-                        l.configure(text=short_name(v.get()))
+                    def update_button(_1=None, _2=None, _3=None, l=path_button, a=attr):
+                        l.configure(text=short_name(a.var.get()))
+                        if a.var.get():
+                            if a.read_only_file:
+                                if not os.path.exists(a.get()):
+                                    l.configure(style="badpath.TButton")
+                                    return
+                            else:
+                                if not os.path.exists(os.path.dirname(a.get())):
+                                    l.configure(style="badpath.TButton")
+                                    return
+                        l.configure(style="TButton")
+
+                    update_button()
                     button_cb = attr.var.trace_add('write', update_button)
                     
-                    def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
-                        l.text = v.get()
+                    def update_hover(_1=None, _2=None, _3=None, l=path_label_hover, a=attr):
+                        l.text = path_hover_text(a)
                     hover_cb = attr.var.trace_add('write', update_hover)
                     
                     self.trace_data.append((attr.var, button_cb))
@@ -292,10 +352,9 @@ class TestView(ttk.Frame):
                             # double check the window is still open, 
                             def winEnumHandler(hwnd, window_open):
                                 name = win32gui.GetWindowText(hwnd)
-                                if win32gui.IsWindowVisible(hwnd) \
-                                    and 'pslf' in name.lower():
-                                        print("PSLFWindow:", hex(hwnd), name)
-                                        window_open.append("name")
+                                if win32gui.IsWindowVisible(hwnd) and 'pslf' in name.lower():
+                                    print("PSLFWindow:", hex(hwnd), name)
+                                    window_open.append("name")
                                 return True
                             open_windows = []
                             win32gui.EnumWindows(winEnumHandler, open_windows)
@@ -413,10 +472,12 @@ class TestView(ttk.Frame):
         type_dropdown.bind("<space>", lambda e: type_dropdown.event_generate('<Down>'))
         type_dropdown.bind("<<ComboboxSelected>>", lambda e: done_button.focus())
         
-        
-    # @TODO needs typechecking
+    # @TODO needs typechecking?
     def open_path(self, attr):
-        os.startfile(attr.var.get())
+        if attr.var.get():
+            os.startfile(attr.get())
+        else:
+            print("No file to open!!!! uh oh")
     
     # get a new path for path type attributes
     # need to pick between input and output files because the file
@@ -428,18 +489,33 @@ class TestView(ttk.Frame):
                 title=f"Select input {attr.extension.upper()} file",
                 defaultextension=f"*.{attr.extension}",
                 filetypes=[(f"Input {attr.extension.upper()} File", f"*.{attr.extension}"),
-                           ("All Files", "*.*")]
+                           ("All Files", "*.*")],
+                initialdir=attr.parent.get_dir()
                 )
         else:
             path = asksaveasfilename(
                 title=f"Choose File Name and Location for Output {attr.extension.upper()} File",
                 defaultextension="*.*",
                 filetypes=[(f"PSLF Output {attr.extension.upper()} File", f"*.{attr.extension}"),
-                           ("All Files", "*.*")]
+                           ("All Files", "*.*")],
+                initialdir=attr.parent.get_dir()
                 )
         
         if path:
-            attr.var.set(path)
+            # @TODO make a better decision on backslashes vs slashes OR use pathlib
+            rel_path = os.path.relpath(path, attr.parent.get_dir()).replace('\\', '/')
+            print(attr.parent.get_dir() + " + " + rel_path)
+            attr.var.set(rel_path)
+            
+            # autofill pslf output file names if they're not already filled in
+            if attr.name == "sav_filename":
+                attrs = attr.parent.attrs
+                for a in attrs.values():
+                    if a.type == "PATH" and not a.read_only_file and not a.var.get():
+                        path = os.path.basename(attr.var.get())
+                        root, ext = os.path.splitext(path)
+                        a.var.set(root + "." + a.extension)
+            
             if attr.name == self.parent.focused_test.plot_sim_file:
                 self.parent.param_frame.render_sim_frame()
             if attr.name == self.parent.focused_test.plot_mes_file:

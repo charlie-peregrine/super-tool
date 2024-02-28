@@ -8,7 +8,7 @@ from tkinter.messagebox import showwarning
 
 print("===== loading config.json =====")
 try:
-    config_data = json.load(open('config.json', 'r'))
+    config_data = json.load(open('config.json', 'r', encoding='utf-8'))
 except FileNotFoundError:
     showwarning(title="Un-configured Installation",
         message="No Configuration file created yet. Please run config.py first.")
@@ -24,10 +24,12 @@ MY_ENV["PATH"] += VEUSZ_PATH + ';'
 
 print("===== config.json loaded =====")
 
+# save the directory that the source code is run from
+SUPERTOOL_DIR = os.getcwd()
+
 print("===== loading default_test_attributes.json =====")
 
-with open("default_test_attributes.json", 'r') as file:
+with open("default_test_attributes.json", 'r', encoding='utf-8') as file:
     DEFAULT_TEST_ATTRIBUTES = json.load(file)
 
 print("===== default_test_attributes.json loaded =====")
-
