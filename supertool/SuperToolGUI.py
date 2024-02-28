@@ -1,17 +1,17 @@
 # SuperToolGUI.py, Charlie Jordan, 11/15/2023
 # main code for mocking up a gui for the super tool program
 
-import json
-import os
-import pathvalidate
 import tkinter as tk
 from tkinter import ttk
 from tkinter import simpledialog
 import tkinter.filedialog  as fd
+import json
+import os
+import pathvalidate
 
 
 import supertool.consts as consts
-from supertool.SuperToolFrames import *
+from supertool.SuperToolFrames import BaseOkPopup, StatusBar
 import supertool.SuperToolProject.Project as stproject
 import supertool.ScriptListener as ScriptListener
 
