@@ -70,7 +70,8 @@ class ScrollFrame(tk.Frame):
         
         # if the pointer is inside the canvas...
         x, y = self.canvas.winfo_pointerxy()
-        if x > xl and x < xr and y > yt and y < yb:
+        widg = self.canvas.winfo_containing(x ,y)
+        if xr > x > xl and yb > y > yt and str(widg).startswith(str(self.frame)):
             # move the canvas accordingly
             # @TODO the .05 is a scrolling speed constant, change it maybe
             p = self.scrollbar.get()[0] + (-1*event.delta//120)*.05
