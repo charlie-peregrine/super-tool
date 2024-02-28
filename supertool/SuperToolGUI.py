@@ -351,9 +351,7 @@ class SuperToolGUI(tk.Tk):
 
     def prompt_for_new_working_dir(self, e=None, proj=None):
         
-        print(proj.__repr__())
-        print(self.project.__repr__())
-        if proj == None:
+        if proj is None:
             proj = self.project
         
         set_dir_window = BaseOkPopup(self, title="Choose a new working directory")

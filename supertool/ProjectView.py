@@ -122,7 +122,7 @@ class ProjectView(ttk.Frame):
             self.clicked_widget = e.widget
             unit_label_menu.post(e.x_root, e.y_root)
 
-        self.no_unit_label.bind("<3>", lambda e: right_click_unit(e))
+        self.no_unit_label.bind("<3>", right_click_unit)
         unit_label_menu.add_command(label="new unit",
                         command=self.add_unit)
 
@@ -157,7 +157,7 @@ class ProjectView(ttk.Frame):
         # context menu. This is necessary because of a
         # lexing/scoping issue with context menus and commands
         # with arguments
-        unit_label.bind("<3>", lambda e: right_click_unit(e))
+        unit_label.bind("<3>", right_click_unit)
 
         # add commands to the context menu
         unit_label_menu.add_command(label="delete unit",
@@ -216,7 +216,7 @@ class ProjectView(ttk.Frame):
 
         # right clicking a test runs the right_click_test
         # method with the added commands in it
-        test_label.bind("<3>", lambda e: right_click_test(e))
+        test_label.bind("<3>", right_click_test)
         test_label_menu.add_command(label="delete test",
                             command=self.delete_test)
         test_label_menu.add_command(label="rename test",
@@ -236,7 +236,7 @@ class ProjectView(ttk.Frame):
     # correlating to the widget that the user clicked on (should be a label)
     # defaults to self.clicked_widget
     def get_clicked_test_or_unit(self, widg=None):
-        if widg == None:
+        if widg is None:
             widg = self.clicked_widget
 
         # print("\n======================================")
@@ -246,7 +246,7 @@ class ProjectView(ttk.Frame):
 
         # search up the widget hierarchy for the canvas widget holding the
         # selected widget, storing each preceding widget in widg_parents
-        widg.widgetName
+        # widg.widgetName
         current_widg = widg
         widg_parents = []
         while current_widg.master.widgetName != 'canvas': # type: ignore
@@ -279,7 +279,7 @@ class ProjectView(ttk.Frame):
         else:
             # in case of a different depth, throw an error. This should not happen
             # in normal use
-            raise Exception("nesting depth issue in ProjectView.get_current_test_or_unit")
+            raise RuntimeError("nesting depth issue in ProjectView.get_current_test_or_unit")
 
     def update_test_type(self, test):
         test.frame.children['!label2']['text'] = test.type
@@ -315,7 +315,7 @@ class ProjectView(ttk.Frame):
         new_name = simpledialog.askstring(title="Rename Test",
             prompt="Enter a new name for the following test\n" + test.name)
         if new_name in test.parent.tests:
-            print("test {} already exists. renaming test {} failed".format(new_name, test.name))
+            print(f"test {new_name} already exists. renaming test {test.name} failed")
         else:
             test.parent.rename_test(test.name, new_name)
             test.frame.children['!label']['text'] = new_name
@@ -440,7 +440,7 @@ class ProjectView(ttk.Frame):
 
         dir_label = ttk.Label(test_prompt_window.frame,
             text="Choose an optional subdirectory for the\n" + \
-                f"test's files to live in. Leave blank to skip.")
+                 "test's files to live in. Leave blank to skip.")
         dir_label.grid(row=2, column=0)
         
         def dir_button_command():
@@ -458,7 +458,7 @@ class ProjectView(ttk.Frame):
 
         # function called by the create new test button, checks that the
         # name and test entered are valid and  if so creates a new test
-        def ok_command(event=None):
+        def ok_command():
             test_name = name_var.get()
             test_type = type_var.get()
             subdir = dir_var.get()
@@ -511,7 +511,7 @@ class ProjectView(ttk.Frame):
                 test_frame = self.build_test_frame(test, unit.frame)
                 test.frame = test_frame
 
-        def cancel_command(e=None):
+        def cancel_command():
             test_prompt_window.destroy()
 
 
@@ -551,7 +551,7 @@ class ProjectView(ttk.Frame):
         new_name = simpledialog.askstring(title="Rename Unit",
             prompt="Enter a new name for the following unit\n" + unit.name)
         if new_name in self.proj.units:
-            print("unit {} already exists. renaming unit {} failed".format(new_name, unit.name))
+            print(f"unit {new_name} already exists. renaming unit {unit.name} failed")
         else:
             self.proj.rename_unit(unit.name, new_name)
             unit.frame.children['!label']['text'] = new_name
@@ -631,7 +631,7 @@ class ProjectView(ttk.Frame):
     def add_unit(self):
         unit_prompt_window = BaseOkPopup(self.parent, "New Unit")
         
-        name_label = ttk.Label(unit_prompt_window.frame, text=f"Enter a name for the Unit:")
+        name_label = ttk.Label(unit_prompt_window.frame, text="Enter a name for the Unit:")
         name_label.grid(row=0, column=0)
         
         name_var = tk.StringVar()
@@ -641,7 +641,7 @@ class ProjectView(ttk.Frame):
         
         dir_label = ttk.Label(unit_prompt_window.frame,
             text="Choose an optional subdirectory for the\n" + \
-                f"unit's files to live in. Leave blank to skip.")
+                 "unit's files to live in. Leave blank to skip.")
         dir_label.grid(row=1, column=0)
         
         def dir_button_command(e=None):

@@ -284,61 +284,26 @@ class Test:
             
             #@TODO somewhere here check if the path attribute files exist
             
-            if name not in self.attrs:
-                print(f"error: {name} not a valid test attribute. it will be ignored.")
-            else:
-                type_ = self.attrs[name].type
-                match type_:
-                    case 'PATH':
-                        convert_type = str      # type: ignore
-                    case 'BOOL':
-                        def convert_type(b: str):
-                            if b == 'True':
-                                return True
-                            elif b == 'False':
-                                return False
-                            else:
-                                raise ValueError()
-                    case 'NUM':
-                        convert_type = float    # type: ignore
-                    case 'STR':
-                        convert_type = str      # type: ignore
-                    case _:
-                        print(type_ + " is not a valid attribute type. ignoring.")
-                        continue
-                
-                try:
-                    self.attrs[name].var.set(convert_type(val))
-                except ValueError:
-                    print(f"Could not set attribute {name} of type " + \
-                            f"{type_} to value {val} of type " + \
-                            f"{type(val).__name__}. Ignoring this attribute.")
-                
-                
-                # try: # @TODO this try does not work properly
-                #     self.attrs[name].var.set(val)
-                # except tk.TclError:
-                #     print(f"TclError: could not set attribute {name} of type " + \
-                #         f"{self.attrs[name].type} to value {val} of " + \
-                #         f"type {type(val).__name__}. Ignoring this attribute.")
-            
+            self.add_attr(name, val)            
         
         return self, lines
     
     def add_attr(self, name, val):
+        def str2bool(b: str):
+            if b == 'True':
+                return True
+            elif b == 'False':
+                return False
+            else:
+                raise ValueError()
+        
         if name in self.attrs:
             type_ = self.attrs[name].type
             match type_:
                 case 'PATH':
                     convert_type = str      # type: ignore
                 case 'BOOL':
-                    def convert_type(b: str):
-                        if b == 'True':
-                            return True
-                        elif b == 'False':
-                            return False
-                        else:
-                            raise ValueError()
+                    convert_type = str2bool
                 case 'NUM':
                     convert_type = float    # type: ignore
                 case 'STR':
@@ -355,6 +320,13 @@ class Test:
                         f"{type(val).__name__}. Ignoring this attribute.")
         else:
             print(f"error: {name} not a valid test attribute. it will be ignored.")
+            
+            # try: # @TODO this try does not work properly
+            #     self.attrs[name].var.set(val)
+            # except tk.TclError:
+            #     print(f"TclError: could not set attribute {name} of type " + \
+            #         f"{self.attrs[name].type} to value {val} of " + \
+            #         f"type {type(val).__name__}. Ignoring this attribute.")
     
     def get_dir(self):
         if self.sub_dir:

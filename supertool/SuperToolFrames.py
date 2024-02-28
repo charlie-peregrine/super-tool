@@ -100,8 +100,8 @@ class ScrollFrame(tk.Frame):
 
 # Base popup class for super tool.
 class Popup(tk.Toplevel):
-    def __init__(self, root=None, title="Popup", cnf={}, **kwargs):
-        super().__init__(root, cnf, **kwargs)
+    def __init__(self, root=None, title="Popup", **kwargs):
+        super().__init__(root, **kwargs)
         # grab and hold focus
         self.transient(root)
         self.grab_set()
