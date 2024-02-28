@@ -16,7 +16,7 @@ from supertool.SuperToolProject.Attribute import Attribute
 class Project:
     def __init__(self, title="Untitled Project", filename=''):
         self.title = title
-        self.file_name = ''
+        self.file_name = filename
         self.working_dir = ''
         self.units = {}
     
