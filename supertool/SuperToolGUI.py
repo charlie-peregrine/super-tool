@@ -417,11 +417,12 @@ class SuperToolGUI(tk.Tk):
         
         dir_entry = ttk.Entry(set_dir_window.frame, textvariable=dir_var, width=45)
         dir_entry.grid(row=1, column=0)
+        dir_entry.bind('<Return>', lambda e: ok_command())
         
         dir_select_button = ttk.Button(set_dir_window.frame, text="Choose Folder",
                                        command=dir_select)
         dir_select_button.grid(row=1, column=1, sticky='ew')
-        dir_select_button.bind("<Return>", lambda e: dir_select)
+        dir_select_button.bind("<Return>", lambda e: dir_select())
         
         set_dir_window.wrapup(ok_command=ok_command, cancel_command=cancel_command)
 
