@@ -125,9 +125,10 @@ class SuperToolGUI(tk.Tk):
         
         # sub-menu creation
         file_menu = tk.Menu(self.menubar)
-        about_menu = tk.Menu(self.menubar)
+        view_menu = tk.Menu(self.menubar)
         self.run_menu = tk.Menu(self.menubar)
         self.graph_menu = tk.Menu(self.menubar)
+        about_menu = tk.Menu(self.menubar)
         
 
         # add options to the file menu
@@ -144,6 +145,9 @@ class SuperToolGUI(tk.Tk):
         # file_menu.add_command(label="Open Workspace", command=open_workspace)
         file_menu.add_separator()
         file_menu.add_command(label='Exit', command=self.destroy)
+
+        # add options to the view menu
+        view_menu.add_command(label="Sub-Directory Summary", command=self.show_dir_details)
 
         # add options to the run menu
         self.run_menu.add_command(label="Run", command=self.test_frame.run_simulation, accelerator="F5")
@@ -168,6 +172,7 @@ class SuperToolGUI(tk.Tk):
         
         # add the submenus to the menu bar
         self.menubar.add_cascade(label="File", menu=file_menu)
+        self.menubar.add_cascade(label="View", menu=view_menu)
         self.menubar.add_cascade(label="Run", menu=self.run_menu)
         self.menubar.add_cascade(label="Graph", menu=self.graph_menu)
         self.menubar.add_cascade(label="About", menu=about_menu)
@@ -335,6 +340,48 @@ class SuperToolGUI(tk.Tk):
         self.focused_test = None
         self.test_frame.show_focused_test()
         self.param_frame.render()
+        
+    def show_dir_details(self):
+        s = tk.Toplevel(self)
+        
+        lines = [
+            "Summary of Sub Directories\n",
+            "The projects directory structure is shown below. It should be useful for debugging",
+            "structural issues with your project's subdirectories. Each pair of lines contains ",
+            "a first line, holding the deepest level of the Project ; Unit ; Test structure that",
+            "is available. The second line in the pair is those stucture's sub-directories, sep-",
+            "-arated by ' -> ' strings. The . and .. sub-directories mean 'current directory' and",
+            "'parent directory', respectively. These linesshould be compared to your actual system",
+            "files, and then use the context menu in the project pane to modify directories",
+            "accordingly. The 'tree' command in your terminal or the left pane in file explorer",
+            "may be useful.\n",
+            "Example:",
+            "ProjectName ; UnitName ; TestName",
+            "\tC:/MyDir -> my unit's directory -> test dir\n"
+        ]
+        p1 = f"{self.project.title}"
+        p2 = f"\t{self.project.working_dir}"
+        if self.project.units:
+            for u_name, unit in self.project.units.items():
+                u1 = p1 + f" ; {u_name}"
+                u2 = p2 + f" -> {max('.', unit.sub_dir)}"
+                if unit.tests:
+                    for t_name, test in unit.tests.items():
+                        t1 = u1 + f" ; {t_name}"
+                        t2 = u2 + f" -> {max('.', test.sub_dir)}"
+                        lines.append(t1)
+                        lines.append(t2)
+                        # for a_name, attr in test.attrs.items():
+                        #     pass
+                else:
+                    lines.append(u1)
+                    lines.append(u2)
+                    
+        else:
+            lines.append(p1)
+            lines.append(p2)
+        label = ttk.Label(s, text="\n".join(lines), padding=4)
+        label.pack()
         
     # method called in project view
     # shows a prompt for the user to rename the currently open project
