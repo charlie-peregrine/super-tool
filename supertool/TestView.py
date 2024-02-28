@@ -116,7 +116,6 @@ class TestView(ttk.Frame):
             
             # set up for loop, offset is how many rows down the big
             # list of attributes should start
-            keys = list(focused.attrs.keys())
             offset = 2
             
             # storage for all of the interactibles so they still
@@ -125,8 +124,8 @@ class TestView(ttk.Frame):
             
             # for every attribute of the attribute dictionary, add
             # a line containing its name and relevant input fields
-            for i in range(len(keys)):
-                attr = focused.attrs[keys[i]]
+            for i, key in enumerate(focused.attrs): # range(len(keys)):
+                attr = focused.attrs[key]
                 
                 # paths are shown with their name, their short name,
                 # and a button to open a file picker window. hovering
@@ -353,10 +352,9 @@ class TestView(ttk.Frame):
                             # double check the window is still open, 
                             def winEnumHandler(hwnd, window_open):
                                 name = win32gui.GetWindowText(hwnd)
-                                if win32gui.IsWindowVisible(hwnd) \
-                                    and 'pslf' in name.lower():
-                                        print("PSLFWindow:", hex(hwnd), name)
-                                        window_open.append("name")
+                                if win32gui.IsWindowVisible(hwnd) and 'pslf' in name.lower():
+                                    print("PSLFWindow:", hex(hwnd), name)
+                                    window_open.append("name")
                                 return True
                             open_windows = []
                             win32gui.EnumWindows(winEnumHandler, open_windows)
@@ -504,7 +502,7 @@ class TestView(ttk.Frame):
                 )
         
         if path:
-            # @TODO make a better decision on backslashes vs slashes
+            # @TODO make a better decision on backslashes vs slashes OR use pathlib
             rel_path = os.path.relpath(path, attr.parent.get_dir()).replace('\\', '/')
             print(attr.parent.get_dir() + " + " + rel_path)
             attr.var.set(rel_path)
