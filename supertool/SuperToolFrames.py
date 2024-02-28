@@ -155,6 +155,7 @@ class BaseOkPopup(Popup):
         self.cancel_button.bind("<Return>", lambda e: cancel_command)
         
         self.protocol("WM_DELETE_WINDOW", cancel_command)
+        self.master.wait_window(self)
 
     def show_errors(self, error_list: list[str] = []):
         """

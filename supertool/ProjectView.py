@@ -410,6 +410,10 @@ class ProjectView(ttk.Frame):
     # user for a test name and type, as well as performing error checking
     # on their input and prompting them for fixes to those errors
     def add_test(self, unit):
+        # double check that there's a working directory
+        if not self.validate_working_dir():
+            return
+        
         # create the add_test window
         test_prompt_window = BaseOkPopup(self.parent, "New Test")
 
@@ -629,6 +633,10 @@ class ProjectView(ttk.Frame):
 
     # add a unit to the project structure
     def add_unit(self):
+        # double check that there's a working directory
+        if not self.validate_working_dir():
+            return
+        
         unit_prompt_window = BaseOkPopup(self.parent, "New Unit")
         
         name_label = ttk.Label(unit_prompt_window.frame, text="Enter a name for the Unit:")
@@ -705,10 +713,19 @@ class ProjectView(ttk.Frame):
         def cancel_command(e=None):
             unit_prompt_window.destroy()
 
-        unit_prompt_window.wrapup(ok_command, cancel_command)
-
         dir_button.bind("<Return>", dir_button_command)
         name_entry.bind("<Return>", lambda e: dir_button.focus())
+        
+        unit_prompt_window.wrapup(ok_command, cancel_command)
+
+    def validate_working_dir(self):
+        if not self.parent.project.working_dir:
+            messagebox.showinfo(title="Wait!!!",
+                message="You need to set a working directory first.\n" + \
+                    "The next window will walk you through that process.")
+            self.parent.prompt_for_new_working_dir()
+        return bool(self.parent.project.working_dir)
+        
 
     # helper method to set the root's focused test to the clicked widget
     def focus_test(self, event):
