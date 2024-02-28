@@ -4,6 +4,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import simpledialog
+from tkinter import messagebox
 import tkinter.filedialog  as fd
 import json
 import os
@@ -325,9 +326,8 @@ class SuperToolGUI(tk.Tk):
             p.file_name = filename
             p.read_from_file_name()
             
-            if not p.working_dir or not os.path.exists(p.working_dir):
-                self.prompt_for_new_working_dir(proj=p)
-            else:
+            # double check that there's a working directory
+            if self.validate_working_dir(proj=p):
                 self.set_project(p)
             
     def set_project(self, proj):
@@ -395,6 +395,19 @@ class SuperToolGUI(tk.Tk):
             
             # change project header in project pane
             self.proj_frame.update_proj_header()
+
+    def validate_working_dir(self, proj=None):
+        if not proj:
+            proj = self.project
+        if not proj.working_dir or \
+                not os.path.exists(proj.working_dir):
+            messagebox.showinfo(title="Invalid Working Directory",
+                message="This project does not have a valid working directory\n" +
+                    "You need to set a working directory first.\n" + \
+                    "The next window will walk you through that process.")
+            self.prompt_for_new_working_dir(proj=proj)
+        return bool(proj.working_dir)
+        
 
     def prompt_for_new_working_dir(self, e=None, proj=None):
         
