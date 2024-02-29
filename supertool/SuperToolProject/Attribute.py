@@ -27,6 +27,9 @@ class Attribute:
             self.var = tk.StringVar(value=defaults['default'])
         else:
             raise ValueError(f"Attribute type {self.type} is not valid")
+        
+        self.full_name = defaults['full_name']
+        self.description = defaults['description']
     
     def write(self, file):
         file.write("\t".join([
