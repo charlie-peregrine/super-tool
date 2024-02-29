@@ -196,36 +196,36 @@
             "default": "",
             "read_only": true,
             "extension": "csv",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "out_filename": {
             "type": "PATH",
             "default": "",
             "read_only": false,
             "extension": "csv",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "if_base": {
             "type": "NUM",
             "default": 0,
             "unit": "",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "if_res": {
             "type": "NUM",
             "default": 0,
             "unit": "",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "UseGenField": {
             "type": "BOOL",
             "default": false,
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "Vbase": {
             "type": "NUM",
@@ -295,15 +295,15 @@
             "type": "NUM",
             "default": 2.0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "totTimeInSec": {
             "type": "NUM",
             "default": 36,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "PSS_On": {
             "type": "BOOL",
@@ -314,34 +314,34 @@
         "change_Pref": {
             "type": "BOOL",
             "default": true,
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "offline_Pref": {
             "type": "NUM",
             "default": 0.004,
             "unit": "",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "change_Vref": {
             "type": "BOOL",
             "default": false,
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "offline_Vref": {
             "type": "NUM",
             "default": 0.79,
             "unit": "",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "AVR_On": {
             "type": "BOOL",
             "default": false,
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "set_loadflow": {
             "type": "BOOL",
@@ -451,92 +451,92 @@
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs1": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs2": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs3": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs4": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs5": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "TotalSimTime": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu0": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu1": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu2": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu3": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu4": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu5": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "SysFreqInHz": {
             "type": "NUM",
@@ -660,78 +660,78 @@
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs2": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs3": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs4": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepTimeInSecs5": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "TotalSimTime": {
             "type": "NUM",
             "default": 0,
             "unit": "sec",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu1": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu2": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu3": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu4": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "StepSizeInPu5": {
             "type": "NUM",
             "default": 0,
             "unit": "pu",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         },
         "SysFreqInHz": {
             "type": "NUM",
@@ -804,8 +804,8 @@
         "GenBusID": {
             "type": "STR",
             "default": "1 ",
-            "full_name": "full_name",
-            "description": "description"
+            "full_name": "",
+            "description": ""
         }
     }
 }

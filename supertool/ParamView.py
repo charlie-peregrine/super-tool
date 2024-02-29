@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
 
+import supertool.consts as consts
 from supertool.SuperToolFrames import ScrollFrame
 
 # subclass of frame that holds the plot parameter view
@@ -26,7 +27,7 @@ class ParamView(ttk.Frame):
 
         self.graph_button.bind("<3>", lambda e:
             self.parent.graph_menu.post(e.x_root, e.y_root))
-        self.graph_button_hover = Hovertip(self.graph_button, hover_delay=300,
+        self.graph_button_hover = Hovertip(self.graph_button, hover_delay=consts.HOVER_DELAY,
             text="Right click to open Run Menu")
 
         # self.scroller = ScrollFrame(self)

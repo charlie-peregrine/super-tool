@@ -1,7 +1,6 @@
 # TestView.py, Charlie Jordan, 12/5/2023
 # file to store the gui work for the test pane of the UI
 
-import signal
 import threading
 import time
 import tkinter as tk
@@ -16,8 +15,8 @@ import os
 import psutil
 import win32gui
 
-import PSLF_PYTHON
-
+from textwrap import wrap as wraptext
+import supertool.consts as consts
 from supertool.SuperToolFrames import ScrollFrame
 from supertool.pslf_scripts.Super_Tool import SuperToolFatalError
 
@@ -42,7 +41,7 @@ class TestView(ttk.Frame):
 
         self.run_button.bind("<3>", lambda e:
             self.parent.run_menu.post(e.x_root, e.y_root))
-        self.run_button_hover = Hovertip(self.run_button, hover_delay=300,
+        self.run_button_hover = Hovertip(self.run_button, hover_delay=consts.HOVER_DELAY,
             text="Right click to open Run Menu")
         
 
@@ -128,11 +127,24 @@ class TestView(ttk.Frame):
                 attr = focused.attrs[key]
                 
                 
-                # show the name label
+                # show the title label
                 title_label = ttk.Label(self.frame, text=attr.name)
                 title_label.grid(row=i+offset, column=0, sticky='w')
                 
-                # update name label if there's a valid long name for it
+                title_label_hover = Hovertip(title_label, text='',
+                                             hover_delay=consts.HOVER_DELAY)
+                
+                # update title label if there's a valid long name for it
+                if attr.full_name:
+                    title_label.config(text=attr.full_name)
+                    title_label_hover.text = f"{attr.full_name} ({attr.name})\n"
+                else:
+                    title_label_hover.text = attr.name + "\n"
+                
+                if attr.description:
+                    title_label_hover.text += "\n".join(wraptext(attr.description, 45))
+                else:
+                    title_label_hover.text += "No Attribute Description"
                 
                 # paths are shown with their name, their short name,
                 # and a button to open a file picker window. hovering
@@ -187,7 +199,7 @@ class TestView(ttk.Frame):
                         return f"Full Path: {attribute.get()}\n" + \
                                f"Relative Path: {attribute.var.get()}\n" + \
                                 "Right click to clear"
-                    path_label_hover = Hovertip(path_button, path_hover_text(attr), hover_delay=300)
+                    path_label_hover = Hovertip(path_button, path_hover_text(attr), hover_delay=consts.HOVER_DELAY)
                     
                     # set up traces for when the path variables update to modify the path label
                     # separate functions needed for clarity

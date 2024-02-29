@@ -11,6 +11,7 @@ from tkinter import simpledialog
 import tkinter.filedialog  as fd
 from idlelib.tooltip import Hovertip
 
+import supertool.consts as consts
 from supertool.SuperToolFrames import *
 
 # subclass of frame, used to hold a nested visual structure of the
@@ -47,7 +48,7 @@ class ProjectView(ttk.Frame):
                 command=self.parent.prompt_for_new_working_dir)
         
         self.proj_header_hover = Hovertip(self.proj_header,
-                text="Working directory: " + self.proj.working_dir, hover_delay=300)
+                text="Working directory: " + self.proj.working_dir, hover_delay=consts.HOVER_DELAY)
 
         # add scrollbar frame for the project section
         self.scroller = ScrollFrame(self)
@@ -141,7 +142,7 @@ class ProjectView(ttk.Frame):
         unit_label = ttk.Label(unit_frame, text=unit.name)
         unit_label.pack(anchor='w')
         
-        unit.hovertext = Hovertip(unit_label, text="Sub Directory: " + unit.sub_dir, hover_delay=300)
+        unit.hovertext = Hovertip(unit_label, text="Sub Directory: " + unit.sub_dir, hover_delay=consts.HOVER_DELAY)
 
         # make a right click menu for the unit labels
         unit_label_menu = tk.Menu(unit_label)
@@ -208,7 +209,7 @@ class ProjectView(ttk.Frame):
             test_label_menu.post(e.x_root, e.y_root)
 
         print(test.sub_dir)
-        test.hovertext = Hovertip(test_label, text="Sub Directory: " + test.sub_dir, hover_delay=300)
+        test.hovertext = Hovertip(test_label, text="Sub Directory: " + test.sub_dir, hover_delay=consts.HOVER_DELAY)
         
         # left clicking on a test focuses the test, showing its
         # details and attributes in the testview frame

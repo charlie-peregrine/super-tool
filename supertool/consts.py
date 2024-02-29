@@ -27,6 +27,9 @@ print("===== config.json loaded =====")
 # save the directory that the source code is run from
 SUPERTOOL_DIR = os.getcwd()
 
+# 
+HOVER_DELAY = 300
+
 print("===== loading default_test_attributes.json =====")
 
 with open("default_test_attributes.json", 'r', encoding='utf-8') as file:
