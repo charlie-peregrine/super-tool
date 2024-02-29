@@ -5,7 +5,7 @@
             "default": "",
             "read_only": true,
             "extension": "dyd",
-            "full_name": "Dyn Data File",
+            "full_name": "Dyn Data File - dyd",
             "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
         },
         "sav_filename": {
@@ -13,7 +13,7 @@
             "default": "",
             "read_only": true,
             "extension": "sav",
-            "full_name": "Save Case File",
+            "full_name": "Save Case File - sav",
             "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
         },
         "chf_filename": {
@@ -21,7 +21,7 @@
             "default": "",
             "read_only": false,
             "extension": "chf",
-            "full_name": "Channel File",
+            "full_name": "Channel File - chf",
             "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
         },
         "csv_filename": {
@@ -29,7 +29,7 @@
             "default": "",
             "read_only": false,
             "extension": "csv",
-            "full_name": "CSV - Sim Data",
+            "full_name": "Sim Data File - csv",
             "description": "This is output file containing the simulation data, as converted to the csv format."
         },
         "rep_filename": {
@@ -37,15 +37,15 @@
             "default": "",
             "read_only": false,
             "extension": "rep",
-            "full_name": "Report File",
-            "description": "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+            "full_name": "Report File - rep",
+            "description": "This is the report file generated with the simulation. Should there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
         },
         "mes_filename": {
             "type": "PATH",
             "default": "",
             "read_only": true,
             "extension": "csv",
-            "full_name": "CSV - Meas Data",
+            "full_name": "Meas Data File - csv",
             "description": "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "
         },
         "StepTimeInSecs": {
@@ -87,14 +87,14 @@
             "type": "BOOL",
             "default": false,
             "full_name": "PSS On?",
-            "description": "If a relevant Power System Stabilizer  Model is included in the *.dyd, then unchecking this box disables the pss model in the simulation run."
+            "description": "If a relevant Power System Stabilizer Model is included in the Dynamics Data File, then unchecking this box disables the PSS model in the simulation run."
         },
         "SysFreqInHz": {
             "type": "NUM",
             "default": 60,
             "unit": "Hz",
-            "full_name": "System Freq",
-            "description": "In general, The system frequency in US is 60 Hz."
+            "full_name": "System Frequency",
+            "description": "In general, the system frequency in the US is 60 Hz."
         },
         "SimPtsPerCycle": {
             "type": "NUM",
@@ -106,14 +106,14 @@
         "set_loadflow": {
             "type": "BOOL",
             "default": true,
-            "full_name": "Set Loadflow?",
-            "description": "Do you want to set the loadflow for this simulation run with the below values? This does not overwrite the save case, just loads initialized values in for this simulation run."
+            "full_name": "Set Loadflow",
+            "description": "Checking this box sets the loadflow for this simulation run with the below values. This does not overwrite the save case, just loads initialized values for this simulation run."
         },
         "save_loadflow": {
             "type": "BOOL",
             "default": false,
-            "full_name": "Save Loadflow?",
-            "description": "Do you want to save the loadflow for this simulation run with the below values? This will overwrite the values in the load flow."
+            "full_name": "Save Loadflow",
+            "description": "Checking this box saves the loadflow for this simulation run, overwriting it in the save case with the below values."
         },
         "Pinit": {
             "type": "NUM",
@@ -164,7 +164,7 @@
             "default": "",
             "read_only": true,
             "extension": "dyd",
-            "full_name": "Dyn Data File",
+            "full_name": "Dyn Data File - dyd",
             "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
         },
         "sav_filename": {
@@ -172,7 +172,7 @@
             "default": "",
             "read_only": true,
             "extension": "sav",
-            "full_name": "Save Case File",
+            "full_name": "Save Case File - sav",
             "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
         },
         "chf_filename": {
@@ -180,7 +180,7 @@
             "default": "",
             "read_only": false,
             "extension": "chf",
-            "full_name": "Channel File",
+            "full_name": "Channel File - chf",
             "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
         },
         "rep_filename": {
@@ -188,37 +188,37 @@
             "default": "",
             "read_only": false,
             "extension": "rep",
-            "full_name": "Report File",
-            "description": "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+            "full_name": "Report File - rep",
+            "description": "This is the report file generated with the simulation. Should there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
         },
         "in_filename": {
             "type": "PATH",
             "default": "",
             "read_only": true,
             "extension": "csv",
-            "full_name": "",
-            "description": ""
+            "full_name": "Input File - csv",
+            "description": "This is the input file for the steady state simulation. There should be 3 or 5 even height columns, with the first 3 being P (MW), Q (MVAR), and Vt (kV). The last 2 columns are optional (but without them you won't get the IF comparison in the output file), and they should be Efe (V) and Ife (A), or Efd (V) and Ifd (A), depending on a brushless or static excitation system, respectively."
         },
         "out_filename": {
             "type": "PATH",
             "default": "",
             "read_only": false,
             "extension": "csv",
-            "full_name": "",
-            "description": ""
+            "full_name": "Output File - csv",
+            "description": "This is the output file for the steady state simulation. The first 10 columns contain the input data and comparisons for the IF measured and simulated, along with percent differences."
         },
         "if_base": {
             "type": "NUM",
             "default": 0,
-            "unit": "",
-            "full_name": "",
+            "unit": "A",
+            "full_name": "If Base",
             "description": ""
         },
         "if_res": {
             "type": "NUM",
             "default": 0,
-            "unit": "",
-            "full_name": "",
+            "unit": "A",
+            "full_name": "If Residual",
             "description": ""
         },
         "UseGenField": {
@@ -248,7 +248,7 @@
             "default": "",
             "read_only": true,
             "extension": "dyd",
-            "full_name": "Dyn Data File",
+            "full_name": "Dyn Data File - dyd",
             "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
         },
         "sav_filename": {
@@ -256,7 +256,7 @@
             "default": "",
             "read_only": true,
             "extension": "sav",
-            "full_name": "Save Case File",
+            "full_name": "Save Case File - sav",
             "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
         },
         "chf_filename": {
@@ -264,7 +264,7 @@
             "default": "",
             "read_only": false,
             "extension": "chf",
-            "full_name": "Channel File",
+            "full_name": "Channel File - chf",
             "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
         },
         "csv_filename": {
@@ -272,7 +272,7 @@
             "default": "",
             "read_only": false,
             "extension": "csv",
-            "full_name": "CSV - Sim Data",
+            "full_name": "Sim Data File - csv",
             "description": "This is output file containing the simulation data, as converted to the csv format."
         },
         "rep_filename": {
@@ -280,15 +280,15 @@
             "default": "",
             "read_only": false,
             "extension": "rep",
-            "full_name": "Report File",
-            "description": "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+            "full_name": "Report File - rep",
+            "description": "This is the report file generated with the simulation. Should there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
         },
         "mes_filename": {
             "type": "PATH",
             "default": "",
             "read_only": true,
             "extension": "csv",
-            "full_name": "CSV - Meas Data",
+            "full_name": "Meas Data File - csv",
             "description": "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "
         },
         "tripTimeInSecs": {
@@ -309,7 +309,7 @@
             "type": "BOOL",
             "default": false,
             "full_name": "PSS On?",
-            "description": "If a relevant Power System Stabilizer  Model is included in the *.dyd, then unchecking this box disables the pss model in the simulation run."
+            "description": "If a relevant Power System Stabilizer Model is included in the Dynamics Data File, then unchecking this box disables the PSS model in the simulation run."
         },
         "change_Pref": {
             "type": "BOOL",
@@ -346,14 +346,14 @@
         "set_loadflow": {
             "type": "BOOL",
             "default": true,
-            "full_name": "Set Loadflow?",
-            "description": "Do you want to set the loadflow for this simulation run with the below values? This does not overwrite the save case, just loads initialized values in for this simulation run."
+            "full_name": "Set Loadflow",
+            "description": "Checking this box sets the loadflow for this simulation run with the below values. This does not overwrite the save case, just loads initialized values for this simulation run."
         },
         "save_loadflow": {
             "type": "BOOL",
             "default": false,
-            "full_name": "Save Loadflow?",
-            "description": "Do you want to save the loadflow for this simulation run with the below values? This will overwrite the values in the load flow."
+            "full_name": "Save Loadflow",
+            "description": "Checking this box saves the loadflow for this simulation run, overwriting it in the save case with the below values."
         },
         "Pinit": {
             "type": "NUM",
@@ -404,7 +404,7 @@
             "default": "",
             "read_only": true,
             "extension": "dyd",
-            "full_name": "Dyn Data File",
+            "full_name": "Dyn Data File - dyd",
             "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
         },
         "sav_filename": {
@@ -412,7 +412,7 @@
             "default": "",
             "read_only": true,
             "extension": "sav",
-            "full_name": "Save Case File",
+            "full_name": "Save Case File - sav",
             "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
         },
         "chf_filename": {
@@ -420,7 +420,7 @@
             "default": "",
             "read_only": false,
             "extension": "chf",
-            "full_name": "Channel File",
+            "full_name": "Channel File - chf",
             "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
         },
         "csv_filename": {
@@ -428,7 +428,7 @@
             "default": "",
             "read_only": false,
             "extension": "csv",
-            "full_name": "CSV - Sim Data",
+            "full_name": "Sim Data File - csv",
             "description": "This is output file containing the simulation data, as converted to the csv format."
         },
         "rep_filename": {
@@ -436,15 +436,15 @@
             "default": "",
             "read_only": false,
             "extension": "rep",
-            "full_name": "Report File",
-            "description": "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+            "full_name": "Report File - rep",
+            "description": "This is the report file generated with the simulation. Should there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
         },
         "mes_filename": {
             "type": "PATH",
             "default": "",
             "read_only": true,
             "extension": "csv",
-            "full_name": "CSV - Meas Data",
+            "full_name": "Meas Data File - csv",
             "description": "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "
         },
         "StepTimeInSecs0": {
@@ -542,8 +542,8 @@
             "type": "NUM",
             "default": 60,
             "unit": "Hz",
-            "full_name": "System Freq",
-            "description": "In general, The system frequency in US is 60 Hz."
+            "full_name": "System Frequency",
+            "description": "In general, the system frequency in the US is 60 Hz."
         },
         "SimPtsPerCycle": {
             "type": "NUM",
@@ -555,14 +555,14 @@
         "set_loadflow": {
             "type": "BOOL",
             "default": true,
-            "full_name": "Set Loadflow?",
-            "description": "Do you want to set the loadflow for this simulation run with the below values? This does not overwrite the save case, just loads initialized values in for this simulation run."
+            "full_name": "Set Loadflow",
+            "description": "Checking this box sets the loadflow for this simulation run with the below values. This does not overwrite the save case, just loads initialized values for this simulation run."
         },
         "save_loadflow": {
             "type": "BOOL",
             "default": false,
-            "full_name": "Save Loadflow?",
-            "description": "Do you want to save the loadflow for this simulation run with the below values? This will overwrite the values in the load flow."
+            "full_name": "Save Loadflow",
+            "description": "Checking this box saves the loadflow for this simulation run, overwriting it in the save case with the below values."
         },
         "Pinit": {
             "type": "NUM",
@@ -613,7 +613,7 @@
             "default": "",
             "read_only": true,
             "extension": "dyd",
-            "full_name": "Dyn Data File",
+            "full_name": "Dyn Data File - dyd",
             "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
         },
         "sav_filename": {
@@ -621,7 +621,7 @@
             "default": "",
             "read_only": true,
             "extension": "sav",
-            "full_name": "Save Case File",
+            "full_name": "Save Case File - sav",
             "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
         },
         "chf_filename": {
@@ -629,7 +629,7 @@
             "default": "",
             "read_only": false,
             "extension": "chf",
-            "full_name": "Channel File",
+            "full_name": "Channel File - chf",
             "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
         },
         "csv_filename": {
@@ -637,7 +637,7 @@
             "default": "",
             "read_only": false,
             "extension": "csv",
-            "full_name": "CSV - Sim Data",
+            "full_name": "Sim Data File - csv",
             "description": "This is output file containing the simulation data, as converted to the csv format."
         },
         "rep_filename": {
@@ -645,15 +645,15 @@
             "default": "",
             "read_only": false,
             "extension": "rep",
-            "full_name": "Report File",
-            "description": "This is the report file generated with the simulation. Shoud there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+            "full_name": "Report File - rep",
+            "description": "This is the report file generated with the simulation. Should there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
         },
         "mes_filename": {
             "type": "PATH",
             "default": "",
             "read_only": true,
             "extension": "csv",
-            "full_name": "CSV - Meas Data",
+            "full_name": "Meas Data File - csv",
             "description": "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "
         },
         "StepTimeInSecs1": {
@@ -737,8 +737,8 @@
             "type": "NUM",
             "default": 60,
             "unit": "Hz",
-            "full_name": "System Freq",
-            "description": "In general, The system frequency in US is 60 Hz."
+            "full_name": "System Frequency",
+            "description": "In general, the system frequency in the US is 60 Hz."
         },
         "SimPtsPerCycle": {
             "type": "NUM",
@@ -750,14 +750,14 @@
         "set_loadflow": {
             "type": "BOOL",
             "default": true,
-            "full_name": "Set Loadflow?",
-            "description": "Do you want to set the loadflow for this simulation run with the below values? This does not overwrite the save case, just loads initialized values in for this simulation run."
+            "full_name": "Set Loadflow",
+            "description": "Checking this box sets the loadflow for this simulation run with the below values. This does not overwrite the save case, just loads initialized values for this simulation run."
         },
         "save_loadflow": {
             "type": "BOOL",
             "default": false,
-            "full_name": "Save Loadflow?",
-            "description": "Do you want to save the loadflow for this simulation run with the below values? This will overwrite the values in the load flow."
+            "full_name": "Save Loadflow",
+            "description": "Checking this box saves the loadflow for this simulation run, overwriting it in the save case with the below values."
         },
         "Pinit": {
             "type": "NUM",
