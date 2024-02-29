@@ -210,7 +210,6 @@ class Project:
         else:
             return ''
             
-
     # printout for the project and all of its subsections
     # overloads str(project) and print(project)
     def __str__(self):

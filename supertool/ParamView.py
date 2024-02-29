@@ -158,7 +158,7 @@ class ParamView(ttk.Frame):
         if self.sim_widgets:
             for k, (_,d,e) in self.sim_widgets.items():
                 sim_data[k] = (d.get(), e.get())
-            sim_data['file'] = (self.foc[self.foc.plot_sim_file], '')
+            sim_data['file'] = (self.foc.attrs[self.foc.plot_sim_file].get(), '')
             sim_data['ready'] = True
         
         for k,v in sim_data.items():
@@ -169,7 +169,7 @@ class ParamView(ttk.Frame):
         if self.mes_widgets:
             for k, (_,d,e) in self.mes_widgets.items():
                 mes_data[k] = (d.get(), e.get())
-            mes_data['file'] = (self.foc[self.foc.plot_mes_file], '')
+            mes_data['file'] = (self.foc.attrs[self.foc.plot_mes_file].get(), '')
             mes_data['ready'] = True # is it ok to graph this data
         
         for k,v in mes_data.items():
