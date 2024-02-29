@@ -387,11 +387,11 @@ class TestView(ttk.Frame):
             runner_thread = threading.Thread(target=run_script)
             runner_thread.start()
             
-            
-            
         else:
             # @TODO make this more elegant
             print("No focused test to run a script for!")
+            self.thread_running = False
+            self.run_button.config(state='normal')
         # blah = ' '.join([i.get() for i in self.strings])
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)
