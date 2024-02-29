@@ -158,7 +158,9 @@ class ParamView(ttk.Frame):
         if self.sim_widgets:
             for k, (_,d,e) in self.sim_widgets.items():
                 sim_data[k] = (d.get(), e.get())
-            sim_data['file'] = (self.foc.attrs[self.foc.plot_sim_file].get(), '')
+            # veusz files need paths to use / instead of \
+            file_path = self.foc.attrs[self.foc.plot_sim_file].get().replace("\\", "/")
+            sim_data['file'] = (file_path, '')
             sim_data['ready'] = True
         
         for k,v in sim_data.items():
@@ -169,7 +171,9 @@ class ParamView(ttk.Frame):
         if self.mes_widgets:
             for k, (_,d,e) in self.mes_widgets.items():
                 mes_data[k] = (d.get(), e.get())
-            mes_data['file'] = (self.foc.attrs[self.foc.plot_mes_file].get(), '')
+            # veusz files need paths to use / instead of \
+            file_path = self.foc.attrs[self.foc.plot_mes_file].get().replace("\\", "/")
+            mes_data['file'] = (file_path, '')
             mes_data['ready'] = True # is it ok to graph this data
         
         for k,v in mes_data.items():
