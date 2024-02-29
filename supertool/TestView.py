@@ -127,14 +127,17 @@ class TestView(ttk.Frame):
             for i, key in enumerate(focused.attrs): # range(len(keys)):
                 attr = focused.attrs[key]
                 
+                
+                # show the name label
+                title_label = ttk.Label(self.frame, text=attr.name)
+                title_label.grid(row=i+offset, column=0, sticky='w')
+                
+                # update name label if there's a valid long name for it
+                
                 # paths are shown with their name, their short name,
                 # and a button to open a file picker window. hovering
                 # over the short name shows a tooltip of the full path name
                 if attr.type == 'PATH':
-                    # attribute name shown
-                    title_label = ttk.Label(self.frame, text=attr.name)
-                    title_label.grid(row=i+offset, column=0, sticky='w')
-                    
                     # show short name of path
                     def short_name(s):
                         s2 = basename(s)
@@ -221,10 +224,6 @@ class TestView(ttk.Frame):
                 
                 # boolean attributes are shown as their name and a checkbox
                 elif attr.type == 'BOOL':
-                    # attribute name shown
-                    title_label = ttk.Label(self.frame, text=attr.name)
-                    title_label.grid(row=i+offset, column=0, sticky='w')
-                    
                     # show a check box
                     # @TODO the bind not be necessary
                     checkbutton = ttk.Checkbutton(self.frame, variable=attr.var)
@@ -237,10 +236,6 @@ class TestView(ttk.Frame):
                 # if the attribute is a number, show it as a name, an entry, and
                 # a unit @TODO error checking on the entry
                 elif attr.type == 'NUM':
-                    # show the name
-                    title_label = ttk.Label(self.frame, text=attr.name)
-                    title_label.grid(row=i+offset, column=0, sticky='w')
-                    
                     # space to enter the user's number
                     entry = ttk.Entry(self.frame, textvariable=attr.var)
                     entry.grid(row=i+offset, column=1)
@@ -254,10 +249,6 @@ class TestView(ttk.Frame):
                     self.interactibles.append((entry, attr.var))
                 
                 elif attr.type == 'STR':
-                    # show the name
-                    title_label = ttk.Label(self.frame, text=attr.name)
-                    title_label.grid(row=i+offset, column=0, sticky='w')
-                    
                     # space to enter the user's number
                     entry = ttk.Entry(self.frame, textvariable=attr.var)
                     entry.grid(row=i+offset, column=1)
