@@ -803,7 +803,9 @@
         },
         "GenBusID": {
             "type": "STR",
-            "default": "1 "
+            "default": "1 ",
+            "full_name": "full_name",
+            "description": "description"
         }
     }
 }
