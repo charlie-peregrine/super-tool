@@ -69,9 +69,6 @@ class ParamView(ttk.Frame):
         
         self.render_sim_frame()
         self.render_mes_frame()
-        
-        self.parent.update_pane_widths()
-
 
     def render_sim_frame(self):
         self.sim_frame.grid_remove()
@@ -83,6 +80,8 @@ class ParamView(ttk.Frame):
             # @TODO watch foc[foc.plot_sim_file] to update sim frame if necessary
             if self.foc.plot_sim_file and self.foc[self.foc.plot_sim_file]:
                 self.build_frame(self.foc.plot_sim_file, self.sim_frame, self.sim_widgets, self.foc.sim_headers)
+                
+        self.parent.update_pane_widths()
     
     def render_mes_frame(self):
         self.mes_frame.grid_remove()
@@ -94,6 +93,7 @@ class ParamView(ttk.Frame):
             if self.foc.plot_mes_file and self.foc[self.foc.plot_mes_file]:
                 self.build_frame(self.foc.plot_mes_file, self.mes_frame, self.mes_widgets, self.foc.mes_headers)
         
+        self.parent.update_pane_widths()
             
 
     # subroutine to make building cleaner
