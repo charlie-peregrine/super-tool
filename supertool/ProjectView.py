@@ -21,12 +21,12 @@ class ProjectView(ttk.Frame):
     def __init__(self, parent):
 
         # set up frame
-        self.parent = parent
-        super().__init__(self.parent, borderwidth=5, relief='groove',
+        super().__init__(parent, borderwidth=5, relief='groove',
                     height=300, width=300)
+        self.parent = parent.master
 
         # grab project for easier access
-        self.proj = parent.project
+        self.proj = self.parent.project
 
         # the row and column configures allow for the scrollbar
         # frame and label section to resize correctly
@@ -208,7 +208,6 @@ class ProjectView(ttk.Frame):
             self.clicked_widget = e.widget
             test_label_menu.post(e.x_root, e.y_root)
 
-        print(test.sub_dir)
         test.hovertext = Hovertip(test_label, text="Sub Directory: " + test.sub_dir, hover_delay=consts.HOVER_DELAY)
         
         # left clicking on a test focuses the test, showing its

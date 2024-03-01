@@ -17,9 +17,9 @@ from supertool.SuperToolFrames import ScrollFrame
 # currently a WIP  
 class ParamView(ttk.Frame):
     def __init__(self, parent):
-        self.parent = parent
-        super().__init__(self.parent, borderwidth=5, relief='groove',
+        super().__init__(parent, borderwidth=5, relief='groove',
                          height=100, width=100)
+        self.parent = parent.master
         
         self.graph_button = ttk.Button(self, text="Show Graphs",
                                         command=self.graph)
@@ -69,6 +69,8 @@ class ParamView(ttk.Frame):
         
         self.render_sim_frame()
         self.render_mes_frame()
+        
+        self.parent.update_pane_widths()
 
 
     def render_sim_frame(self):

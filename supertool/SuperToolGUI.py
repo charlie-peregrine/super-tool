@@ -84,23 +84,32 @@ class SuperToolGUI(tk.Tk):
     # main window. also handles making each row and column resize-able
     def widgets(self):
         ### Frame creation
+        self.panedwindow = ttk.PanedWindow(self, orient='horizontal')
+        self.panedwindow.grid(row=0, column=0, columnspan=1, rowspan=1, sticky="nesw")
+        
         # main frame setup, row and column configure for initial size and resizeability
-        self.grid_rowconfigure(0, minsize=150, weight=1)
-        self.grid_columnconfigure(0, minsize=50, weight=1)
-        self.grid_columnconfigure(1, minsize=50, weight=1)
-        self.grid_columnconfigure(2, minsize=50, weight=1)
+        # self.grid_rowconfigure(0, minsize=150, weight=1)
+        # self.grid_columnconfigure(0, minsize=50, weight=1)
+        # self.grid_columnconfigure(1, minsize=50, weight=1)
+        # self.grid_columnconfigure(2, minsize=50, weight=1)
 
         # create the sub-frames
-        self.proj_frame = ProjectView(self)
-        self.test_frame = TestView(self)
-        self.param_frame = ParamView(self)
+        self.proj_frame = ProjectView(self.panedwindow)
+        self.test_frame = TestView(self.panedwindow)
+        self.param_frame = ParamView(self.panedwindow)
+        
+        # self.proj_frame.bind("<Configure>", blah)
+        
         self.statusbar_frame = StatusBar(self)
         
         # place the sub-frames into the main window
-        self.proj_frame.grid(row=0,column=0, columnspan=1, rowspan=1, sticky="nesw")
-        self.test_frame.grid(row=0,column=1, columnspan=1, rowspan=1, sticky="nesw")
-        self.param_frame.grid(row=0,column=2, columnspan=1, rowspan=1, sticky="nesw")
-        self.statusbar_frame.grid(row=1, column=0, columnspan=3, sticky="nesw")
+        self.panedwindow.add(self.proj_frame, weight=1)
+        self.panedwindow.add(self.test_frame, weight=2)
+        self.panedwindow.add(self.param_frame, weight=2)
+        # self.proj_frame.grid(row=0,column=0, columnspan=1, rowspan=1, sticky="nesw")
+        # self.test_frame.grid(row=0,column=1, columnspan=1, rowspan=1, sticky="nesw")
+        # self.param_frame.grid(row=0,column=2, columnspan=1, rowspan=1, sticky="nesw")
+        self.statusbar_frame.grid(row=1, column=0, columnspan=1, sticky="nesw")
 
         # top bar menu setup
         self.menu()
@@ -182,7 +191,51 @@ class SuperToolGUI(tk.Tk):
     # needs some work
     def set_status(self, string):
         self.statusbar_frame.set_text(string)
-    
+
+    def update_pane_widths(self):
+        # def printout():
+        #     print(
+        #         f"{self.proj_frame.winfo_width():<5}= "
+        #         f"{self.proj_frame.winfo_reqwidth():<5}"
+        #         f"{self.test_frame.winfo_width():<5}= "
+        #         f"{self.test_frame.winfo_reqwidth():<5}"
+        #         f"{self.param_frame.winfo_width():<5}= "
+        #         f"{self.param_frame.winfo_reqwidth():<5}"
+        #         f"{self.panedwindow.winfo_width():<5}= "
+        #         f"{self.panedwindow.winfo_reqwidth():<5}"
+        #     )
+        
+        # printout()
+        
+        def set_panes():
+            # printout()
+            
+            rw0 = self.proj_frame.winfo_reqwidth()
+            rw1 = self.test_frame.winfo_reqwidth()
+            rw2 = self.param_frame.winfo_reqwidth()
+            
+            # w0 = self.proj_frame.winfo_width()
+            # w1 = self.test_frame.winfo_width()
+            # w2 = self.param_frame.winfo_width()
+            
+            # nw0 = max(rw0, w0)
+            # nw1 = max(rw1, w1)
+            # nw2 = max(rw2, w2)
+            
+            # print(rw0+rw1+rw2+10, w0+w1+w2+10)
+            # if nw0+nw1+nw2+10 > w0+w1+w2+10:
+            self.panedwindow.config(width=rw0+rw1+rw2+10)
+            
+            # if nw0+nw1+5 > w0+w1+5:
+            self.panedwindow.sashpos(1, rw0+rw1+5)
+
+            # if nw0 > w0:
+            self.panedwindow.sashpos(0, rw0)
+        
+            # printout()
+
+        self.after(150, set_panes)
+
     # method called by ctrl+n and the file menu
     # shows a prompt asking for a new file name and
     # creates a new project
@@ -340,6 +393,7 @@ class SuperToolGUI(tk.Tk):
         self.focused_test = None
         self.test_frame.show_focused_test()
         self.param_frame.render()
+        self.update_pane_widths()
         
     def show_dir_details(self):
         s = tk.Toplevel(self)
@@ -408,7 +462,6 @@ class SuperToolGUI(tk.Tk):
             self.prompt_for_new_working_dir(proj=proj)
         return bool(proj.working_dir)
         
-
     def prompt_for_new_working_dir(self, e=None, proj=None):
         
         if proj is None:

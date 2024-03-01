@@ -25,9 +25,9 @@ from supertool.pslf_scripts.Super_Tool import SuperToolFatalError
 class TestView(ttk.Frame):
     def __init__(self, parent):
         # set up the frame and place it in the window
-        self.parent = parent
-        super().__init__(self.parent, borderwidth=5, relief='groove',
+        super().__init__(parent, borderwidth=5, relief='groove',
                             height=100, width=100)
+        self.parent = parent.master
         
         ### Test Parameters Box details
         # header
@@ -287,6 +287,8 @@ class TestView(ttk.Frame):
             # @TODO probably a memory leak due to dropping the old no_test_label
             self.no_test_label = ttk.Label(self.frame, text="No Test Selected. Create or click one to begin.")
             self.no_test_label.grid(row=1,column=0)
+        
+        self.parent.update_pane_widths()
         
     # run the backend PSLF script associated with the focused test's
     # test type
