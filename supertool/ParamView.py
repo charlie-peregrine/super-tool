@@ -93,7 +93,7 @@ class ParamView(ttk.Frame):
             if self.foc.plot_mes_file and self.foc[self.foc.plot_mes_file]:
                 self.build_frame(self.foc.plot_mes_file, self.mes_frame, self.mes_widgets, self.foc.mes_headers)
         
-        self.parent.update_pane_widths()
+        self.parent.update_pane_widths() # @TODO do we need this to run twice?
             
 
     # subroutine to make building cleaner
