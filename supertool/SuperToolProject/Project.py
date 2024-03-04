@@ -71,7 +71,6 @@ class Project:
         ET.indent(tree, space="    ", level=0)
         tree.write(tmp_name, short_empty_elements=False)
         if tmp_proj.read_from_file_name():
-            input("press enter")
             os.replace(tmp_name, self.file_name)
         else:
             print("--- Could not successfully save file")
