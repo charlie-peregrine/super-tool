@@ -19,6 +19,7 @@ from textwrap import wrap as wraptext
 import supertool.consts as consts
 from supertool.SuperToolFrames import ScrollFrame
 from supertool.pslf_scripts.Super_Tool import SuperToolFatalError
+from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 
 # Frame subclass for presenting and receving info regarding
 # individual tests and their attributes
@@ -58,7 +59,8 @@ class TestView(ttk.Frame):
 
         self.trace_data = []
         
-        self.thread_running = False
+        self.run_sim_active = False
+        self.running_thread = threading.Thread()
         
         # show the focused test. note that when it's used in the initializer,
         # the "no test selected" text will always be shown since no test
@@ -295,13 +297,16 @@ class TestView(ttk.Frame):
     def run_simulation(self, event=None, save_on_run=True):
 
         # block running here
-        if self.thread_running:
+        if self.run_sim_active or self.running_thread and self.running_thread.is_alive():
             print("Stop Right There! A PSLF Script is already running.")
-            print("Wait until the script has completed to run again.")
+            print("Wait until the script has completed to run again.",
+                  *[int(i) for i in (self.run_sim_active, bool(self.running_thread), self.running_thread.is_alive())])
+                  # prev line for debugging
+            ScriptQueue.put(SuperToolMessage('scriptalreadyrunning',
+                                "A PSLF Script is already running."))
             return
         
-        self.thread_running = True
-        self.run_button.config(state='disabled')
+        self.run_sim_active = True
         
         if self.parent.focused_test:
             
@@ -384,23 +389,32 @@ class TestView(ttk.Frame):
                     print("\n===== General Exception while running Supertool Script - end =====")
                 
                 self.parent.last_hide_pslf_gui_val = hide
-                self.thread_running = False
-                self.run_button.config(state='normal')
+                self.run_sim_active = False
+                self.unlock_run_button()
                 # return to old working directory
                 os.chdir(working_dir)
             
-            runner_thread = threading.Thread(target=run_script)
-            runner_thread.start()
+            self.running_thread = threading.Thread(target=run_script)
+            self.running_thread.start()
+            self.lock_run_button()
             
         else:
             # @TODO make this more elegant
             print("No focused test to run a script for!")
-            self.thread_running = False
-            self.run_button.config(state='normal')
+            self.unlock_run_button()
+        
+        self.run_sim_active = False
+        
         # blah = ' '.join([i.get() for i in self.strings])
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)
     
+    def lock_run_button(self):
+        self.run_button.config(state='disabled')
+    
+    def unlock_run_button(self):
+        self.run_button.config(state='normal')
+        
     # @TODO change the comments in here oopsie
     def change_focused_test_type(self):
         

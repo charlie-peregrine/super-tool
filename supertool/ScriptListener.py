@@ -9,7 +9,7 @@ import traceback
 from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 import queue
 
-from tkinter.messagebox import askyesno
+import tkinter.messagebox as messagebox
 
 class ScriptListener(threading.Thread):
     def __init__(self, root):
@@ -28,12 +28,14 @@ class ScriptListener(threading.Thread):
             print(f">>> ScriptListener Processing:\n>>> {message}")
             try:
                 if message.type == 'ynprompt':
-                    message.return_val = askyesno(message=message.text)
+                    message.return_val = messagebox.askyesno(message=message.text)
                     message.done()
+                if message.type == 'scriptalreadyrunning':
+                    messagebox.showinfo(message=message.text)
                 
                 
                 else:
-                    raise Exception("SuperToolMessage " + message
+                    raise TypeError("SuperToolMessage " + message
                                     + " does not have a valid type")
             except Exception as err:
                 print(">>> ScriptListener Encountered an error while processing:")
