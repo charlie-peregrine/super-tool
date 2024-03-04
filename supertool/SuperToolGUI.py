@@ -377,7 +377,8 @@ class SuperToolGUI(tk.Tk):
         if filename:
             p = stproject.Project()
             p.file_name = filename
-            p.read_from_file_name()
+            if not p.read_from_file_name():
+                return
             
             # double check that there's a working directory
             if self.validate_working_dir(proj=p):

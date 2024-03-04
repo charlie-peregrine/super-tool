@@ -3,6 +3,7 @@
 # Super Tool Project. Handles reading and writing to save
 # files and storing test, unit, and plot data
 
+import os
 import tkinter as tk
 import xml.etree.ElementTree as ET
 
@@ -21,7 +22,7 @@ class Project:
         self.units = {}
     
     def write_to_file_name(self, *args):
-        print("building xml ElementTree for writing")
+        print("--- building xml ElementTree for writing")
         tree = ET.ElementTree(
             ET.Element("project", 
                        {"title": self.title,
@@ -65,8 +66,15 @@ class Project:
                 unit_node.append(test_node)
             root.append(unit_node)
         
+        tmp_name = self.file_name + ".tmp"
+        tmp_proj = Project(filename=tmp_name)
         ET.indent(tree, space="    ", level=0)
-        tree.write(self.file_name, short_empty_elements=False)
+        tree.write(tmp_name, short_empty_elements=False)
+        if tmp_proj.read_from_file_name():
+            input("press enter")
+            os.replace(tmp_name, self.file_name)
+        else:
+            print("--- Could not successfully save file")
     
     # deprecated
     # wrapper for write, intended for use by the gui
@@ -94,65 +102,72 @@ class Project:
                 self.__read_from_file_name()
                 return
         
-        print(f"reading {self.file_name} as an xml format .pec file")
-        tree = ET.parse(self.file_name)
-        root = tree.getroot()
-        
-        del self.units
-        self.units = {}
-        
-        def none_to_str(v):
-            if v == None:
-                return ''
-            return v
-        
-        # KeyError for dict keys   v
-        self.title = root.attrib['title']
-        
-        # read working directory if it exists, backwards compatibility
-        if 'working_dir' in root.attrib:
-            self.working_dir = root.attrib['working_dir']
-            print("working dir:", self.working_dir)
-        
-        for unit_node in root:
-            unit = Unit(self, unit_node.attrib['name'])
-            if 'subdir' in unit_node.attrib:
-                unit.sub_dir = unit_node.attrib['subdir']
-                print("unit dir:", unit.sub_dir)
-            for test_node in unit_node:
-                test = Test(name=test_node.attrib['name'],
-                            type=test_node.attrib['type'],
-                            parent=unit)
-                if 'subdir' in test_node.attrib:
-                    test.sub_dir = test_node.attrib['subdir']
-                    print("test dir:", test.sub_dir)
-                for attr_node in test_node:
-                    # print(unit_node.attrib, test_node.attrib, attr_node.attrib, attr_node.text)
-                    
-                    if attr_node.tag == 'attr':
-                        val = none_to_str(attr_node.text)
-                        test.add_attr(attr_node.attrib['name'], val)
-                    
-                    elif attr_node.tag == 'chnl': 
-                        header_type = attr_node.attrib['type']
-                        header_key = attr_node.attrib['name']
-                        header_pair = [none_to_str(attr_node.text), attr_node.attrib['expr']]
-                        header_pair = [tk.StringVar(value=s) for s in header_pair]
-                        if header_type == 'sim':
-                            test.sim_headers[header_key] = header_pair
-                        elif header_type == 'mes':
-                            test.mes_headers[header_key] = header_pair
-                    
-                    elif attr_node.tag == 'xmin':
-                        val = none_to_str(attr_node.text)
-                        test.x_range_min.set(val)
+        print(f"--- reading {self.file_name} as an xml format .pec file")
+        try:
+            tree = ET.parse(self.file_name)
+            root = tree.getroot()
+            
+            del self.units
+            self.units = {}
+            
+            def none_to_str(v):
+                if v is None:
+                    return ''
+                return v
+            
+            # KeyError for dict keys   v
+            self.title = root.attrib['title']
+            
+            # read working directory if it exists, backwards compatibility
+            if 'working_dir' in root.attrib:
+                self.working_dir = root.attrib['working_dir']
+                # print("working dir:", self.working_dir)
+            
+            for unit_node in root:
+                unit = Unit(self, unit_node.attrib['name'])
+                if 'subdir' in unit_node.attrib:
+                    unit.sub_dir = unit_node.attrib['subdir']
+                    # print("unit dir:", unit.sub_dir)
+                for test_node in unit_node:
+                    test = Test(name=test_node.attrib['name'],
+                                type=test_node.attrib['type'],
+                                parent=unit)
+                    if 'subdir' in test_node.attrib:
+                        test.sub_dir = test_node.attrib['subdir']
+                        # print("test dir:", test.sub_dir)
+                    for attr_node in test_node:
+                        # print(unit_node.attrib, test_node.attrib,
+                        #       attr_node.attrib, attr_node.text)
                         
-                    elif attr_node.tag == 'xmax':
-                        val = none_to_str(attr_node.text)
-                        test.x_range_max.set(val)
+                        if attr_node.tag == 'attr':
+                            val = none_to_str(attr_node.text)
+                            test.add_attr(attr_node.attrib['name'], val)
+                        
+                        elif attr_node.tag == 'chnl': 
+                            header_type = attr_node.attrib['type']
+                            header_key = attr_node.attrib['name']
+                            header_pair = [none_to_str(attr_node.text), attr_node.attrib['expr']]
+                            header_pair = [tk.StringVar(value=s) for s in header_pair]
+                            if header_type == 'sim':
+                                test.sim_headers[header_key] = header_pair
+                            elif header_type == 'mes':
+                                test.mes_headers[header_key] = header_pair
+                        
+                        elif attr_node.tag == 'xmin':
+                            val = none_to_str(attr_node.text)
+                            test.x_range_min.set(val)
+                            
+                        elif attr_node.tag == 'xmax':
+                            val = none_to_str(attr_node.text)
+                            test.x_range_max.set(val)
 
-                unit.tests[test.name] = test
-            self.units[unit.name] = unit
+                    unit.tests[test.name] = test
+                self.units[unit.name] = unit
+        except ET.ParseError as e:
+            print(f"--- ParseError occured while trying to read {self.file_name}:")
+            print("---", e.msg)
+            return False
+        return True
     
     # deprecated
     # wrapper for read method, intended for use by the gui
