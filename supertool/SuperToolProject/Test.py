@@ -234,60 +234,6 @@ class Test:
             self.plot = veusz_handler.plot_speed_reference
             
         
-    
-    # internal write method to write a test and its attributes to a file
-    def write(self, file):
-        file.write("\t".join([
-                "T", self.name, self.type]
-                ) + "\n")
-        for attr in self.attrs.values():
-            attr.write(file)
-        # for k, [h, m] in self.sim_headers.items():
-        #     file.write("\t".join([
-        #         "1", k, h.get(), m.get()
-        #     ]) + "\n")
-        #     # print(k, h.get(), m.get(), sep='\t')
-        # for k, [h, m] in self.mes_headers.items():
-        #     file.write("\t".join([
-        #         "2", k, h.get(), m.get()
-        #     ]) + "\n")
-            # print(k, h.get(), m.get(), sep='\t')
-    
-    # internal read method to read in a test and its attributes from 
-    # the lines of a file
-    def read(self, lines):
-        line = lines.pop()
-        print('t', line, )
-        
-        # if there are no more lines to read finish the read
-        if line == '':
-            return False, lines
-        
-        # read the line and assign the data properly
-        if line[0] == "T":
-            # parent is assigned when the test is added
-            # to the parent unit's test list
-            _, self.name, self.type = line.split("\t")
-            self.test_defaults()
-        elif line[0] == "U":
-            lines.append(line)
-            return False, lines
-        else:
-            raise ValueError("not a unit or test")
-        
-        # read in attributes
-        while lines:
-            a, lines = Attribute.read(lines)
-            if not a:
-                break
-            name, val = a
-            
-            #@TODO somewhere here check if the path attribute files exist
-            
-            self.add_attr(name, val)            
-        
-        return self, lines
-    
     def add_attr(self, name, val):
         def str2bool(b: str):
             if b == 'True':
@@ -345,3 +291,61 @@ class Test:
     # not just accessing the attribute in the dictionary
     def __getitem__(self, key):
         return self.attrs[key].var.get()
+
+    # DEPRECATED
+    # internal write method to write a test and its attributes to a file
+    def write(self, file):
+        """Deprecated project save method. Use write_to_file_name instead."""
+        file.write("\t".join([
+                "T", self.name, self.type]
+                ) + "\n")
+        for attr in self.attrs.values():
+            attr.write(file)
+        # for k, [h, m] in self.sim_headers.items():
+        #     file.write("\t".join([
+        #         "1", k, h.get(), m.get()
+        #     ]) + "\n")
+        #     # print(k, h.get(), m.get(), sep='\t')
+        # for k, [h, m] in self.mes_headers.items():
+        #     file.write("\t".join([
+        #         "2", k, h.get(), m.get()
+        #     ]) + "\n")
+            # print(k, h.get(), m.get(), sep='\t')
+    
+    # DEPRECATED
+    # internal read method to read in a test and its attributes from 
+    # the lines of a file
+    def read(self, lines):
+        """Deprecated project save method. Use read_from_file_name instead."""
+        line = lines.pop()
+        print('t', line, )
+        
+        # if there are no more lines to read finish the read
+        if line == '':
+            return False, lines
+        
+        # read the line and assign the data properly
+        if line[0] == "T":
+            # parent is assigned when the test is added
+            # to the parent unit's test list
+            _, self.name, self.type = line.split("\t")
+            self.test_defaults()
+        elif line[0] == "U":
+            lines.append(line)
+            return False, lines
+        else:
+            raise ValueError("not a unit or test")
+        
+        # read in attributes
+        while lines:
+            a, lines = Attribute.read(lines)
+            if not a:
+                break
+            name, val = a
+            
+            #@TODO somewhere here check if the path attribute files exist
+            
+            self.add_attr(name, val)            
+        
+        return self, lines
+    

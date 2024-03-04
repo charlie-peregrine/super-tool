@@ -75,23 +75,6 @@ class Project:
         else:
             print("--- Could not successfully save file")
     
-    # deprecated
-    # wrapper for write, intended for use by the gui
-    # does not check if the file_name is valid
-    def __write_to_file_name(self, *args):
-        with open(self.file_name, mode='w') as file:
-            self.write(file)
-            
-    # internal write method, writes the project section to a file
-    # and then delegates to each unit to write its details, effectively
-    # recursing through the project tree
-    def write(self, file):
-        file.write("\t".join(
-            ["P", self.title]
-            ) + "\n")
-        for unit in self.units.values():
-            unit.write(file)
-    
     def read_from_file_name(self):
         # backwards compatibility for old format
         with open(self.file_name, 'r') as file:
@@ -168,36 +151,6 @@ class Project:
             return False
         return True
     
-    # deprecated
-    # wrapper for read method, intended for use by the gui
-    # resets the dictionary of units and starts reading from the lines
-    # of the file
-    def __read_from_file_name(self):
-        with open(self.file_name, mode='r') as file:
-            lines = file.read().split('\n')[::-1]
-
-        del self.units
-        self.units = {}
-        
-        self.read(lines)
-
-    # internal method for reading the project from lines of a file
-    # and then passing control to units to read those
-    def read(self, lines):
-        line = lines.pop()
-        print('p', line)
-        if line[0] == "P":
-            self.title = line.split("\t")[1]
-        else:
-            raise ValueError("not a project")
-        print(self)
-        
-        while lines:
-            u, lines = Unit(self).read(lines)
-            if not u:
-                break
-            self.units[u.name] = u
-
     # add a unit to the unit dictionary
     def add_unit(self, name):
         self.units[name] = Unit(self, name)
@@ -233,3 +186,55 @@ class Project:
     def __getitem__(self, key):
         return self.units[key]
 
+    # DEPRECATED
+    # wrapper for write, intended for use by the gui
+    # does not check if the file_name is valid
+    def __write_to_file_name(self, *args):
+        """Deprecated project save method. Use write_to_file_name instead."""
+        with open(self.file_name, mode='w') as file:
+            self.write(file)
+            
+    # DEPRECATED
+    # internal write method, writes the project section to a file
+    # and then delegates to each unit to write its details, effectively
+    # recursing through the project tree
+    def write(self, file):
+        """Deprecated project save method. Use write_to_file_name instead."""
+        file.write("\t".join(
+            ["P", self.title]
+            ) + "\n")
+        for unit in self.units.values():
+            unit.write(file)
+
+    # DEPRECATED
+    # wrapper for read method, intended for use by the gui
+    # resets the dictionary of units and starts reading from the lines
+    # of the file
+    def __read_from_file_name(self):
+        """Deprecated project save method. Use read_from_file_name instead."""
+        with open(self.file_name, mode='r') as file:
+            lines = file.read().split('\n')[::-1]
+
+        del self.units
+        self.units = {}
+        
+        self.read(lines)
+
+    # DEPRECATED
+    # internal method for reading the project from lines of a file
+    # and then passing control to units to read those
+    def read(self, lines):
+        """Deprecated project save method. Use read_from_file_name instead."""
+        line = lines.pop()
+        print('p', line)
+        if line[0] == "P":
+            self.title = line.split("\t")[1]
+        else:
+            raise ValueError("not a project")
+        print(self)
+        
+        while lines:
+            u, lines = Unit(self).read(lines)
+            if not u:
+                break
+            self.units[u.name] = u
