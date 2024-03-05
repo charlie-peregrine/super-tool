@@ -12,7 +12,7 @@ import pathvalidate
 
 
 import supertool.consts as consts
-from supertool.SuperToolFrames import BaseOkPopup, StatusBar
+from supertool.SuperToolFrames import BaseOkPopup, StatusBar, Popup
 import supertool.SuperToolProject.Project as stproject
 import supertool.ScriptListener as ScriptListener
 from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
@@ -117,7 +117,7 @@ class SuperToolGUI(tk.Tk):
         view_menu = tk.Menu(self.menubar)
         self.run_menu = tk.Menu(self.menubar)
         self.graph_menu = tk.Menu(self.menubar)
-        about_menu = tk.Menu(self.menubar)
+        help_menu = tk.Menu(self.menubar)
         
 
         # add options to the file menu
@@ -156,9 +156,8 @@ class SuperToolGUI(tk.Tk):
             command=lambda: self.param_frame.graph(save_on_graph=False))
 
         # add options to the about menu
-        about_menu.add_command(label="About")
-        about_menu.add_command(label="Version")
-        about_menu.add_command(label="Check For Updates",
+        help_menu.add_command(label="About", command=self.show_about_popup)
+        help_menu.add_command(label="Check For Updates",
             command=lambda: ScriptQueue.put(SuperToolMessage('check4update')))
         
         # add the submenus to the menu bar
@@ -166,7 +165,7 @@ class SuperToolGUI(tk.Tk):
         self.menubar.add_cascade(label="View", menu=view_menu)
         self.menubar.add_cascade(label="Run", menu=self.run_menu)
         self.menubar.add_cascade(label="Graph", menu=self.graph_menu)
-        self.menubar.add_cascade(label="About", menu=about_menu)
+        self.menubar.add_cascade(label="Help", menu=help_menu)
     
     # method to call when the program exits
     def on_quit(self):
@@ -559,3 +558,19 @@ class SuperToolGUI(tk.Tk):
         if filename:
             self.project.file_name = filename
             self.project.write_to_file_name()
+
+    def show_about_popup(self):
+        win = Popup(self, title="About")
+        
+        title_label = ttk.Label(win, text="Super Tool GUI")
+        title_label.grid(row=0, column=0)
+        
+        version_label = ttk.Label(win, text="Version: v"
+                                  + ".".join((str(i) for i in consts.VERSION)))
+        version_label.grid(row=1, column=0)
+        
+        ok_buton = ttk.Button(win, text="OK", command=win.destroy)
+        ok_buton.grid(row=2, column=0)
+
+        for widget in win.winfo_children():
+            widget.grid_configure(padx=5, pady=3)
