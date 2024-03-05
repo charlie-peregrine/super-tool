@@ -494,7 +494,16 @@ class TestView(ttk.Frame):
     # @TODO needs typechecking?
     def open_path(self, attr):
         if attr.var.get():
-            os.startfile(attr.get())
+            if os.path.exists(attr.get()):
+                os.startfile(attr.get())
+            else:
+                if attr.read_only_file:
+                    print(f"File: '{attr.get()}' does not exist. "
+                          "Select a file using the left button first")
+                else:
+                    print(f"File: '{attr.get()}' does not exist. "
+                          "Run the simulation or select a file "
+                          "using the left button first")
         else:
             print("No file to open!!!! uh oh")
     
