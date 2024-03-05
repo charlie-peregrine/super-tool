@@ -158,6 +158,8 @@ class SuperToolGUI(tk.Tk):
         # add options to the about menu
         about_menu.add_command(label="About")
         about_menu.add_command(label="Version")
+        about_menu.add_command(label="Check For Updates",
+            command=lambda: ScriptQueue.put(SuperToolMessage('check4update')))
         
         # add the submenus to the menu bar
         self.menubar.add_cascade(label="File", menu=file_menu)
