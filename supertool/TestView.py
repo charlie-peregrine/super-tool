@@ -105,19 +105,19 @@ class TestView(ttk.Frame):
                                           command=self.change_focused_test_type)
             self.type_button.grid(row=1, column=1, sticky='e')
             
-            # self.sub_dir_label = ttk.Label(self.frame, text="Sub-Directory")
-            # self.sub_dir_label.grid(row=2, column=0)
-            # self.sub_dir_val_label = ttk.Label(self.frame,
-            #         text=focused.sub_dir + "haaa", wraplength=40)
-            # print("sub dir:", focused.sub_dir)
-            # self.sub_dir_val_label.grid(row=2, column=1)
-            # self.sub_dir_button = ttk.Button(self.frame,
-            #         text="Change")
-            # self.sub_dir_button.grid(row=2, column=2)
+            offset = 2
+            attr_groups = ['INFILE', 'OUTFILE', 'PLAIN', 'LOADFLOW', 'USER']
+            self.label_frames: dict[str, ttk.LabelFrame | None] = {}
+            for i, g in enumerate(attr_groups, start=offset):
+                self.label_frames[g] = ttk.LabelFrame(self.frame, text=g, borderwidth=5)
+                self.label_frames[g].grid(row=i, column=0, columnspan=3, sticky='nesw')
             
+            print(self.label_frames)
+            # self.label_frames['INFILE'] = ttk.LabelFrame(self, text='INFILE')
+            # print(self.label_frames)
             # set up for loop, offset is how many rows down the big
             # list of attributes should start
-            offset = 2
+            offset = 10
             
             # storage for all of the interactibles so they still
             # work outside of the loop
@@ -128,9 +128,15 @@ class TestView(ttk.Frame):
             for i, key in enumerate(focused.attrs): # range(len(keys)):
                 attr = focused.attrs[key]
                 
+                if attr.group and attr.group in attr_groups:
+                    baseframe = self.label_frames[attr.group]
+                    print(attr.group, baseframe)
+                else:
+                    print("Uh oh no group for this one")
+                    continue
                 
                 # show the title label
-                title_label = ttk.Label(self.frame, text=attr.name)
+                title_label = ttk.Label(baseframe, text=attr.name)
                 title_label.grid(row=i+offset, column=0, sticky='w')
                 
                 title_label_hover = Hovertip(title_label, text='',
@@ -163,7 +169,7 @@ class TestView(ttk.Frame):
                         else:
                             return s2
                     
-                    path_button = ttk.Button(self.frame, text=short_name(attr.var.get()),
+                    path_button = ttk.Button(baseframe, text=short_name(attr.var.get()),
                             command=lambda attr=attr: self.get_new_path(attr))
                     path_button.grid(row=i+offset, column=1, sticky='nesw')
                     
@@ -229,7 +235,7 @@ class TestView(ttk.Frame):
                     self.trace_data.append((attr.var, hover_cb))
                     
                     # place a select button to get a new path
-                    open_path_button = ttk.Button(self.frame, text="open",
+                    open_path_button = ttk.Button(baseframe, text="open",
                             command=lambda attr=attr: self.open_path(attr))
                     open_path_button.grid(row=i+offset, column=2)
                     
@@ -240,7 +246,7 @@ class TestView(ttk.Frame):
                 elif attr.type == 'BOOL':
                     # show a check box
                     # @TODO the bind not be necessary
-                    checkbutton = ttk.Checkbutton(self.frame, variable=attr.var)
+                    checkbutton = ttk.Checkbutton(baseframe, variable=attr.var)
                     checkbutton.grid(row=i+offset, column=1)
                     
                     # add the checkbox and variable to a higher scoped list
@@ -251,11 +257,11 @@ class TestView(ttk.Frame):
                 # a unit @TODO error checking on the entry
                 elif attr.type == 'NUM':
                     # space to enter the user's number
-                    entry = ttk.Entry(self.frame, textvariable=attr.var)
+                    entry = ttk.Entry(baseframe, textvariable=attr.var)
                     entry.grid(row=i+offset, column=1)
                     
                     # label containing unit
-                    unit_label = ttk.Label(self.frame, text=attr.unit)
+                    unit_label = ttk.Label(baseframe, text=attr.unit)
                     unit_label.grid(row=i+offset, column=2)
                     
                     # add the entry to a higher scoped list
@@ -264,11 +270,11 @@ class TestView(ttk.Frame):
                 
                 elif attr.type == 'STR':
                     # space to enter the user's number
-                    entry = ttk.Entry(self.frame, textvariable=attr.var)
+                    entry = ttk.Entry(baseframe, textvariable=attr.var)
                     entry.grid(row=i+offset, column=1)
                     
                     # label containing unit
-                    unit_label = ttk.Label(self.frame, text="string")
+                    unit_label = ttk.Label(baseframe, text="string")
                     unit_label.grid(row=i+offset, column=2)
                     
                     # add the entry to a higher scoped list

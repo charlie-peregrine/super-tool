@@ -11,6 +11,7 @@ class Attribute:
     def __init__(self, parent, name: str, defaults: dict):
         self.name = name
         self.type = defaults['type']
+        self.group = defaults['group']
         
         self.parent = parent
 
