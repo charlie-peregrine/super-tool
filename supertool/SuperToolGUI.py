@@ -53,31 +53,8 @@ class SuperToolGUI(tk.Tk):
         self.minsize(500,250)
         # print(self.winfo_width(), self.winfo_height())
         
-        def on_quit():
-            # set running to false, indicating that the listener thread should stop
-            self.running = False
-            print("===== Waiting for ScriptListener to finish =====")
-            self.listener.join()
-            print("===== ScriptListener has finished  =====")
-            
-            # close the window
-            self.destroy()
-            
-            # save use pslf gui value
-            print("===== Saving Modified Configuration Data =====")
-            try:
-                consts.config_data['HIDE_PSLF_GUI'] = self.hide_pslf_gui.get()
-                json.dump(consts.config_data, open('config.json', 'w'), indent=4)
-                print("===== Modified Configuration Data Saved =====")
-            except FileNotFoundError:
-                print("ERROR: Failed to open config.json. Runtime settings not saved.")
-            
-            # close the pslf window while we're on the way out
-            print("===== Closing PSLF =====")
-            kill_pslf()
-            print("===== PSLF Closed =====")
-
-        self.protocol('WM_DELETE_WINDOW', on_quit)
+        
+        self.protocol('WM_DELETE_WINDOW', self.on_quit)
         
 
     # helper method to create and add all of the high level widgets to the 
@@ -187,6 +164,31 @@ class SuperToolGUI(tk.Tk):
         self.menubar.add_cascade(label="Graph", menu=self.graph_menu)
         self.menubar.add_cascade(label="About", menu=about_menu)
     
+    # method to call when the program exits
+    def on_quit(self):
+        # set running to false, indicating that the listener thread should stop
+        self.running = False
+        print("===== Waiting for ScriptListener to finish =====")
+        self.listener.join()
+        print("===== ScriptListener has finished  =====")
+        
+        # close the window
+        self.destroy()
+        
+        # save use pslf gui value
+        print("===== Saving Modified Configuration Data =====")
+        try:
+            consts.config_data['HIDE_PSLF_GUI'] = self.hide_pslf_gui.get()
+            json.dump(consts.config_data, open('config.json', 'w'), indent=4)
+            print("===== Modified Configuration Data Saved =====")
+        except FileNotFoundError:
+            print("ERROR: Failed to open config.json. Runtime settings not saved.")
+        
+        # close the pslf window while we're on the way out
+        print("===== Closing PSLF =====")
+        kill_pslf()
+        print("===== PSLF Closed =====")
+
     # wrapper for statusbar text setting
     # needs some work
     def set_status(self, string):
