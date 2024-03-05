@@ -46,6 +46,18 @@ def run(test, no_gui=False):
     Vbase               = test.attrs["Vbase"].get()             # 14.5    # kV
     Zbranch             = test.attrs["Zbranch"].get()           # 0.09    # pu
 
+    #----------------------------------
+    # User Defined Parameters
+    # Note that these are not accessed
+    # unless decided so by the user
+    #----------------------------------
+
+    UserVar1        = test.attrs["UserVar1"].get()
+    UserVar2        = test.attrs["UserVar2"].get()
+    UserVar3        = test.attrs["UserVar3"].get()
+    UserVar4        = test.attrs["UserVar4"].get()
+    UserVar5        = test.attrs["UserVar5"].get()
+
 #--------------------------------------------------------------------------------------------------
 
     # gets the project directory of this file and initialize the PSLF instance
