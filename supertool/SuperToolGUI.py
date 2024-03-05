@@ -15,6 +15,7 @@ import supertool.consts as consts
 from supertool.SuperToolFrames import BaseOkPopup, StatusBar
 import supertool.SuperToolProject.Project as stproject
 import supertool.ScriptListener as ScriptListener
+from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 
 from supertool.ProjectView import ProjectView
 from supertool.TestView import TestView, kill_pslf
@@ -53,6 +54,7 @@ class SuperToolGUI(tk.Tk):
         self.minsize(500,250)
         # print(self.winfo_width(), self.winfo_height())
         
+        ScriptQueue.put(SuperToolMessage('check4update'))
         
         self.protocol('WM_DELETE_WINDOW', self.on_quit)
         

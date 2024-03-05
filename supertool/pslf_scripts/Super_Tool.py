@@ -28,7 +28,7 @@ class SuperToolFatalError(Exception):
         super().__init__(message)
 
 class SuperToolMessage():
-    def __init__(self, message_type: str, message: str):
+    def __init__(self, message_type: str, message: str = ""):
         self.lock = threading.Lock()
         self.type = message_type
         self.text = message

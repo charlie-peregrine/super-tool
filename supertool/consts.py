@@ -27,8 +27,12 @@ print("===== config.json loaded =====")
 # save the directory that the source code is run from
 SUPERTOOL_DIR = os.getcwd()
 
-# 
+# application wide hover delay
 HOVER_DELAY = 300
+
+# current version, v1.4.4 -> (1,4,4)
+VERSION = (1,4,3)
+GITHUB_REPO = "https://github.com/charlie-peregrine/super-tool/releases/latest"
 
 print("===== loading default_test_attributes.json =====")
 
