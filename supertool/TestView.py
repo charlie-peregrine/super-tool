@@ -105,36 +105,40 @@ class TestView(ttk.Frame):
                                           command=self.change_focused_test_type)
             self.type_button.grid(row=1, column=1, sticky='e')
             
-            offset = 2
-            attr_groups = ['INFILE', 'OUTFILE', 'PLAIN', 'LOADFLOW', 'USER']
-            self.label_frames: dict[str, ttk.LabelFrame | None] = {}
-            for i, g in enumerate(attr_groups, start=offset):
-                self.label_frames[g] = ttk.LabelFrame(self.frame, text=g, borderwidth=5)
-                self.label_frames[g].grid(row=i, column=0, columnspan=3, sticky='nesw')
+            attr_groups = {k: [] for k in ['INFILE', 'OUTFILE', 'PLAIN', 'LOADFLOW', 'USER']}
             
-            print(self.label_frames)
-            # self.label_frames['INFILE'] = ttk.LabelFrame(self, text='INFILE')
-            # print(self.label_frames)
+            for attr in focused.attrs.values():
+                if attr.group and attr.group in attr_groups:
+                    attr_groups[attr.group].append(attr)
+                    # print(attr.group, attr_groups[attr.group])
+                else:
+                    print(f"Uh oh no group for {attr}")
+                    continue
+            
             # set up for loop, offset is how many rows down the big
             # list of attributes should start
-            offset = 10
+            offset = 2
             
             # storage for all of the interactibles so they still
             # work outside of the loop
             self.interactibles = []
             
+            line = offset
+            for i, (group, attr_ls) in enumerate(attr_groups.items()):
+                print(i, group, len(attr_ls))
+                # lid
+                header = self.AttributeHeader(self.frame, group)
+                header.grid(row=line, column=0, columnspan=3, sticky='nesw')
+                line += 1
+                for attr in attr_ls:
+                    self.build_attr_line(attr, self.frame, line)
+                    line += 1
+                # bottom
+            
             # for every attribute of the attribute dictionary, add
             # a line containing its name and relevant input fields
-            for i, attr in enumerate(focused.attrs.values()): # range(len(keys)):
-                # attr = focused.attrs[key]
-                if attr.group and attr.group in attr_groups:
-                    baseframe = self.label_frames[attr.group]
-                    print(attr.group, baseframe)
-                else:
-                    print("Uh oh no group for this one")
-                    continue
-                
-                self.build_attr_line(attr, baseframe, i+offset)
+            # for i, attr in enumerate(focused.attrs.values()):
+            #     self.build_attr_line(attr, self.frame, i+offset)
                 
         else:
             # if there's no focused test, show that no test is selected
@@ -143,8 +147,31 @@ class TestView(ttk.Frame):
             self.no_test_label.grid(row=1,column=0)
         
         self.parent.update_pane_widths()
-        
+    
+    # helper class, should probably move this outside of the class @TODO
+    class AttributeHeader(ttk.Frame):
+        def __init__(self, parent, text, **kwargs):
+            super().__init__(parent, **kwargs)
+            
+            self.columnconfigure(2, weight=1)
+            
+            self.lsep_frame = ttk.Frame(self, width=20)
+            self.lsep_frame.grid(row=0, column=0, sticky='ew', ipadx=6)
+            self.lsep_frame.columnconfigure(0, weight=1)
+            
+            self.lsep = ttk.Separator(self.lsep_frame)
+            self.lsep.grid(row=0, column=0, sticky='ew')
+            
+            self.label = ttk.Label(self, text=text)
+            self.label.grid(row=0, column=1, padx=3)
+
+            self.rsep = ttk.Separator(self)
+            self.rsep.grid(row=0, column=2, sticky='ew', padx=1)
+    
     def build_attr_line(self, attr, frame, line):
+        # configure values that are the same accross all types
+        padding_info = {'pady': 1, 'padx': 2}
+        
         # show the title label
         title_label = ttk.Label(frame, text=attr.name)
         title_label.grid(row=line, column=0, sticky='w')
@@ -181,7 +208,7 @@ class TestView(ttk.Frame):
             
             path_button = ttk.Button(frame, text=short_name(attr.var.get()),
                     command=lambda attr=attr: self.get_new_path(attr))
-            path_button.grid(row=line, column=1, sticky='nesw')
+            path_button.grid(row=line, column=1, sticky='nesw', cnf=padding_info)
             
             def clear_path(e=None, attr=attr):
                 attr.var.set("")
@@ -257,7 +284,7 @@ class TestView(ttk.Frame):
             # show a check box
             # @TODO the bind not be necessary
             checkbutton = ttk.Checkbutton(frame, variable=attr.var)
-            checkbutton.grid(row=line, column=1)
+            checkbutton.grid(row=line, column=1, cnf=padding_info)
             
             # add the checkbox and variable to a higher scoped list
             # @TODO is attr.var necessary here?
@@ -268,7 +295,7 @@ class TestView(ttk.Frame):
         elif attr.type == 'NUM':
             # space to enter the user's number
             entry = ttk.Entry(frame, textvariable=attr.var)
-            entry.grid(row=line, column=1)
+            entry.grid(row=line, column=1, cnf=padding_info)
             
             # label containing unit
             unit_label = ttk.Label(frame, text=attr.unit)
@@ -281,7 +308,7 @@ class TestView(ttk.Frame):
         elif attr.type == 'STR':
             # space to enter the user's number
             entry = ttk.Entry(frame, textvariable=attr.var)
-            entry.grid(row=line, column=1)
+            entry.grid(row=line, column=1, cnf=padding_info)
             
             # label containing unit
             unit_label = ttk.Label(frame, text="string")
