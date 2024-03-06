@@ -37,7 +37,7 @@ class ScriptListener(threading.Thread):
                 if message.type == 'scriptalreadyrunning':
                     messagebox.showinfo(message=message.text)
                 if message.type == 'check4update':
-                    self.check_for_update
+                    self.check_for_update()
                 
                 else:
                     raise TypeError("SuperToolMessage " + message
