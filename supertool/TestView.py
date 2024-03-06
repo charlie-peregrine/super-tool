@@ -125,9 +125,8 @@ class TestView(ttk.Frame):
             
             # for every attribute of the attribute dictionary, add
             # a line containing its name and relevant input fields
-            for i, key in enumerate(focused.attrs): # range(len(keys)):
-                attr = focused.attrs[key]
-                
+            for i, attr in enumerate(focused.attrs.values()): # range(len(keys)):
+                # attr = focused.attrs[key]
                 if attr.group and attr.group in attr_groups:
                     baseframe = self.label_frames[attr.group]
                     print(attr.group, baseframe)
@@ -135,160 +134,7 @@ class TestView(ttk.Frame):
                     print("Uh oh no group for this one")
                     continue
                 
-                # show the title label
-                title_label = ttk.Label(baseframe, text=attr.name)
-                title_label.grid(row=i+offset, column=0, sticky='w')
-                
-                title_label_hover = Hovertip(title_label, text='',
-                                             hover_delay=consts.HOVER_DELAY)
-                
-                # update title label if there's a valid long name for it
-                if attr.full_name:
-                    title_label.config(text=attr.full_name)
-                    title_label_hover.text = f"{attr.full_name} ({attr.name})\n"
-                else:
-                    title_label_hover.text = attr.name + "\n"
-                
-                if attr.description:
-                    title_label_hover.text += "\n".join(wraptext(attr.description, 45))
-                else:
-                    title_label_hover.text += "No Attribute Description"
-                
-                # paths are shown with their name, their short name,
-                # and a button to open a file picker window. hovering
-                # over the short name shows a tooltip of the full path name
-                if attr.type == 'PATH':
-                    # show short name of path
-                    def short_name(s):
-                        s2 = basename(s)
-                        ln = len(s2)
-                        max_len = 30
-                        if ln > max_len:
-                            return s2[:max_len//2] + "..." \
-                                   + s2[-(max_len//2 - 2):]
-                        else:
-                            return s2
-                    
-                    path_button = ttk.Button(baseframe, text=short_name(attr.var.get()),
-                            command=lambda attr=attr: self.get_new_path(attr))
-                    path_button.grid(row=i+offset, column=1, sticky='nesw')
-                    
-                    def clear_path(e=None, attr=attr):
-                        attr.var.set("")
-                    path_button.bind("<3>", clear_path)
-                    
-                    # create hovertext for paths to show the long path instead of just the basename
-                    def path_hover_text(attribute):
-                        if attribute.var.get() == '':
-                            return "Click to Select a file"
-                        else:
-                            # print(attribute.get())
-                            # print("RO:", attribute.read_only_file, end=' - ')
-                            if attribute.read_only_file:
-                                # check that the file itself exists
-                                # print(attribute.get())
-                                # print(os.path.exists(attribute.get()))
-                                if not os.path.exists(attribute.get()):
-                                    return f"This file does not exist at this location.\n" + \
-                                           f"Full Path: {attribute.get()}\n" + \
-                                           f"Relative Path: {attribute.var.get()}\n" + \
-                                            "Right click to clear or click to re-select a file" 
-                            else:
-                                # check that the parent directory exists
-                                # print(attribute.parent.get_dir())
-                                # print(os.path.exists(os.path.dirname(attribute.get())))
-                                if not os.path.exists(os.path.dirname(attribute.get())):
-                                    return  "This file cannot be generated at this location.\n" + \
-                                            "This is likely an issue with the working, unit,\n" + \
-                                            "or test sub-directories being malformed.\n" + \
-                                           f"Full Path: {attribute.get()}\n" + \
-                                           f"Relative Path: {attribute.var.get()}\n" + \
-                                            "Right click to clear or click to re-select a file" 
-                        return f"Full Path: {attribute.get()}\n" + \
-                               f"Relative Path: {attribute.var.get()}\n" + \
-                                "Right click to clear"
-                    path_label_hover = Hovertip(path_button, path_hover_text(attr), hover_delay=consts.HOVER_DELAY)
-                    
-                    # set up traces for when the path variables update to modify the path label
-                    # separate functions needed for clarity
-                    def update_button(_1=None, _2=None, _3=None, l=path_button, a=attr):
-                        l.configure(text=short_name(a.var.get()))
-                        if a.var.get():
-                            if a.read_only_file:
-                                if not os.path.exists(a.get()):
-                                    l.configure(style="badpath.TButton")
-                                    return
-                            else:
-                                if not os.path.exists(os.path.dirname(a.get())):
-                                    l.configure(style="badpath.TButton")
-                                    return
-                        l.configure(style="TButton")
-
-                    update_button()
-                    button_cb = attr.var.trace_add('write', update_button)
-                    
-                    def update_hover(_1=None, _2=None, _3=None, l=path_label_hover, a=attr):
-                        l.text = path_hover_text(a)
-                    hover_cb = attr.var.trace_add('write', update_hover)
-                    
-                    self.trace_data.append((attr.var, button_cb))
-                    self.trace_data.append((attr.var, hover_cb))
-                    
-                    # place a select button to get a new path
-                    open_path_button = ttk.Button(baseframe, text="open",
-                            command=lambda attr=attr: self.open_path(attr))
-                    open_path_button.grid(row=i+offset, column=2)
-                    
-                    # add interactibles to a higher scoped list
-                    self.interactibles.append((open_path_button, path_button))
-                
-                # boolean attributes are shown as their name and a checkbox
-                elif attr.type == 'BOOL':
-                    # show a check box
-                    # @TODO the bind not be necessary
-                    checkbutton = ttk.Checkbutton(baseframe, variable=attr.var)
-                    checkbutton.grid(row=i+offset, column=1)
-                    
-                    # add the checkbox and variable to a higher scoped list
-                    # @TODO is attr.var necessary here?
-                    self.interactibles.append((checkbutton, attr.var))
-                
-                # if the attribute is a number, show it as a name, an entry, and
-                # a unit @TODO error checking on the entry
-                elif attr.type == 'NUM':
-                    # space to enter the user's number
-                    entry = ttk.Entry(baseframe, textvariable=attr.var)
-                    entry.grid(row=i+offset, column=1)
-                    
-                    # label containing unit
-                    unit_label = ttk.Label(baseframe, text=attr.unit)
-                    unit_label.grid(row=i+offset, column=2)
-                    
-                    # add the entry to a higher scoped list
-                    # @TODO is attr.var necessary?
-                    self.interactibles.append((entry, attr.var))
-                
-                elif attr.type == 'STR':
-                    # space to enter the user's number
-                    entry = ttk.Entry(baseframe, textvariable=attr.var)
-                    entry.grid(row=i+offset, column=1)
-                    
-                    # label containing unit
-                    unit_label = ttk.Label(baseframe, text="string")
-                    unit_label.grid(row=i+offset, column=2)
-                    
-                    # add the entry to a higher scoped list
-                    # @TODO is attr.var necessary?
-                    self.interactibles.append((entry, attr.var))
-                else:
-                    raise ValueError(f"Incorrect attribute type of '{attr.type}'")
-                    
-            
-            # if focused.plot_sim_file:
-            #     attr = focused.attrs[focused.plot_sim_file]
-            #     trace = attr.var.trace_add('write', lambda a_, b_, c_:
-            #         self.parent.param_frame.show_simulated_headers())
-            #     self.trace_data.append((attr.var, trace))
+                self.build_attr_line(attr, baseframe, i+offset)
                 
         else:
             # if there's no focused test, show that no test is selected
@@ -297,6 +143,155 @@ class TestView(ttk.Frame):
             self.no_test_label.grid(row=1,column=0)
         
         self.parent.update_pane_widths()
+        
+    def build_attr_line(self, attr, frame, line):
+        # show the title label
+        title_label = ttk.Label(frame, text=attr.name)
+        title_label.grid(row=line, column=0, sticky='w')
+        
+        title_label_hover = Hovertip(title_label, text='',
+                                        hover_delay=consts.HOVER_DELAY)
+        
+        # update title label if there's a valid long name for it
+        if attr.full_name:
+            title_label.config(text=attr.full_name)
+            title_label_hover.text = f"{attr.full_name} ({attr.name})\n"
+        else:
+            title_label_hover.text = attr.name + "\n"
+        
+        if attr.description:
+            title_label_hover.text += "\n".join(wraptext(attr.description, 45))
+        else:
+            title_label_hover.text += "No Attribute Description"
+        
+        # paths are shown with their name, their short name,
+        # and a button to open a file picker window. hovering
+        # over the short name shows a tooltip of the full path name
+        if attr.type == 'PATH':
+            # show short name of path
+            def short_name(s):
+                s2 = basename(s)
+                ln = len(s2)
+                max_len = 30
+                if ln > max_len:
+                    return s2[:max_len//2] + "..." \
+                            + s2[-(max_len//2 - 2):]
+                else:
+                    return s2
+            
+            path_button = ttk.Button(frame, text=short_name(attr.var.get()),
+                    command=lambda attr=attr: self.get_new_path(attr))
+            path_button.grid(row=line, column=1, sticky='nesw')
+            
+            def clear_path(e=None, attr=attr):
+                attr.var.set("")
+            path_button.bind("<3>", clear_path)
+            
+            # create hovertext for paths to show the long path instead of just the basename
+            def path_hover_text(attribute):
+                if attribute.var.get() == '':
+                    return "Click to Select a file"
+                else:
+                    # print(attribute.get())
+                    # print("RO:", attribute.read_only_file, end=' - ')
+                    if attribute.read_only_file:
+                        # check that the file itself exists
+                        # print(attribute.get())
+                        # print(os.path.exists(attribute.get()))
+                        if not os.path.exists(attribute.get()):
+                            return f"This file does not exist at this location.\n" + \
+                                    f"Full Path: {attribute.get()}\n" + \
+                                    f"Relative Path: {attribute.var.get()}\n" + \
+                                    "Right click to clear or click to re-select a file" 
+                    else:
+                        # check that the parent directory exists
+                        # print(attribute.parent.get_dir())
+                        # print(os.path.exists(os.path.dirname(attribute.get())))
+                        if not os.path.exists(os.path.dirname(attribute.get())):
+                            return  "This file cannot be generated at this location.\n" + \
+                                    "This is likely an issue with the working, unit,\n" + \
+                                    "or test sub-directories being malformed.\n" + \
+                                    f"Full Path: {attribute.get()}\n" + \
+                                    f"Relative Path: {attribute.var.get()}\n" + \
+                                    "Right click to clear or click to re-select a file" 
+                return f"Full Path: {attribute.get()}\n" + \
+                        f"Relative Path: {attribute.var.get()}\n" + \
+                        "Right click to clear"
+            path_label_hover = Hovertip(path_button, path_hover_text(attr), hover_delay=consts.HOVER_DELAY)
+            
+            # set up traces for when the path variables update to modify the path label
+            # separate functions needed for clarity
+            def update_button(_1=None, _2=None, _3=None, l=path_button, a=attr):
+                l.configure(text=short_name(a.var.get()))
+                if a.var.get():
+                    if a.read_only_file:
+                        if not os.path.exists(a.get()):
+                            l.configure(style="badpath.TButton")
+                            return
+                    else:
+                        if not os.path.exists(os.path.dirname(a.get())):
+                            l.configure(style="badpath.TButton")
+                            return
+                l.configure(style="TButton")
+
+            update_button()
+            button_cb = attr.var.trace_add('write', update_button)
+            
+            def update_hover(_1=None, _2=None, _3=None, l=path_label_hover, a=attr):
+                l.text = path_hover_text(a)
+            hover_cb = attr.var.trace_add('write', update_hover)
+            
+            self.trace_data.append((attr.var, button_cb))
+            self.trace_data.append((attr.var, hover_cb))
+            
+            # place a select button to get a new path
+            open_path_button = ttk.Button(frame, text="open",
+                    command=lambda attr=attr: self.open_path(attr))
+            open_path_button.grid(row=line, column=2)
+            
+            # add interactibles to a higher scoped list
+            self.interactibles.append((open_path_button, path_button))
+        
+        # boolean attributes are shown as their name and a checkbox
+        elif attr.type == 'BOOL':
+            # show a check box
+            # @TODO the bind not be necessary
+            checkbutton = ttk.Checkbutton(frame, variable=attr.var)
+            checkbutton.grid(row=line, column=1)
+            
+            # add the checkbox and variable to a higher scoped list
+            # @TODO is attr.var necessary here?
+            self.interactibles.append((checkbutton, attr.var))
+        
+        # if the attribute is a number, show it as a name, an entry, and
+        # a unit @TODO error checking on the entry
+        elif attr.type == 'NUM':
+            # space to enter the user's number
+            entry = ttk.Entry(frame, textvariable=attr.var)
+            entry.grid(row=line, column=1)
+            
+            # label containing unit
+            unit_label = ttk.Label(frame, text=attr.unit)
+            unit_label.grid(row=line, column=2)
+            
+            # add the entry to a higher scoped list
+            # @TODO is attr.var necessary?
+            self.interactibles.append((entry, attr.var))
+        
+        elif attr.type == 'STR':
+            # space to enter the user's number
+            entry = ttk.Entry(frame, textvariable=attr.var)
+            entry.grid(row=line, column=1)
+            
+            # label containing unit
+            unit_label = ttk.Label(frame, text="string")
+            unit_label.grid(row=line, column=2)
+            
+            # add the entry to a higher scoped list
+            # @TODO is attr.var necessary?
+            self.interactibles.append((entry, attr.var))
+        else:
+            raise ValueError(f"Incorrect attribute type of '{attr.type}'")
         
     # run the backend PSLF script associated with the focused test's
     # test type
