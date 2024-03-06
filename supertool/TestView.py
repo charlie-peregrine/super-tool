@@ -106,6 +106,11 @@ class TestView(ttk.Frame):
             self.type_button.grid(row=1, column=1, sticky='e')
             
             attr_groups = {k: [] for k in ['INFILE', 'OUTFILE', 'PLAIN', 'LOADFLOW', 'USER']}
+            attr_full_names = {'INFILE': "Input Files",
+                               'OUTFILE': "Output Files",
+                               'PLAIN': "Simulation Specific Variables",
+                               'LOADFLOW': "Loadflow Variables",
+                               'USER': "User Defined Variables"}
             
             for attr in focused.attrs.values():
                 if attr.group and attr.group in attr_groups:
@@ -127,14 +132,13 @@ class TestView(ttk.Frame):
             for i, (group, attr_ls) in enumerate(attr_groups.items()):
                 print(i, group, len(attr_ls))
                 # lid
-                header = self.AttributeHeader(self.frame, group)
-                header.grid(row=line, column=0, columnspan=3, sticky='nesw')
+                header = AttributeHeader(self.frame, attr_full_names[group])
+                header.grid(row=line, column=0, columnspan=4, sticky='nesw', pady=1)
                 line += 1
                 for attr in attr_ls:
                     self.build_attr_line(attr, self.frame, line)
                     line += 1
-                # bottom
-            
+                
             # for every attribute of the attribute dictionary, add
             # a line containing its name and relevant input fields
             # for i, attr in enumerate(focused.attrs.values()):
@@ -147,26 +151,6 @@ class TestView(ttk.Frame):
             self.no_test_label.grid(row=1,column=0)
         
         self.parent.update_pane_widths()
-    
-    # helper class, should probably move this outside of the class @TODO
-    class AttributeHeader(ttk.Frame):
-        def __init__(self, parent, text, **kwargs):
-            super().__init__(parent, **kwargs)
-            
-            self.columnconfigure(2, weight=1)
-            
-            self.lsep_frame = ttk.Frame(self, width=20)
-            self.lsep_frame.grid(row=0, column=0, sticky='ew', ipadx=6)
-            self.lsep_frame.columnconfigure(0, weight=1)
-            
-            self.lsep = ttk.Separator(self.lsep_frame)
-            self.lsep.grid(row=0, column=0, sticky='ew')
-            
-            self.label = ttk.Label(self, text=text)
-            self.label.grid(row=0, column=1, padx=3)
-
-            self.rsep = ttk.Separator(self)
-            self.rsep.grid(row=0, column=2, sticky='ew', padx=1)
     
     def build_attr_line(self, attr, frame, line):
         # configure values that are the same accross all types
@@ -603,3 +587,26 @@ def kill_pslf():
                 continue
         if not found:
             break
+
+# helper class, used to make pretty separators for the testview scroll frame
+class AttributeHeader(ttk.Frame):
+    def __init__(self, parent, text, **kwargs):
+        super().__init__(parent, **kwargs)
+        
+        self.columnconfigure(2, weight=1)
+        
+        spacing_frame = ttk.Frame(self)
+        spacing_frame.grid(row=0, column=0, sticky='nesw', ipady=2)
+        
+        self.lsep_frame = ttk.Frame(self, width=20)
+        self.lsep_frame.grid(row=1, column=0, sticky='ew', ipadx=6)
+        self.lsep_frame.columnconfigure(0, weight=1)
+        
+        self.lsep = ttk.Separator(self.lsep_frame)
+        self.lsep.grid(row=1, column=0, sticky='ew')
+        
+        self.label = ttk.Label(self, text=text)
+        self.label.grid(row=1, column=1, padx=3)
+
+        self.rsep = ttk.Separator(self)
+        self.rsep.grid(row=1, column=2, sticky='ew', padx=1)
