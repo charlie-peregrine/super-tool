@@ -37,33 +37,7 @@ class ScriptListener(threading.Thread):
                 if message.type == 'scriptalreadyrunning':
                     messagebox.showinfo(message=message.text)
                 if message.type == 'check4update':
-                    try:
-                        new_url = urlopen(consts.GITHUB_REPO, timeout=3).url
-                        if len(new_url) > 40 and "github" in new_url:
-                            ver = new_url.split('/')[-1]
-                            m = re.match(r'^v(\d+)\.(\d+)\.(\d+)$', ver)
-                            if m: # request worked
-                                remote_ver = (int(m.group(i)) for i in [1,2,3])
-                                for remote, local in zip(remote_ver, consts.VERSION):
-                                    if remote > local:
-                                        # need update
-                                        print(f"Update to version {m.group(0)}")
-                                        break
-                                    if local > remote:
-                                        # ahead?
-                                        print(f"Ahead of version {m.group(0)}")
-                                        break
-                                else:
-                                    # same version number
-                                    print(f"Versions are the same.")
-                                    
-                            else: # request failed, printout update checker failed
-                                pass
-                        else: # request failed, printout update checker failed
-                            pass
-                    
-                    except URLError:
-                        pass
+                    self.check_for_update
                 
                 else:
                     raise TypeError("SuperToolMessage " + message
@@ -81,3 +55,33 @@ class ScriptListener(threading.Thread):
             
             print(f">>> ScriptListener Done Processing:\n>>> {message}")
             ScriptQueue.task_done()
+    
+    def check_for_update(self):
+        try:
+            new_url = urlopen(consts.GITHUB_REPO, timeout=3).url
+            if len(new_url) > 40 and "github" in new_url:
+                ver = new_url.split('/')[-1]
+                m = re.match(r'^v(\d+)\.(\d+)\.(\d+)$', ver)
+                if m: # request worked
+                    remote_ver = (int(m.group(i)) for i in [1,2,3])
+                    for remote, local in zip(remote_ver, consts.VERSION):
+                        if remote > local:
+                            # need update
+                            print(f"Update to version {m.group(0)}")
+                            break
+                        if local > remote:
+                            # ahead?
+                            print(f"Ahead of version {m.group(0)}")
+                            break
+                    else:
+                        # same version number
+                        print("Versions are the same.")
+                        
+                else: # request failed, printout update checker failed
+                    pass
+            else: # request failed, printout update checker failed
+                pass
+        
+        except (URLError, TimeoutError):
+            pass
+    
