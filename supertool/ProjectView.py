@@ -314,7 +314,9 @@ class ProjectView(ttk.Frame):
         test = self.get_clicked_test_or_unit()
         new_name = simpledialog.askstring(title="Rename Test",
             prompt="Enter a new name for the following test\n" + test.name)
-        if new_name in test.parent.tests:
+        if not new_name:
+            print("oopsie no new test name!")
+        elif new_name in test.parent.tests:
             print(f"test {new_name} already exists. renaming test {test.name} failed")
         else:
             test.parent.rename_test(test.name, new_name)
@@ -554,7 +556,9 @@ class ProjectView(ttk.Frame):
         unit = self.get_clicked_test_or_unit()
         new_name = simpledialog.askstring(title="Rename Unit",
             prompt="Enter a new name for the following unit\n" + unit.name)
-        if new_name in self.proj.units:
+        if not new_name:
+            print("no text entered for new unit name! oopsie!")
+        elif new_name in self.proj.units:
             print(f"unit {new_name} already exists. renaming unit {unit.name} failed")
         else:
             self.proj.rename_unit(unit.name, new_name)
