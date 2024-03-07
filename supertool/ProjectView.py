@@ -50,6 +50,31 @@ class ProjectView(ttk.Frame):
         self.proj_header_hover = Hovertip(self.proj_header,
                 text="Working directory: " + self.proj.working_dir, hover_delay=consts.HOVER_DELAY)
 
+        # make a right click menu for the unit labels
+        self.unit_context_menu = tk.Menu(self)
+        # add commands to the context menu
+        self.unit_context_menu.add_command(label="delete unit",
+                        command=self.delete_unit)
+        self.unit_context_menu.add_command(label="rename unit",
+                        command=self.rename_unit)
+        self.unit_context_menu.add_command(label="change unit sub-dir",
+                            command=self.set_unit_sub_dir)
+        self.unit_context_menu.add_command(label="new unit",
+                        command=self.add_unit)
+        self.unit_context_menu.add_command(label="new test",
+                        command=self.add_test_from_unit)
+
+        # create context menu for tests
+        self.test_context_menu = tk.Menu(self)
+        self.test_context_menu.add_command(label="delete test",
+                            command=self.delete_test)
+        self.test_context_menu.add_command(label="rename test",
+                            command=self.rename_test)
+        self.test_context_menu.add_command(label="change test sub-dir",
+                            command=self.set_test_sub_dir)
+        self.test_context_menu.add_command(label="new test",
+                            command=self.add_test_from_test)
+
         # add scrollbar frame for the project section
         self.scroller = ScrollFrame(self)
         self.scroller.grid(row=1, column=0, sticky='nesw')
@@ -144,14 +169,11 @@ class ProjectView(ttk.Frame):
         
         unit.hovertext = Hovertip(unit_label, text="Sub Directory: " + unit.sub_dir, hover_delay=consts.HOVER_DELAY)
 
-        # make a right click menu for the unit labels
-        unit_label_menu = tk.Menu(unit_label)
-
         # internal helper function that sets the clicked_widget
         # and triggers the unit_label_menu to be posted
         def right_click_unit(e):
             self.clicked_widget = e.widget
-            unit_label_menu.post(e.x_root, e.y_root)
+            self.unit_context_menu.post(e.x_root, e.y_root)
 
         # right click calls right_click_unit, effectively
         # saving the right clicked widget and posting the unit
@@ -160,18 +182,6 @@ class ProjectView(ttk.Frame):
         # with arguments
         unit_label.bind("<3>", right_click_unit)
 
-        # add commands to the context menu
-        unit_label_menu.add_command(label="delete unit",
-                        command=self.delete_unit)
-        unit_label_menu.add_command(label="rename unit",
-                        command=self.rename_unit)
-        unit_label_menu.add_command(label="change unit sub-dir",
-                            command=self.set_unit_sub_dir)
-        unit_label_menu.add_command(label="new unit",
-                        command=self.add_unit)
-        unit_label_menu.add_command(label="new test",
-                        command=self.add_test_from_unit)
-        
         unit.no_tests_label = ttk.Label(unit_frame, text="No Tests")
         if not unit.tests:
             # if there aren't any tests then say so
@@ -201,12 +211,10 @@ class ProjectView(ttk.Frame):
         test_label = ttk.Label(test_frame, text=test.name)
         test_label.pack(padx=0, anchor='w')
 
-        # create context menu for tests
-        test_label_menu = tk.Menu(test_label)
         # right_click_test works the same as right_click_unit
         def right_click_test(e):
             self.clicked_widget = e.widget
-            test_label_menu.post(e.x_root, e.y_root)
+            self.test_context_menu.post(e.x_root, e.y_root)
 
         test.hovertext = Hovertip(test_label, text="Sub Directory: " + test.sub_dir, hover_delay=consts.HOVER_DELAY)
         
@@ -217,14 +225,6 @@ class ProjectView(ttk.Frame):
         # right clicking a test runs the right_click_test
         # method with the added commands in it
         test_label.bind("<3>", right_click_test)
-        test_label_menu.add_command(label="delete test",
-                            command=self.delete_test)
-        test_label_menu.add_command(label="rename test",
-                            command=self.rename_test)
-        test_label_menu.add_command(label="change test sub-dir",
-                            command=self.set_test_sub_dir)
-        test_label_menu.add_command(label="new test",
-                            command=self.add_test_from_test)
 
         # add the type label of the test to the test frame
         test_type_label = ttk.Label(test_frame, text=test.type)
