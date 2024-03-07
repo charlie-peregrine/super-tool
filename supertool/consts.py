@@ -31,7 +31,7 @@ SUPERTOOL_DIR = os.getcwd()
 HOVER_DELAY = 300
 
 # current version, v1.4.4 -> (1,4,4)
-VERSION = (1,4,3)
+VERSION = (1,4,4)
 GITHUB_REPO = "https://github.com/charlie-peregrine/super-tool/releases/latest"
 
 print("===== loading default_test_attributes.json =====")
