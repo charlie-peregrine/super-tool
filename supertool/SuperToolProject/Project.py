@@ -72,12 +72,14 @@ class Project:
         tree.write(tmp_name, short_empty_elements=False)
         if tmp_proj.read_from_file_name():
             os.replace(tmp_name, self.file_name)
+            print(f"--- Successfully saved '{self.title}' to")
+            print(self.file_name)
         else:
             print("--- Could not successfully save file")
     
     def read_from_file_name(self):
         # backwards compatibility for old format
-        with open(self.file_name, 'r') as file:
+        with open(self.file_name, 'r', encoding='utf-8') as file:
             line = file.readline()
             if line[0] == 'P' and line[1] in '\t ':
                 print(f"reading {self.file_name} as an old format .pec file")
@@ -191,7 +193,7 @@ class Project:
     # does not check if the file_name is valid
     def __write_to_file_name(self, *args):
         """Deprecated project save method. Use write_to_file_name instead."""
-        with open(self.file_name, mode='w') as file:
+        with open(self.file_name, mode='w', encoding='utf-8') as file:
             self.write(file)
             
     # DEPRECATED
@@ -212,7 +214,7 @@ class Project:
     # of the file
     def __read_from_file_name(self):
         """Deprecated project save method. Use read_from_file_name instead."""
-        with open(self.file_name, mode='r') as file:
+        with open(self.file_name, mode='r', encoding='utf-8') as file:
             lines = file.read().split('\n')[::-1]
 
         del self.units
