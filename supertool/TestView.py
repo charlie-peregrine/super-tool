@@ -129,9 +129,7 @@ class TestView(ttk.Frame):
             self.interactibles = []
             
             line = offset
-            for i, (group, attr_ls) in enumerate(attr_groups.items()):
-                print(i, group, len(attr_ls))
-                # lid
+            for group, attr_ls in attr_groups.items():
                 header = AttributeHeader(self.frame, attr_full_names[group])
                 header.grid(row=line, column=0, columnspan=4, sticky='nesw', pady=1)
                 line += 1
