@@ -180,17 +180,23 @@ class SuperToolGUI(tk.Tk):
         
         # save use pslf gui value
         print("===== Saving Modified Configuration Data =====")
-        try:
-            consts.config_data['HIDE_PSLF_GUI'] = self.hide_pslf_gui.get()
-            json.dump(consts.config_data, open('config.json', 'w'), indent=4)
+        if self.save_config_data():
             print("===== Modified Configuration Data Saved =====")
-        except FileNotFoundError:
-            print("ERROR: Failed to open config.json. Runtime settings not saved.")
         
         # close the pslf window while we're on the way out
         print("===== Closing PSLF =====")
         kill_pslf()
         print("===== PSLF Closed =====")
+
+    def save_config_data(self):
+        try:
+            consts.config_data['HIDE_PSLF_GUI'] = self.hide_pslf_gui.get()
+            json.dump(consts.config_data, 
+                    open('config.json', 'w', encoding='utf-8'), indent=4)
+            return True
+        except FileNotFoundError:
+            print("ERROR: Failed to open config.json. Runtime settings not saved.")
+            return False
 
     # wrapper for statusbar text setting
     # needs some work
@@ -546,6 +552,7 @@ class SuperToolGUI(tk.Tk):
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file
     def save_project(self, e=None):
+        self.save_config_data()
         if self.project.file_name:
             self.project.write_to_file_name()
         else:
