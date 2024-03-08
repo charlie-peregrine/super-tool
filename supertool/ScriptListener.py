@@ -6,6 +6,7 @@
 
 import threading
 import traceback
+from supertool.Version import Version
 from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 import queue
 
@@ -63,19 +64,13 @@ class ScriptListener(threading.Thread):
                 ver = new_url.split('/')[-1]
                 m = re.match(r'^v(\d+)\.(\d+)\.(\d+)$', ver)
                 if m: # request worked
-                    remote_ver = (int(m.group(i)) for i in [1,2,3])
-                    for remote, local in zip(remote_ver, consts.VERSION):
-                        if remote > local:
-                            # need update
-                            print(f"Update to version {m.group(0)}")
-                            break
-                        if local > remote:
-                            # ahead?
-                            print(f"Ahead of version {m.group(0)}")
-                            break
+                    remote_ver = Version(*(int(m.group(i)) for i in [1,2,3]))
+                    if remote_ver > consts.VERSION:
+                        print(f"Current Version: {consts.VERSION}, Update to version {remote_ver}")
+                    elif remote_ver < consts.VERSION:
+                        print(f"Current Version: {consts.VERSION}, Ahead of version {remote_ver}")
                     else:
-                        # same version number
-                        print("Versions are the same.")
+                        print(f"Up to date with version: {consts.VERSION}")
                         
                 else: # request failed, printout update checker failed
                     pass

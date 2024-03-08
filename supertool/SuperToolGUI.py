@@ -574,8 +574,7 @@ class SuperToolGUI(tk.Tk):
         title_label = ttk.Label(win, text="Super Tool GUI")
         title_label.grid(row=0, column=0)
         
-        version_label = ttk.Label(win, text="Version: v"
-                                  + ".".join((str(i) for i in consts.VERSION)))
+        version_label = ttk.Label(win, text=f"Version: {consts.VERSION}")
         version_label.grid(row=1, column=0)
         
         style = ttk.Style(win)

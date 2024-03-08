@@ -6,7 +6,9 @@
 import os
 import tkinter as tk
 import xml.etree.ElementTree as ET
+from supertool.Version import Version
 
+import supertool.consts as consts
 from supertool.SuperToolProject.Unit import Unit
 from supertool.SuperToolProject.Test import Test
 from supertool.SuperToolProject.Attribute import Attribute
@@ -26,7 +28,8 @@ class Project:
         tree = ET.ElementTree(
             ET.Element("project", 
                        {"title": self.title,
-                        "working_dir": self.working_dir}))
+                        "working_dir": self.working_dir,
+                        "version": str(consts.VERSION)}))
         root = tree.getroot()
         for unit_name, unit in self.units.items():
             unit_node = ET.Element("unit", {"name": unit_name,
@@ -106,6 +109,20 @@ class Project:
             if 'working_dir' in root.attrib:
                 self.working_dir = root.attrib['working_dir']
                 # print("working dir:", self.working_dir)
+            
+            # read the version that was last used to save this file
+            if 'version' in root.attrib:
+                file_ver = Version(root.attrib['version'])
+                if file_ver < consts.VERSION:
+                    print(f"--- This project was last saved with Super Tool {file_ver}.\n"
+                          f"--- Saving again with this version may mean that some features\n"
+                          f"--- will not be usable with with older versions of the tool.")
+                elif file_ver > consts.VERSION:
+                    print(f"--- This project was last saved with Super Tool {file_ver}.\n"
+                          f"--- Saving again with this version may strip some data from the\n"
+                          f"--- file, and certain features from the last save may not be\n"
+                          f"--- available in the currently running version. Update to the\n"
+                          f"--- latest version to avoid this issue.")
             
             for unit_node in root:
                 unit = Unit(self, unit_node.attrib['name'])
