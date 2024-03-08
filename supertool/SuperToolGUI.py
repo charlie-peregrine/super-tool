@@ -5,9 +5,11 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import simpledialog
 from tkinter import messagebox
+import tkinter.font
 import tkinter.filedialog  as fd
 import json
 import os
+import webbrowser
 import pathvalidate
 
 
@@ -576,8 +578,21 @@ class SuperToolGUI(tk.Tk):
                                   + ".".join((str(i) for i in consts.VERSION)))
         version_label.grid(row=1, column=0)
         
-        ok_buton = ttk.Button(win, text="OK", command=win.destroy)
-        ok_buton.grid(row=2, column=0)
+        style = ttk.Style(win)
+        label_font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
+        style.configure('hyperlink.TLabel', foreground='blue',
+            font=(label_font.cget('family'), label_font.cget('size'), 'underline'))
+        
+        link_label = ttk.Label(win, text="Project Website", cursor="hand2",
+                style='hyperlink.TLabel')
+        link_label.grid(row=2, column=0)
+        link_label.bind("<1>", 
+                lambda e: webbrowser.open_new_tab(
+                    consts.GITHUB_REPO.split('releases', maxsplit=1)[0]
+                    ))
+        
+        ok_button = ttk.Button(win, text="OK", command=win.destroy)
+        ok_button.grid(row=3, column=0)
 
         for widget in win.winfo_children():
             widget.grid_configure(padx=5, pady=3)
