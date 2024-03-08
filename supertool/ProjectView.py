@@ -157,7 +157,10 @@ class ProjectView(ttk.Frame):
         unit.sep.pack(fill='x')
         #   ^ using pack here since everything is in a single column
         
-        unit_frame = ttk.Frame(parent_frame, padding='10 0 0 4')
+        # frame_index = len(parent_frame.children)
+        # print(frame_index)
+        unit_frame = ttk.Frame(parent_frame, padding='10 0 0 4', 
+                name=f'!unitframe{hash(unit.name)}')
         unit_frame.pack(fill='x')
 
         # the unit_label shows the name of the unit
@@ -180,7 +183,8 @@ class ProjectView(ttk.Frame):
         # context menu. This is necessary because of a
         # lexing/scoping issue with context menus and commands
         # with arguments
-        unit_label.bind("<3>", right_click_unit)
+        for widget in (*unit_frame.children.values(), unit_frame):
+            widget.bind("<3>", right_click_unit)
 
         unit.no_tests_label = ttk.Label(unit_frame, text="No Tests")
         if not unit.tests:
@@ -202,7 +206,7 @@ class ProjectView(ttk.Frame):
 
     def build_test_frame(self, test, parent_frame):
         test_frame = ttk.Frame(parent_frame, padding="10 0 0 0",
-                borderwidth=2)
+                borderwidth=2, name=f'!testframe{hash(test.name)}')
         test_frame.pack(fill='x')
         
         # same warning as with units, be very careful when
@@ -218,17 +222,18 @@ class ProjectView(ttk.Frame):
 
         test.hovertext = Hovertip(test_label, text="Sub Directory: " + test.sub_dir, hover_delay=consts.HOVER_DELAY)
         
-        # left clicking on a test focuses the test, showing its
-        # details and attributes in the testview frame
-        test_label.bind("<1>", self.focus_test)
-
-        # right clicking a test runs the right_click_test
-        # method with the added commands in it
-        test_label.bind("<3>", right_click_test)
-
         # add the type label of the test to the test frame
         test_type_label = ttk.Label(test_frame, text=test.type)
         test_type_label.pack(padx=10, anchor='w')
+        
+        for widget in (*test_frame.children.values(), test_frame):
+            # left clicking on a test focuses the test, showing its
+            # details and attributes in the testview frame
+            widget.bind("<1>", self.focus_test)
+
+            # right clicking a test runs the right_click_test
+            # method with the added commands in it
+            widget.bind("<3>", right_click_test)
         
         return test_frame
 
@@ -241,44 +246,40 @@ class ProjectView(ttk.Frame):
 
         # print("\n======================================")
         # print("clicked widget:", widg)
-        # print("masters' children:", widg.master.children)
+        # print("masters' children:", len(widg.master.children))
+        # for L, c in widg.master.children.items():
+        #     print(f"{L:<15}{c}")
         # print("=======================================")
 
         # search up the widget hierarchy for the canvas widget holding the
         # selected widget, storing each preceding widget in widg_parents
         # widg.widgetName
         current_widg = widg
-        widg_parents = []
-        while current_widg.master.widgetName != 'canvas': # type: ignore
-            widg_parents.append(current_widg)
+        parents = str(widg).split('.')[-1:3:-1]
+        found_test_name = ''
+        found_unit_name = ''
+        for widg_str in parents:
+            if widg_str.startswith("!testframe"):
+                found_test_name = current_widg.children['!label'].cget('text')
+            if widg_str.startswith("!unitframe"):
+                found_unit_name = current_widg.children['!label'].cget('text')
+                break
             current_widg = current_widg.master
-            # print(current_widg, current_widg.widgetName, end='\n\n') # type: ignore
-
-
-        # print("==============")
-        # print(len(widg_parents), widg_parents)
-        # depending on the depth, the widget either holds a unit or a test
-        if len(widg_parents) == 2: # unit
-            unit_label = widg_parents[0]
-            unit_frame = widg_parents[1]
-            # print(f"unit {unit_label.cget('text')}")
-            # print(self.parent.project[unit_label.cget('text')])
-
-            # return the unit object
-            return self.parent.project[unit_label.cget('text')]
-        elif len(widg_parents) == 3: # test
-            test_label = widg_parents[0]
-            test_frame = widg_parents[1]
-            unit_frame = widg_parents[2]
-            unit_label = unit_frame.children['!label']
-            # print(f"test {test_label.cget('text')} in unit {unit_label.cget('text')}")
-            # print(self.parent.project[unit_label.cget('text')][test_label.cget('text')])
-
-            # return the test object. note the double access
-            return self.parent.project[unit_label.cget('text')][test_label.cget('text')]
         else:
-            # in case of a different depth, throw an error. This should not happen
+            print("no suitable parent frame found")
+            return
+        
+        # print(f"Unit: '{found_unit_name}', Test: '{found_test_name}'")
+
+        if found_unit_name:
+            if found_test_name:
+                return self.parent.project[found_unit_name][found_test_name]
+            else:
+                return self.parent.project[found_unit_name]
+        else:
+            # in case of a weird nesting, throw an error. This should not happen
             # in normal use
+            print("no found unit name in ProjectView.get_clicked_test_or_unit()")
             raise RuntimeError("nesting depth issue in ProjectView.get_current_test_or_unit")
 
     def update_test_type(self, test):
