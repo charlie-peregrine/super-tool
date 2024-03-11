@@ -552,7 +552,7 @@ class TestView(ttk.Frame):
                     if a.type == "PATH" and not a.read_only_file and not a.var.get():
                         path = os.path.basename(attr.var.get())
                         root, ext = os.path.splitext(path)
-                        a.var.set(root + "." + a.extension)
+                        a.var.set(root + "_sim." + a.extension)
             
             if attr.name == self.parent.focused_test.plot_sim_file:
                 self.parent.param_frame.render_sim_frame()
