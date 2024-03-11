@@ -12,7 +12,7 @@ try:
     config_data = json.load(open('config.json', 'r', encoding='utf-8'))
 except FileNotFoundError:
     showwarning(title="Un-configured Installation",
-        message="No Configuration file created yet. Please run config.py first.")
+        message="No Configuration file created yet. Please run setup.py first.")
     exit()
 
 VEUSZ_PATH = config_data['VEUSZ_PATH']
