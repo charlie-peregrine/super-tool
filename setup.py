@@ -1,5 +1,20 @@
 # config.py
 
+print("===== Printing Python Info =====")
+import sys
+import os.path
+import inspect
+
+filename = inspect.getframeinfo(inspect.currentframe()).filename # type: ignore
+path = os.path.dirname(os.path.abspath(filename))
+print("Python Version:", sys.version)
+print("Executable:    ", sys.executable)
+print("Working dir:   ", path)
+print("Running File:  ", filename)
+print("Arguments:     ", " ".join(sys.argv))
+print("Command:       ", f'"{sys.executable}" "{filename}"{" " + " ".join(sys.argv[1:])}')
+
+
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.filedialog import askdirectory
@@ -295,4 +310,4 @@ try:
     print("Setup Script Complete! Exiting...")
 except Exception as e:
     print(traceback.print_exc())
-    input("\n\nERROR FOUND! Record it somehow and then Press Enter to close")
+    input("\n\nERROR: Record it somehow and then Press Enter to close")

@@ -3,9 +3,19 @@
 
 import json
 import os
+import inspect
 from tkinter.messagebox import showwarning
 from supertool.Version import Version
 
+# save the directory that the source code is run from
+filename = inspect.getframeinfo(inspect.currentframe()).filename # type: ignore
+SUPERTOOL_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(filename)), '..'))
+
+os.chdir(SUPERTOOL_DIR)
+
+print("===== File Constants =====")
+print("SuperTool Folder:", SUPERTOOL_DIR)
+print("Config file     :", os.path.join(SUPERTOOL_DIR, 'config.json'))
 
 print("===== loading config.json =====")
 try:
@@ -24,9 +34,6 @@ MY_ENV = os.environ.copy()
 MY_ENV["PATH"] += VEUSZ_PATH + ';'
 
 print("===== config.json loaded =====")
-
-# save the directory that the source code is run from
-SUPERTOOL_DIR = os.getcwd()
 
 # application wide hover delay
 HOVER_DELAY = 300
