@@ -14,6 +14,7 @@ print("Running File:  ", filename)
 print("Arguments:     ", " ".join(sys.argv))
 print("Command:       ", f'"{sys.executable}" "{filename}"{" " + " ".join(sys.argv[1:])}')
 
+os.chdir(path)
 
 import tkinter as tk
 import tkinter.ttk as ttk
