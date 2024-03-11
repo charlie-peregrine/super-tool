@@ -1094,5 +1094,218 @@
             "full_name": "User Variable 5",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         }
+    },
+    "syncmod": {
+        "dyd_filename": {
+            "type": "PATH",
+            "group": "INFILE",
+            "default": "",
+            "read_only": true,
+            "extension": "dyd",
+            "full_name": "Dyn Data File - dyd",
+            "description": "This is the dynamics data file used as input to the simulation. This contains the model names, parameters, bus numbers & voltages, etc. "
+        },
+        "sav_filename": {
+            "type": "PATH",
+            "group": "INFILE",
+            "default": "",
+            "read_only": true,
+            "extension": "sav",
+            "full_name": "Save Case File - sav",
+            "description": "This is the save case file used as input to the simulation. This contains the arrangement of the buses, machines, lines, etc., along with initialized values."
+        },
+        "chf_filename": {
+            "type": "PATH",
+            "group": "OUTFILE",
+            "default": "",
+            "read_only": false,
+            "extension": "chf",
+            "full_name": "Channel File - chf",
+            "description": "This is GE proprietary output file of the simulation run, which contains all the outputs of the models' output channels during the length of the simulation."
+        },
+        "csv_filename": {
+            "type": "PATH",
+            "group": "OUTFILE",
+            "default": "",
+            "read_only": false,
+            "extension": "csv",
+            "full_name": "Sim Data File - csv",
+            "description": "This is output file containing the simulation data, as converted to the csv format."
+        },
+        "syncmod_filename": {
+            "type": "PATH",
+            "group": "OUTFILE",
+            "default": "syncmod.p",
+            "read_only": false,
+            "extension": "p",
+            "full_name": "Sync Mod Script File - p",
+            "description": ""
+        },
+        "rep_filename": {
+            "type": "PATH",
+            "group": "OUTFILE",
+            "default": "",
+            "read_only": false,
+            "extension": "rep",
+            "full_name": "Report File - rep",
+            "description": "This is the report file generated with the simulation. Should there be any simulation issues, unsteady initial conditions, model instability issues, it would show here."
+        },
+        "mes_filename": {
+            "type": "PATH",
+            "group": "INFILE",
+            "default": "",
+            "read_only": true,
+            "extension": "csv",
+            "full_name": "Meas Data File - csv",
+            "description": "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "
+        },
+        "GenModelName": {
+            "type": "STR",
+            "group": "PLAIN",
+            "default": "genqec",
+            "full_name": "",
+            "description": ""
+        },
+        "SyncTimeInSecs": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "sec",
+            "full_name": "",
+            "description": ""
+        },
+        "TotTimeInSec": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "sec",
+            "full_name": "",
+            "description": ""
+        },
+        "PreSyncHz": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "Hz",
+            "full_name": "",
+            "description": ""
+        },
+        "PostSyncHz": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "Hz",
+            "full_name": "",
+            "description": ""
+        },
+        "BaseHz": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "Hz",
+            "full_name": "",
+            "description": ""
+        },
+        "SyncAngleDegs": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "degree",
+            "full_name": "",
+            "description": ""
+        },
+        "PSS_On": {
+            "type": "BOOL",
+            "group": "PLAIN",
+            "default": false,
+            "full_name": "",
+            "description": ""
+        },
+        "AVR_On": {
+            "type": "BOOL",
+            "group": "PLAIN",
+            "default": true,
+            "full_name": "",
+            "description": ""
+        },
+        "ChangePref": {
+            "type": "BOOL",
+            "group": "PLAIN",
+            "default": true,
+            "full_name": "",
+            "description": ""
+        },
+        "OnlinePref": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "",
+            "full_name": "",
+            "description": ""
+        },
+        "PrefDelay": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "",
+            "full_name": "",
+            "description": ""
+        },
+        "ChangeVref": {
+            "type": "BOOL",
+            "group": "PLAIN",
+            "default": true,
+            "full_name": "",
+            "description": ""
+        },
+        "OnlineVref": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 0,
+            "unit": "",
+            "full_name": "",
+            "description": ""
+        },
+        "GenVinit": {
+            "type": "NUM",
+            "group": "LOADFLOW",
+            "default": 0,
+            "unit": "kV",
+            "full_name": "",
+            "description": ""
+        },
+        "GenVbase": {
+            "type": "NUM",
+            "group": "LOADFLOW",
+            "default": 0,
+            "unit": "",
+            "full_name": "",
+            "description": ""
+        },
+        "Zbranch": {
+            "type": "NUM",
+            "group": "LOADFLOW",
+            "default": 0.05,
+            "unit": "pu",
+            "full_name": "System Impedance",
+            "description": "The impedance of the system, as seen by the unit, on a 100MVA base. Can use per unitized measured X=dV/dQ to approximate impedance."
+        },
+        "SmibVinit": {
+            "type": "NUM",
+            "group": "LOADFLOW",
+            "default": 0,
+            "unit": "kV",
+            "full_name": "",
+            "description": ""
+        },
+        "SmibVbase": {
+            "type": "NUM",
+            "group": "LOADFLOW",
+            "default": 0,
+            "unit": "",
+            "full_name": "",
+            "description": ""
+        }
+
     }
 }

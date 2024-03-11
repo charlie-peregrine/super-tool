@@ -439,7 +439,9 @@ class ProjectView(ttk.Frame):
         # add test type interactible combobox (aka dropdown menu)
         type_var = tk.StringVar(test_prompt_window.frame)
         type_dropdown = ttk.Combobox(test_prompt_window.frame, textvariable=type_var)
-        test_types = ("Voltage Reference", "Load Reference", "Current Interruption", "Speed Reference", "Steady State")
+        test_types = ("Voltage Reference", "Load Reference",
+                      "Current Interruption", "Speed Reference",
+                      "Steady State", "Synchronization")
         type_dropdown['values'] = test_types
         # state = readonly makes it so the user cannot add test types
         type_dropdown.state(['readonly'])

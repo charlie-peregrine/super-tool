@@ -22,43 +22,43 @@ def run(test, no_gui=False):
     #--------------------------------------------------------------------------------------------------
 
     # input files
-    DydFileName      =    "U2_SYNC.dyd"
-    SavFileName      =    "U2_SYNC.sav"
+    dyd_filename      = test.attrs["dyd_filename"].get()      # "U2_SYNC.dyd"
+    sav_filename      = test.attrs["sav_filename"].get()      # "U2_SYNC.sav"
 
     # output files
-    ChfFileName      =    "U2_SYNC_sim.chf"
-    CsvFilename      =    "U2_SYNC_sim.csv"
-    SyncmodFilename  =   "syncmod.p"     # This parameter should have this default filename
-    RepFileName      =    "rep.rep"
+    chf_filename      = test.attrs["chf_filename"].get()      # "U2_SYNC_sim.chf"
+    csv_filename      = test.attrs["csv_filename"].get()      # "U2_SYNC_sim.csv"
+    syncmod_filename  = test.attrs["syncmod_filename"].get()  # "syncmod.p"     # This parameter should have this default filename
+    rep_filename      = test.attrs["rep_filename"].get()      # "rep.rep"
 
-    GenModelName     =    "genqec"
+    GenModelName     = test.attrs["GenModelName"].get()     # "genqec"
 
-    SyncTimeInSecs   =    0.983
-    TotTimeInSec     =    5.00
-    PreSyncHz        =    59.992
-    PostSyncHz       =    59.979
-    BaseHz           =    60.0
-    SyncAngleDegs    =    -2.5
-    PSS_On           =    False
-    AVR_On           =    True        # T/F
-    ChangePref       =    True        # T/F
-    OnlinePref       =    1.002       # if changePref, then this is used
-    PrefDelay        =    0.000       # if changePref, then this is used
-    ChangeVref       =    True        # T/F
-    OnlineVref       =    1.0255      # if changeVref, then this is use
+    SyncTimeInSecs   = test.attrs["SyncTimeInSecs"].get()   # 0.983
+    TotTimeInSec     = test.attrs["TotTimeInSec"].get()     # 5.00
+    PreSyncHz        = test.attrs["PreSyncHz"].get()        # 59.992
+    PostSyncHz       = test.attrs["PostSyncHz"].get()       # 59.979
+    BaseHz           = test.attrs["BaseHz"].get()           # 60.0
+    SyncAngleDegs    = test.attrs["SyncAngleDegs"].get()    # -2.5
+    PSS_On           = test.attrs["PSS_On"].get()           # False
+    AVR_On           = test.attrs["AVR_On"].get()           # True        # T/F
+    ChangePref       = test.attrs["ChangePref"].get()       # True        # T/F
+    OnlinePref       = test.attrs["OnlinePref"].get()       # 1.002       # if changePref, then this is used
+    PrefDelay        = test.attrs["PrefDelay"].get()        # 0.000       # if changePref, then this is used
+    ChangeVref       = test.attrs["ChangeVref"].get()       # True        # T/F
+    OnlineVref       = test.attrs["OnlineVref"].get()       # 1.0255      # if changeVref, then this is use
 
     #----------------------------------
     # loadflow Parameters
     #----------------------------------
 
     # GenBus (aka presync voltage)
-    GenVinit         = 12.763   # kV  # changes genbus voltage
-    GenVbase         = 12.47
-    BranchZ          = 0.2      # pu
+    GenVinit         = test.attrs["GenVinit"].get()         # 12.763   # kV  # changes genbus voltage
+    GenVbase         = test.attrs["GenVbase"].get()         # 12.47
+    BranchZ          = test.attrs["BranchZ"].get()          # 0.2      # pu
 
     # SMIB (aka postsync voltage)
-    SmibVinit        = 12.7705  # kV  # changes system bus voltage
-    SmibVbase        = 12.47
+    SmibVinit        = test.attrs["SmibVinit"].get()        # 12.7705  # kV  # changes system bus voltage
+    SmibVbase        = test.attrs["SmibVbase"].get()        # 12.47
 
 
     #--------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ def run(test, no_gui=False):
 
 
     ## reads the source syncmod.p file and copies it to an output file, with certain strings text replaced.
-    with open(SyncmodFilename, 'w') as out:
+    with open(syncmod_filename, 'w') as out:
         with open(Syncmod_src, 'r') as f:
             count=0
             lines = f.readlines()
@@ -84,7 +84,7 @@ def run(test, no_gui=False):
 
 
 
-    SuperTool.launch_Pslf(project_directory)
+    SuperTool.launch_Pslf(project_directory, silent=no_gui)
     SuperTool.pwd()
 
     ##------------------------------------------------##
@@ -123,7 +123,7 @@ def run(test, no_gui=False):
     ##-------------------##
     ## Load the SAV Case ##
     ##-------------------##
-    SuperTool.getf(SavFileName)
+    SuperTool.getf(sav_filename)
 
 
     # Set the syncronization angle requested by the user # 
@@ -152,8 +152,8 @@ def run(test, no_gui=False):
     ##-----------------------------------------##
 
     SuperTool.psds()       
-    SuperTool.rdyd(DydFileName, RepFileName,1,0,1)
-    SuperTool.init(ChfFileName, RepFileName,0,1,"","", 1)
+    SuperTool.rdyd(dyd_filename, rep_filename,1,0,1)
+    SuperTool.init(chf_filename, rep_filename,0,1,"","", 1)
 
     ##------------------------------------------------------##
     ## Turn off the PSS if it isn't used in this simulation ##
@@ -222,7 +222,7 @@ def run(test, no_gui=False):
         dp.Tpause = TotTimeInSec
         i = Pslf.run_dyn()
         i = Pslf.end_dyn_run()
-        i = SuperTool.chf_to_csv(CsvFilename)
+        i = SuperTool.chf_to_csv(csv_filename)
 
     else:
         SuperTool.print_to_pslf("--- Closing the Breaker")
@@ -242,7 +242,7 @@ def run(test, no_gui=False):
         dp.Tpause = TotTimeInSec
         i = Pslf.run_dyn()
         i = Pslf.end_dyn_run()
-        i = SuperTool.chf_to_csv(CsvFilename)
+        i = SuperTool.chf_to_csv(csv_filename)
 
     ##----------------------------------------------##
     ## Remind the user what settings were just used ##
@@ -263,10 +263,10 @@ def run(test, no_gui=False):
     SuperTool.print_to_pslf( "   Pre-Sync Speed       " , PreSyncHz)
     SuperTool.print_to_pslf( "   Post-Sync Speed      " , PostSyncHz)
     SuperTool.print_to_pslf( "   Initial Speed        " , InitialSpeed)
-    SuperTool.print_to_pslf( "   Dyd File Name:       " , DydFileName)
-    SuperTool.print_to_pslf( "   Chf File Name:       " , ChfFileName)
-    SuperTool.print_to_pslf( "   Csv File Name:       " , CsvFilename)
-    SuperTool.print_to_pslf( "   Syncmod File Name:   " , SyncmodFilename)
+    SuperTool.print_to_pslf( "   Dyd File Name:       " , dyd_filename)
+    SuperTool.print_to_pslf( "   Chf File Name:       " , chf_filename)
+    SuperTool.print_to_pslf( "   Csv File Name:       " , csv_filename)
+    SuperTool.print_to_pslf( "   Syncmod File Name:   " , syncmod_filename)
 
     if ChangeVref == 1:
         SuperTool.print_to_pslf( "* After sync, changed Vref to " , OnlineVref)
