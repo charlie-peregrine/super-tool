@@ -89,11 +89,13 @@ class SuperTool:
 
     @staticmethod
     def pwd():
-        # print working directory and project directory
-        project_directory = os.path.dirname(os.path.realpath(__file__))
-        SuperTool.print_to_pslf("\nProject directory: ",project_directory)
-        print("project directory: ",project_directory)
-        os.chdir(project_directory)
+        # # print working directory and project directory
+        # project_directory = os.path.dirname(os.path.realpath(__file__))
+        # SuperTool.print_to_pslf("\nProject directory: ",project_directory)
+        # print("project directory: ",project_directory)
+        # os.chdir(project_directory)
+        
+        # print working directory
         print("working directory: ", os.getcwd())
         return
     

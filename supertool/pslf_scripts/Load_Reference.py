@@ -89,9 +89,8 @@ def run(test, no_gui=False):
     #--------------------------------------------------------------------------------------------------
 
 
-    # gets the project directory of this file
-    project_directory = os.path.dirname(os.path.realpath(__file__))
-    os.chdir(project_directory)
+    # gets the project directory of this test and initialize the PSLF instance
+    project_directory = test.get_dir().replace("/", "\\") # os.path.dirname(os.path.realpath(__file__))
     SuperTool.launch_Pslf(project_directory, silent=no_gui)
     SuperTool.pwd()
 

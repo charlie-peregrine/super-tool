@@ -95,9 +95,8 @@ def run(test, no_gui=False):
     StepSizeInPu[0]    = 0
 
 
-    # gets the project directory of this file
-    project_directory = os.path.dirname(os.path.realpath(__file__))
-
+    # gets the project directory of this test
+    project_directory = test.get_dir().replace("/", "\\") # os.path.dirname(os.path.realpath(__file__))
     SuperTool.launch_Pslf(project_directory, silent=no_gui)
     SuperTool.pwd()
 
