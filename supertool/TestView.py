@@ -370,14 +370,14 @@ class TestView(ttk.Frame):
                         if not hide and not last_hide:
                             print("not last hide and not hide")
                             # double check the window is still open, 
-                            def winEnumHandler(hwnd, window_open):
+                            def win_enum_handler(hwnd, window_open):
                                 name = win32gui.GetWindowText(hwnd)
                                 if win32gui.IsWindowVisible(hwnd) and 'pslf' in name.lower():
                                     print("PSLFWindow:", hex(hwnd), name)
-                                    window_open.append("name")
+                                    window_open.append(name)
                                 return True
                             open_windows = []
-                            win32gui.EnumWindows(winEnumHandler, open_windows)
+                            win32gui.EnumWindows(win_enum_handler, open_windows)
                             print("window open:", open_windows)
                             if open_windows == "":
                                 # if window is closed but process still running, 
