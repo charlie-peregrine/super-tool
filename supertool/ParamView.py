@@ -114,7 +114,7 @@ class ParamView(ttk.Frame):
             header_list = [s for s in header_list if s]
             header_text = '\n'.join(header_list)
             max_width = max([len(s) for s in header_list] + [20])
-            max_width = int(max_width * .75)
+            max_width = int(max_width * .83)
         
         
         for i, (key, regex, longname) in enumerate(self.foc.header_info):
