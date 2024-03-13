@@ -4,8 +4,8 @@
 SetCompatLevel(0)
 
 # AddImportPath('C:\\Users\\charlie\\Downloads\\synchronization')
-ImportFileCSV('{s_filename}', encoding='utf-8-sig', linked=True, textdelimiter="'")
-ImportFileCSV('{m_filename}', encoding='utf-8-sig', linked=True, textdelimiter="'")
+ImportFileCSV('{s_filename}', dsprefix="SIM ", encoding='utf-8-sig', linked=True, textdelimiter="'")
+ImportFileCSV('{m_filename}', dsprefix="MES ", encoding='utf-8-sig', linked=True, textdelimiter="'")
 Set('colorTheme', 'default-latest')
 Set('StyleSheet/axis-function/autoRange', 'next-tick')
 
