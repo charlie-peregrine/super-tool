@@ -253,6 +253,17 @@ class TestView(ttk.Frame):
             self.trace_data.append((attr.var, button_cb))
             self.trace_data.append((attr.var, hover_cb))
             
+            if attr.name == self.parent.focused_test.plot_sim_file:
+                sim_cb = attr.var.trace_add('write',
+                    lambda _1=None, _2=None, _3=None: self.parent.param_frame.render_sim_frame()
+                                   )
+                self.trace_data.append((attr.var, sim_cb))
+            if attr.name == self.parent.focused_test.plot_mes_file:
+                sim_cb = attr.var.trace_add('write',
+                    lambda _1=None, _2=None, _3=None: self.parent.param_frame.render_mes_frame()
+                                   )
+                self.trace_data.append((attr.var, sim_cb))
+            
             # place a select button to get a new path
             open_path_button = ttk.Button(frame, text="open",
                     command=lambda attr=attr: self.open_path(attr))
@@ -398,6 +409,7 @@ class TestView(ttk.Frame):
                     traceback.print_exception(err)
                     print("\n===== General Exception while running Supertool Script - end =====")
                 
+                self.parent.param_frame.render_sim_frame()
                 self.parent.last_hide_pslf_gui_val = hide
                 self.run_sim_active = False
                 self.unlock_run_button()
@@ -545,12 +557,6 @@ class TestView(ttk.Frame):
             print(attr.parent.get_dir() + " + " + rel_path)
             attr.var.set(rel_path)
             
-            def check_and_render(attribute):
-                if attribute.name == self.parent.focused_test.plot_sim_file:
-                    self.parent.param_frame.render_sim_frame()
-                if attribute.name == self.parent.focused_test.plot_mes_file:
-                    self.parent.param_frame.render_mes_frame()
-            
             # autofill pslf output file names if they're not already filled in
             if attr.name == "sav_filename":
                 attrs = attr.parent.attrs
@@ -559,9 +565,6 @@ class TestView(ttk.Frame):
                         path = os.path.basename(attr.var.get())
                         root, ext = os.path.splitext(path)
                         a.var.set(root + "_sim." + a.extension)
-                        check_and_render(a)
-            
-            check_and_render(attr)
 
 def kill_pslf():
     for i in range(10):
