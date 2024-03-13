@@ -20,9 +20,12 @@ class ScriptListener(threading.Thread):
     def __init__(self, root):
         super().__init__()
         self.root = root
+        self.daemon = True
+        self.running = False
     
     def run(self):
-        while self.root.running:
+        self.running = True
+        while self.running:
             # try to grab something from the queue, if there's nothing reset
             # the loop
             try:
@@ -35,11 +38,15 @@ class ScriptListener(threading.Thread):
                 if message.type == 'ynprompt':
                     message.return_val = messagebox.askyesno(message=message.text)
                     message.done()
-                if message.type == 'scriptalreadyrunning':
+                elif message.type == 'scriptalreadyrunning':
                     messagebox.showinfo(message=message.text)
-                if message.type == 'check4update':
+                elif message.type == 'check4update':
                     self.check_for_update()
-                
+                elif message.type == 'stopscriptlistener':
+                    print("stopscriptlistener")
+                    message.done()
+                    self.running = False
+                    
                 else:
                     raise TypeError("SuperToolMessage " + message
                                     + " does not have a valid type")
@@ -56,6 +63,8 @@ class ScriptListener(threading.Thread):
             
             print(f">>> ScriptListener Done Processing:\n>>> {message}")
             ScriptQueue.task_done()
+        
+        print(">>> ScriptListener Closing...\n")
     
     def check_for_update(self):
         try:
