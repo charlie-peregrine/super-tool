@@ -106,10 +106,10 @@ class SuperTool:
         os.chdir(project_directory) # changes the python working directory to the project directory
         # Initializes the PSLF instance
         try:
-            init_pslf(use_existing=True, working_directory=project_directory, silent = silent) 
+            init_pslf(use_existing=True, path="Pslf.exe", working_directory=project_directory, silent = silent) 
             print("GUI already launched")
         except:
-            init_pslf(use_existing=False, working_directory=project_directory, silent = silent) 
+            init_pslf(use_existing=False, path="Pslf.exe", working_directory=project_directory, silent = silent) 
             print("launching GUI")
         finally:
             pass
