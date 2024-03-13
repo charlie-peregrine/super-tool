@@ -545,6 +545,12 @@ class TestView(ttk.Frame):
             print(attr.parent.get_dir() + " + " + rel_path)
             attr.var.set(rel_path)
             
+            def check_and_render(attribute):
+                if attribute.name == self.parent.focused_test.plot_sim_file:
+                    self.parent.param_frame.render_sim_frame()
+                if attribute.name == self.parent.focused_test.plot_mes_file:
+                    self.parent.param_frame.render_mes_frame()
+            
             # autofill pslf output file names if they're not already filled in
             if attr.name == "sav_filename":
                 attrs = attr.parent.attrs
@@ -553,11 +559,9 @@ class TestView(ttk.Frame):
                         path = os.path.basename(attr.var.get())
                         root, ext = os.path.splitext(path)
                         a.var.set(root + "_sim." + a.extension)
+                        check_and_render(a)
             
-            if attr.name == self.parent.focused_test.plot_sim_file:
-                self.parent.param_frame.render_sim_frame()
-            if attr.name == self.parent.focused_test.plot_mes_file:
-                self.parent.param_frame.render_mes_frame()
+            check_and_render(attr)
 
 def kill_pslf():
     for i in range(10):
