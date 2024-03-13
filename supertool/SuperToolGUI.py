@@ -174,8 +174,13 @@ class SuperToolGUI(tk.Tk):
         # set running to false, indicating that the listener thread should stop
         self.running = False
         print("===== Waiting for ScriptListener to finish =====")
-        self.listener.join()
-        print("===== ScriptListener has finished  =====")
+        stop_message = SuperToolMessage("stopscriptlistener")
+        ScriptQueue.put(stop_message)
+        stop_message.wait()
+        # queue.join instead of listener because
+        # listener.join causes a program freeze
+        ScriptQueue.join()
+        print("===== ScriptListener has finished  =====", end='')
         
         # close the window
         self.destroy()

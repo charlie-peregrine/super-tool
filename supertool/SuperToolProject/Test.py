@@ -4,7 +4,7 @@
 import tkinter as tk
 
 from supertool.pslf_scripts import Voltage_Reference, Steady_State, Speed_Reference
-from supertool.pslf_scripts import Current_Interruption, Load_Reference
+from supertool.pslf_scripts import Current_Interruption, Load_Reference, Synchronization
 import supertool.veusz_handler as veusz_handler
 import supertool.consts as consts
 
@@ -232,6 +232,42 @@ class Test:
             
             # # set the speed reference plotter to use for the show graphs button
             self.plot = veusz_handler.plot_speed_reference
+        
+        elif self.type == "Synchronization":
+            print("sync mod in test_defaults:", self.name)
+
+            # print(consts.DEFAULT_TEST_ATTRIBUTES['speedref'])
+            for n, d in consts.DEFAULT_TEST_ATTRIBUTES['syncmod'].items():
+                # print(n, str(d)[:50])
+                self.attrs[n] = Attribute(self, n, d)
+            
+            # set the sync mod runner as the script for speed reference
+            self.script = lambda no_gui: Synchronization.run(self, no_gui=no_gui)
+
+            # default initialize header structures
+            # @TODO reset these on change?
+            keys = ['time', 'vt', 'pg', 'qg', 'efe', 'ife', 'freq']
+            for k in keys:
+                self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+                self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
+            
+            # set plot files to grab from
+            self.plot_sim_file = 'csv_filename'
+            self.plot_mes_file = 'mes_filename'
+            
+            # set header info for this test type
+            # format is (key, regular expression, long name)
+            self.header_info = [
+                ('time', r'.*time.*', "Time (x)"),
+                ('vt',   r'(?=.*vt)(?=.*1)(?=.*gen).*',     "Voltage (y)"),
+                ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
+                ('qg',   r'(?=.*qg)(?=.*1)(?=.*gen).*',     "Q (y)"),
+                ('efe',  r'(?=.*efd)(?=.*1)(?=.*gen).*',    "EFE (y)"),
+                ('ife',  r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*',    "IFE (y)"),
+                ('freq', r'(?=.*spd)(?=.*1)(?=.*gen).*',    "Frequency (y)")
+            ]
+            # # set the speed reference plotter to use for the show graphs button
+            self.plot = veusz_handler.plot_synchronization
             
         
     def add_attr(self, name, val):
