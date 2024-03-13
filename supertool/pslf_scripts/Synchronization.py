@@ -54,7 +54,7 @@ def run(test, no_gui=False):
     # GenBus (aka presync voltage)
     GenVinit         = test.attrs["GenVinit"].get()         # 12.763   # kV  # changes genbus voltage
     GenVbase         = test.attrs["GenVbase"].get()         # 12.47
-    BranchZ          = test.attrs["BranchZ"].get()          # 0.2      # pu
+    Zbranch          = test.attrs["Zbranch"].get()          # 0.2      # pu
 
     # SMIB (aka postsync voltage)
     SmibVinit        = test.attrs["SmibVinit"].get()        # 12.7705  # kV  # changes system bus voltage
@@ -143,7 +143,7 @@ def run(test, no_gui=False):
     Secdd[1].St = 1
 
     # Set the impedance of the branch that will be enabled when we sync #
-    Secdd[0].Zsecx = BranchZ
+    Secdd[0].Zsecx = Zbranch
 
     SuperTool.soln(0)
 

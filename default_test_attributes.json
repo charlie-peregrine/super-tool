@@ -1305,6 +1305,41 @@
             "unit": "",
             "full_name": "",
             "description": ""
+        },
+        "UserVar1": {
+            "type": "STR",
+            "group": "USER",
+            "default": "",
+            "full_name": "User Variable 1",
+            "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
+        },
+        "UserVar2": {
+            "type": "STR",
+            "group": "USER",
+            "default": "",
+            "full_name": "User Variable 2",
+            "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
+        },
+        "UserVar3": {
+            "type": "STR",
+            "group": "USER",
+            "default": "",
+            "full_name": "User Variable 3",
+            "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
+        },
+        "UserVar4": {
+            "type": "STR",
+            "group": "USER",
+            "default": "",
+            "full_name": "User Variable 4",
+            "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
+        },
+        "UserVar5": {
+            "type": "STR",
+            "group": "USER",
+            "default": "",
+            "full_name": "User Variable 5",
+            "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         }
 
     }

@@ -246,8 +246,7 @@ class Test:
 
             # default initialize header structures
             # @TODO reset these on change?
-            # valve -> valve position percent, freq -> perceived frequency percent
-            keys = ['time', 'pg', 'valve', 'freq']
+            keys = ['time', 'vt', 'pg', 'qg', 'efe', 'ife', 'freq']
             for k in keys:
                 self.sim_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
                 self.mes_headers[k] = [tk.StringVar(), tk.StringVar(value="*1")]
@@ -260,13 +259,15 @@ class Test:
             # format is (key, regular expression, long name)
             self.header_info = [
                 ('time', r'.*time.*', "Time (x)"),
+                ('vt',   r'(?=.*vt)(?=.*1)(?=.*gen).*',     "Voltage (y)"),
                 ('pg',   r'(?=.*pg)(?=.*1)(?=.*gen).*',     "P (y)"),
-                ('valve', r'(?=.*fsr)(?=.*1)(?=.*gov).*',    "Valve Pos % (y)"),
-                ('freq', r'(?=.*tnh)(?=.*1)(?=.*gov).*',    "Perceived Freq % (y)")
+                ('qg',   r'(?=.*qg)(?=.*1)(?=.*gen).*',     "Q (y)"),
+                ('efe',  r'(?=.*efd)(?=.*1)(?=.*gen).*',    "EFE (y)"),
+                ('ife',  r'(?=.*ifd?)(?=.*1)(?=.*(?:gen|es)).*',    "IFE (y)"),
+                ('freq', r'(?=.*spd)(?=.*1)(?=.*gen).*',    "Frequency (y)")
             ]
-            
             # # set the speed reference plotter to use for the show graphs button
-            self.plot = veusz_handler.plot_speed_reference
+            self.plot = veusz_handler.plot_synchronization
             
         
     def add_attr(self, name, val):
