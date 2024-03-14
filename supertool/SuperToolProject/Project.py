@@ -84,10 +84,10 @@ class Project:
         # backwards compatibility for old format
         with open(self.file_name, 'r', encoding='utf-8') as file:
             line = file.readline()
-            if line[0] == 'P' and line[1] in '\t ':
-                print(f"reading {self.file_name} as an old format .pec file")
-                self.__read_from_file_name()
-                return
+        if line[0] == 'P' and line[1] in '\t ':
+            print(f"reading {self.file_name} as an old format .pec file")
+            self.__read_from_file_name()
+            return True
         
         print(f"--- reading {self.file_name} as an xml format .pec file")
         try:
