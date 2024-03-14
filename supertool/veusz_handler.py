@@ -33,10 +33,10 @@ import re
 # mes_file_name = 'C:/Users/charlie/Downloads/SampleProject/SampleFolder/Voltage_Reference.csv'
 # sim_file_name = 'C:/Users/charlie/Downloads/SampleProject/SampleFolder/Voltage_Reference_sim.csv'
 
-def vsz_format(d, prefix='', exclude=[]):
+def vsz_format(d, prefix='', pref_exclude=[]):
     for k,v in d.items():
         if isinstance(v, tuple):
-            if k in exclude:
+            if k in pref_exclude:
                 pref = ''
             else:
                 pref = prefix
@@ -57,8 +57,8 @@ def plot_voltage_reference(*, sim_dict=None, mes_dict=None): #sim_file='', mes_f
     with open("veusz_files/Voltage_Reference.fvsz", 'r', encoding='utf-8') as file:
         fvsz_text = file.read()
     
-    vsz_format(sim_dict, prefix="SIM ", exclude=['file', 'xmin', 'xmax'])
-    vsz_format(mes_dict, prefix="MES ", exclude=['file', 'xmin', 'xmax'])
+    vsz_format(sim_dict, prefix="SIM ", pref_exclude=['file', 'xmin', 'xmax'])
+    vsz_format(mes_dict, prefix="MES ", pref_exclude=['file', 'xmin', 'xmax'])
 
     if sim_dict['ready'] and mes_dict['ready']:
         result_text = fvsz_text.format(s_filename=sim_dict['file'],
@@ -131,8 +131,8 @@ def plot_load_reference(*, sim_dict=None, mes_dict=None):
     with open("veusz_files/Load_Reference.fvsz", 'r', encoding='utf-8') as file:
         fvsz_text = file.read()
     
-    vsz_format(sim_dict, prefix="SIM ", exclude=['file', 'xmin', 'xmax'])
-    vsz_format(mes_dict, prefix="MES ", exclude=['file', 'xmin', 'xmax'])
+    vsz_format(sim_dict, prefix="SIM ", pref_exclude=['file', 'xmin', 'xmax'])
+    vsz_format(mes_dict, prefix="MES ", pref_exclude=['file', 'xmin', 'xmax'])
 
     if sim_dict['ready'] and mes_dict['ready']:
         result_text = fvsz_text.format(s_filename=sim_dict['file'],
@@ -197,8 +197,8 @@ def plot_speed_reference(*, sim_dict=None, mes_dict=None):
     with open("veusz_files/Speed_Reference.fvsz", 'r', encoding='utf-8') as file:
         fvsz_text = file.read()
     
-    vsz_format(sim_dict, prefix="SIM ", exclude=['file', 'xmin', 'xmax'])
-    vsz_format(mes_dict, prefix="MES ", exclude=['file', 'xmin', 'xmax'])
+    vsz_format(sim_dict, prefix="SIM ", pref_exclude=['file', 'xmin', 'xmax'])
+    vsz_format(mes_dict, prefix="MES ", pref_exclude=['file', 'xmin', 'xmax'])
 
     if sim_dict['ready'] and mes_dict['ready']:
         result_text = fvsz_text.format(s_filename=sim_dict['file'],
@@ -264,7 +264,7 @@ def plot_steady_state(sim_dict=None, mes_dict=None):
         print("no file to get steady state graphs from! uh oh")
         return
     
-    vsz_format(sim_dict, exclude=['file', 'xmin', 'xmax'])
+    vsz_format(sim_dict, pref_exclude=['file', 'xmin', 'xmax'])
     
     with open("veusz_files/Steady_State.fvsz", 'r', encoding='utf-8') as file:
         fvsz_text = file.read()
@@ -289,8 +289,8 @@ def plot_current_interruption(*, sim_dict=None, mes_dict=None):
     with open("veusz_files/Current_Interruption.fvsz", 'r', encoding='utf-8') as file:
         fvsz_text = file.read()
     
-    vsz_format(sim_dict, prefix="SIM ", exclude=['file', 'xmin', 'xmax'])
-    vsz_format(mes_dict, prefix="MES ", exclude=['file', 'xmin', 'xmax'])
+    vsz_format(sim_dict, prefix="SIM ", pref_exclude=['file', 'xmin', 'xmax'])
+    vsz_format(mes_dict, prefix="MES ", pref_exclude=['file', 'xmin', 'xmax'])
     
     if sim_dict['ready'] and mes_dict['ready']:
         result_text = fvsz_text.format(s_filename=sim_dict['file'],
@@ -366,8 +366,8 @@ def plot_synchronization(*, sim_dict=None, mes_dict=None): #sim_file='', mes_fil
     with open("veusz_files/Synchronization.fvsz", 'r', encoding='utf-8') as file:
         fvsz_text = file.read()
     
-    vsz_format(sim_dict, prefix="SIM ", exclude=['file', 'xmin', 'xmax'])
-    vsz_format(mes_dict, prefix="MES ", exclude=['file', 'xmin', 'xmax'])
+    vsz_format(sim_dict, prefix="SIM ", pref_exclude=['file', 'xmin', 'xmax'])
+    vsz_format(mes_dict, prefix="MES ", pref_exclude=['file', 'xmin', 'xmax'])
 
     if sim_dict['ready'] and mes_dict['ready']:
         result_text = fvsz_text.format(s_filename=sim_dict['file'],
