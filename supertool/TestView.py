@@ -1,11 +1,11 @@
 # TestView.py, Charlie Jordan, 12/5/2023
 # file to store the gui work for the test pane of the UI
 
-import signal
 import threading
 import time
 import tkinter as tk
 import tkinter.ttk as ttk
+import tkinter.font
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import traceback
 from idlelib.tooltip import Hovertip
@@ -15,19 +15,20 @@ import os
 import psutil
 import win32gui
 
-import PSLF_PYTHON
-
+from textwrap import wrap as wraptext
+import supertool.consts as consts
 from supertool.SuperToolFrames import ScrollFrame
 from supertool.pslf_scripts.Super_Tool import SuperToolFatalError
+from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 
 # Frame subclass for presenting and receving info regarding
 # individual tests and their attributes
 class TestView(ttk.Frame):
     def __init__(self, parent):
         # set up the frame and place it in the window
-        self.parent = parent
-        super().__init__(self.parent, borderwidth=5, relief='groove',
+        super().__init__(parent, borderwidth=5, relief='groove',
                             height=100, width=100)
+        self.parent = parent.master
         
         ### Test Parameters Box details
         # header
@@ -41,7 +42,7 @@ class TestView(ttk.Frame):
 
         self.run_button.bind("<3>", lambda e:
             self.parent.run_menu.post(e.x_root, e.y_root))
-        self.run_button_hover = Hovertip(self.run_button, hover_delay=300,
+        self.run_button_hover = Hovertip(self.run_button, hover_delay=consts.HOVER_DELAY,
             text="Right click to open Run Menu")
         
 
@@ -58,7 +59,8 @@ class TestView(ttk.Frame):
 
         self.trace_data = []
         
-        self.thread_running = False
+        self.run_sim_active = False
+        self.running_thread = threading.Thread()
         
         # show the focused test. note that when it's used in the initializer,
         # the "no test selected" text will always be shown since no test
@@ -83,6 +85,13 @@ class TestView(ttk.Frame):
         # the scrollbar would still act like the frame was large
         self.scroller.scroll_to_top()
         
+        style = ttk.Style()
+        
+        # create style for path buttons with paths that don't exist 
+        button_font = tkinter.font.nametofont(style.lookup('TButton', 'font'))
+        style.configure('badpath.TButton', foreground='red',
+            font=(button_font.cget('family'), button_font.cget('size'), 'bold'))
+        
         focused = self.parent.focused_test
         if focused: # if there is a focused test
             # put labels and buttons for the top of the scrollable frame
@@ -96,108 +105,42 @@ class TestView(ttk.Frame):
                                           command=self.change_focused_test_type)
             self.type_button.grid(row=1, column=1, sticky='e')
             
+            attr_groups = {k: [] for k in ['INFILE', 'OUTFILE', 'PLAIN', 'LOADFLOW', 'USER']}
+            attr_full_names = {'INFILE': "Input Files",
+                               'OUTFILE': "Output Files",
+                               'PLAIN': "Simulation Specific Variables",
+                               'LOADFLOW': "Loadflow Variables",
+                               'USER': "User Defined Variables"}
             
+            for attr in focused.attrs.values():
+                if attr.group and attr.group in attr_groups:
+                    attr_groups[attr.group].append(attr)
+                    # print(attr.group, attr_groups[attr.group])
+                else:
+                    print(f"Uh oh no group for {attr}")
+                    continue
             
             # set up for loop, offset is how many rows down the big
             # list of attributes should start
-            keys = list(focused.attrs.keys())
             offset = 2
             
             # storage for all of the interactibles so they still
             # work outside of the loop
             self.interactibles = []
             
+            line = offset
+            for group, attr_ls in attr_groups.items():
+                header = AttributeHeader(self.frame, attr_full_names[group])
+                header.grid(row=line, column=0, columnspan=4, sticky='nesw', pady=1)
+                line += 1
+                for attr in attr_ls:
+                    self.build_attr_line(attr, self.frame, line)
+                    line += 1
+                
             # for every attribute of the attribute dictionary, add
             # a line containing its name and relevant input fields
-            for i in range(len(keys)):
-                attr = focused.attrs[keys[i]]
-                
-                # paths are shown with their name, their short name,
-                # and a button to open a file picker window. hovering
-                # over the short name shows a tooltip of the full path name
-                if attr.type == 'PATH':
-                    # attribute name shown
-                    title_label = ttk.Label(self.frame, text=attr.name)
-                    title_label.grid(row=i+offset, column=0, sticky='w')
-                    
-                    # show short name of path
-                    def short_name(s):
-                        s2 = basename(s)
-                        ln = len(s2)
-                        max_len = 30
-                        if ln > max_len:
-                            return s2[:max_len//2] + "..." \
-                                   + s2[-(max_len//2 - 2):]
-                        else:
-                            return s2
-                    
-                    path_button = ttk.Button(self.frame, text=short_name(attr.var.get()),
-                            command=lambda attr=attr: self.get_new_path(attr))
-                    path_button.grid(row=i+offset, column=1, sticky='nesw')
-                    
-                    # create hovertext for paths to show the long path instead of just the basename
-                    path_label_hover = Hovertip(path_button, attr.var.get(), hover_delay=300)
-                    
-                    # set up traces for when the path variables update to modify the path label
-                    # separate functions needed for clarity
-                    def update_button(_1, _2, _3, l=path_button, v=attr.var):
-                        l.configure(text=short_name(v.get()))
-                    button_cb = attr.var.trace_add('write', update_button)
-                    
-                    def update_hover(_1, _2, _3, l=path_label_hover, v=attr.var):
-                        l.text = v.get()
-                    hover_cb = attr.var.trace_add('write', update_hover)
-                    
-                    self.trace_data.append((attr.var, button_cb))
-                    self.trace_data.append((attr.var, hover_cb))
-                    
-                    # place a select button to get a new path
-                    open_path_button = ttk.Button(self.frame, text="open",
-                            command=lambda attr=attr: self.open_path(attr))
-                    open_path_button.grid(row=i+offset, column=2)
-                    
-                    # add interactibles to a higher scoped list
-                    self.interactibles.append((open_path_button, path_button))
-                
-                # boolean attributes are shown as their name and a checkbox
-                elif attr.type == 'BOOL':
-                    # attribute name shown
-                    title_label = ttk.Label(self.frame, text=attr.name)
-                    title_label.grid(row=i+offset, column=0, sticky='w')
-                    
-                    # show a check box
-                    # @TODO the bind not be necessary
-                    checkbutton = ttk.Checkbutton(self.frame, variable=attr.var)
-                    checkbutton.grid(row=i+offset, column=1)
-                    
-                    # add the checkbox and variable to a higher scoped list
-                    # @TODO is attr.var necessary here?
-                    self.interactibles.append((checkbutton, attr.var))
-                
-                # if the attribute is a number, show it as a name, an entry, and
-                # a unit @TODO error checking on the entry
-                else:
-                    # show the name
-                    title_label = ttk.Label(self.frame, text=attr.name)
-                    title_label.grid(row=i+offset, column=0, sticky='w')
-                    
-                    # space to enter the user's number
-                    entry = ttk.Entry(self.frame, textvariable=attr.var)
-                    entry.grid(row=i+offset, column=1)
-                    
-                    # label containing unit
-                    unit_label = ttk.Label(self.frame, text=attr.unit)
-                    unit_label.grid(row=i+offset, column=2)
-                    
-                    # add the entry to a higher scoped list
-                    # @TODO is attr.var necessary?
-                    self.interactibles.append((entry, attr.var))
-            
-            # if focused.plot_sim_file:
-            #     attr = focused.attrs[focused.plot_sim_file]
-            #     trace = attr.var.trace_add('write', lambda a_, b_, c_:
-            #         self.parent.param_frame.show_simulated_headers())
-            #     self.trace_data.append((attr.var, trace))
+            # for i, attr in enumerate(focused.attrs.values()):
+            #     self.build_attr_line(attr, self.frame, i+offset)
                 
         else:
             # if there's no focused test, show that no test is selected
@@ -205,18 +148,186 @@ class TestView(ttk.Frame):
             self.no_test_label = ttk.Label(self.frame, text="No Test Selected. Create or click one to begin.")
             self.no_test_label.grid(row=1,column=0)
         
+        self.parent.update_pane_widths()
+    
+    def build_attr_line(self, attr, frame, line):
+        # configure values that are the same accross all types
+        padding_info = {'pady': 1, 'padx': 2}
+        
+        # show the title label
+        title_label = ttk.Label(frame, text=attr.name)
+        title_label.grid(row=line, column=0, sticky='w')
+        
+        title_label_hover = Hovertip(title_label, text='',
+                                        hover_delay=consts.HOVER_DELAY)
+        
+        # update title label if there's a valid long name for it
+        if attr.full_name:
+            title_label.config(text=attr.full_name)
+            title_label_hover.text = f"{attr.full_name} ({attr.name})\n"
+        else:
+            title_label_hover.text = attr.name + "\n"
+        
+        if attr.description:
+            title_label_hover.text += "\n".join(wraptext(attr.description, 45))
+        else:
+            title_label_hover.text += "No Attribute Description"
+        
+        # paths are shown with their name, their short name,
+        # and a button to open a file picker window. hovering
+        # over the short name shows a tooltip of the full path name
+        if attr.type == 'PATH':
+            # show short name of path
+            def short_name(s):
+                s2 = basename(s)
+                ln = len(s2)
+                max_len = 30
+                if ln > max_len:
+                    return s2[:max_len//2] + "..." \
+                            + s2[-(max_len//2 - 2):]
+                else:
+                    return s2
+            
+            path_button = ttk.Button(frame, text=short_name(attr.var.get()),
+                    command=lambda attr=attr: self.get_new_path(attr))
+            path_button.grid(row=line, column=1, sticky='nesw', cnf=padding_info)
+            
+            def clear_path(e=None, attr=attr):
+                attr.var.set("")
+            path_button.bind("<3>", clear_path)
+            
+            # create hovertext for paths to show the long path instead of just the basename
+            def path_hover_text(attribute):
+                if attribute.var.get() == '':
+                    return "Click to Select a file"
+                else:
+                    # print(attribute.get())
+                    # print("RO:", attribute.read_only_file, end=' - ')
+                    if attribute.read_only_file:
+                        # check that the file itself exists
+                        # print(attribute.get())
+                        # print(os.path.exists(attribute.get()))
+                        if not os.path.exists(attribute.get()):
+                            return f"This file does not exist at this location.\n" + \
+                                    f"Full Path: {attribute.get()}\n" + \
+                                    f"Relative Path: {attribute.var.get()}\n" + \
+                                    "Right click to clear or click to re-select a file" 
+                    else:
+                        # check that the parent directory exists
+                        # print(attribute.parent.get_dir())
+                        # print(os.path.exists(os.path.dirname(attribute.get())))
+                        if not os.path.exists(os.path.dirname(attribute.get())):
+                            return  "This file cannot be generated at this location.\n" + \
+                                    "This is likely an issue with the working, unit,\n" + \
+                                    "or test sub-directories being malformed.\n" + \
+                                    f"Full Path: {attribute.get()}\n" + \
+                                    f"Relative Path: {attribute.var.get()}\n" + \
+                                    "Right click to clear or click to re-select a file" 
+                return f"Full Path: {attribute.get()}\n" + \
+                        f"Relative Path: {attribute.var.get()}\n" + \
+                        "Right click to clear"
+            path_label_hover = Hovertip(path_button, path_hover_text(attr), hover_delay=consts.HOVER_DELAY)
+            
+            # set up traces for when the path variables update to modify the path label
+            # separate functions needed for clarity
+            def update_button(_1=None, _2=None, _3=None, l=path_button, a=attr):
+                l.configure(text=short_name(a.var.get()))
+                if a.var.get():
+                    if a.read_only_file:
+                        if not os.path.exists(a.get()):
+                            l.configure(style="badpath.TButton")
+                            return
+                    else:
+                        if not os.path.exists(os.path.dirname(a.get())):
+                            l.configure(style="badpath.TButton")
+                            return
+                l.configure(style="TButton")
+
+            update_button()
+            button_cb = attr.var.trace_add('write', update_button)
+            
+            def update_hover(_1=None, _2=None, _3=None, l=path_label_hover, a=attr):
+                l.text = path_hover_text(a)
+            hover_cb = attr.var.trace_add('write', update_hover)
+            
+            self.trace_data.append((attr.var, button_cb))
+            self.trace_data.append((attr.var, hover_cb))
+            
+            if attr.name == self.parent.focused_test.plot_sim_file:
+                sim_cb = attr.var.trace_add('write',
+                    lambda _1=None, _2=None, _3=None: self.parent.param_frame.render_sim_frame()
+                                   )
+                self.trace_data.append((attr.var, sim_cb))
+            if attr.name == self.parent.focused_test.plot_mes_file:
+                sim_cb = attr.var.trace_add('write',
+                    lambda _1=None, _2=None, _3=None: self.parent.param_frame.render_mes_frame()
+                                   )
+                self.trace_data.append((attr.var, sim_cb))
+            
+            # place a select button to get a new path
+            open_path_button = ttk.Button(frame, text="open",
+                    command=lambda attr=attr: self.open_path(attr))
+            open_path_button.grid(row=line, column=2)
+            
+            # add interactibles to a higher scoped list
+            self.interactibles.append((open_path_button, path_button))
+        
+        # boolean attributes are shown as their name and a checkbox
+        elif attr.type == 'BOOL':
+            # show a check box
+            # @TODO the bind not be necessary
+            checkbutton = ttk.Checkbutton(frame, variable=attr.var)
+            checkbutton.grid(row=line, column=1, cnf=padding_info)
+            
+            # add the checkbox and variable to a higher scoped list
+            # @TODO is attr.var necessary here?
+            self.interactibles.append((checkbutton, attr.var))
+        
+        # if the attribute is a number, show it as a name, an entry, and
+        # a unit @TODO error checking on the entry
+        elif attr.type == 'NUM':
+            # space to enter the user's number
+            entry = ttk.Entry(frame, textvariable=attr.var)
+            entry.grid(row=line, column=1, cnf=padding_info)
+            
+            # label containing unit
+            unit_label = ttk.Label(frame, text=attr.unit)
+            unit_label.grid(row=line, column=2)
+            
+            # add the entry to a higher scoped list
+            # @TODO is attr.var necessary?
+            self.interactibles.append((entry, attr.var))
+        
+        elif attr.type == 'STR':
+            # space to enter the user's number
+            entry = ttk.Entry(frame, textvariable=attr.var)
+            entry.grid(row=line, column=1, cnf=padding_info)
+            
+            # label containing unit
+            unit_label = ttk.Label(frame, text="string")
+            unit_label.grid(row=line, column=2)
+            
+            # add the entry to a higher scoped list
+            # @TODO is attr.var necessary?
+            self.interactibles.append((entry, attr.var))
+        else:
+            raise ValueError(f"Incorrect attribute type of '{attr.type}'")
+        
     # run the backend PSLF script associated with the focused test's
     # test type
     def run_simulation(self, event=None, save_on_run=True):
 
         # block running here
-        if self.thread_running:
+        if self.run_sim_active or self.running_thread and self.running_thread.is_alive():
             print("Stop Right There! A PSLF Script is already running.")
-            print("Wait until the script has completed to run again.")
+            print("Wait until the script has completed to run again.",
+                  *[int(i) for i in (self.run_sim_active, bool(self.running_thread), self.running_thread.is_alive())])
+                  # prev line for debugging
+            ScriptQueue.put(SuperToolMessage('scriptalreadyrunning',
+                                "A PSLF Script is already running."))
             return
         
-        self.thread_running = True
-        self.run_button.config(state='disabled')
+        self.run_sim_active = True
         
         if self.parent.focused_test:
             
@@ -270,15 +381,14 @@ class TestView(ttk.Frame):
                         if not hide and not last_hide:
                             print("not last hide and not hide")
                             # double check the window is still open, 
-                            def winEnumHandler(hwnd, window_open):
+                            def win_enum_handler(hwnd, window_open):
                                 name = win32gui.GetWindowText(hwnd)
-                                if win32gui.IsWindowVisible(hwnd) \
-                                    and 'pslf' in name.lower():
-                                        print("PSLFWindow:", hex(hwnd), name)
-                                        window_open.append("name")
+                                if win32gui.IsWindowVisible(hwnd) and 'pslf' in name.lower():
+                                    print("PSLFWindow:", hex(hwnd), name)
+                                    window_open.append(name)
                                 return True
                             open_windows = []
-                            win32gui.EnumWindows(winEnumHandler, open_windows)
+                            win32gui.EnumWindows(win_enum_handler, open_windows)
                             print("window open:", open_windows)
                             if open_windows == "":
                                 # if window is closed but process still running, 
@@ -299,24 +409,34 @@ class TestView(ttk.Frame):
                     traceback.print_exception(err)
                     print("\n===== General Exception while running Supertool Script - end =====")
                 
+                self.parent.param_frame.render_sim_frame()
                 self.parent.last_hide_pslf_gui_val = hide
-                self.thread_running = False
-                self.run_button.config(state='normal')
+                self.run_sim_active = False
+                self.unlock_run_button()
                 # return to old working directory
                 os.chdir(working_dir)
             
-            runner_thread = threading.Thread(target=run_script)
-            runner_thread.start()
-            
-            
+            self.running_thread = threading.Thread(target=run_script)
+            self.running_thread.start()
+            self.lock_run_button()
             
         else:
             # @TODO make this more elegant
             print("No focused test to run a script for!")
+            self.unlock_run_button()
+        
+        self.run_sim_active = False
+        
         # blah = ' '.join([i.get() for i in self.strings])
         # print(blah)
         # self.parent.set_status("Status Bar: " + blah)
     
+    def lock_run_button(self):
+        self.run_button.config(state='disabled')
+    
+    def unlock_run_button(self):
+        self.run_button.config(state='normal')
+        
     # @TODO change the comments in here oopsie
     def change_focused_test_type(self):
         
@@ -393,10 +513,21 @@ class TestView(ttk.Frame):
         type_dropdown.bind("<space>", lambda e: type_dropdown.event_generate('<Down>'))
         type_dropdown.bind("<<ComboboxSelected>>", lambda e: done_button.focus())
         
-        
-    # @TODO needs typechecking
+    # @TODO needs typechecking?
     def open_path(self, attr):
-        os.startfile(attr.var.get())
+        if attr.var.get():
+            if os.path.exists(attr.get()):
+                os.startfile(attr.get())
+            else:
+                if attr.read_only_file:
+                    print(f"File: '{attr.get()}' does not exist. "
+                          "Select a file using the left button first")
+                else:
+                    print(f"File: '{attr.get()}' does not exist. "
+                          "Run the simulation or select a file "
+                          "using the left button first")
+        else:
+            print("No file to open!!!! uh oh")
     
     # get a new path for path type attributes
     # need to pick between input and output files because the file
@@ -408,22 +539,32 @@ class TestView(ttk.Frame):
                 title=f"Select input {attr.extension.upper()} file",
                 defaultextension=f"*.{attr.extension}",
                 filetypes=[(f"Input {attr.extension.upper()} File", f"*.{attr.extension}"),
-                           ("All Files", "*.*")]
+                           ("All Files", "*.*")],
+                initialdir=attr.parent.get_dir()
                 )
         else:
             path = asksaveasfilename(
                 title=f"Choose File Name and Location for Output {attr.extension.upper()} File",
                 defaultextension="*.*",
                 filetypes=[(f"PSLF Output {attr.extension.upper()} File", f"*.{attr.extension}"),
-                           ("All Files", "*.*")]
+                           ("All Files", "*.*")],
+                initialdir=attr.parent.get_dir()
                 )
         
         if path:
-            attr.var.set(path)
-            if attr.name == self.parent.focused_test.plot_sim_file:
-                self.parent.param_frame.render_sim_frame()
-            if attr.name == self.parent.focused_test.plot_mes_file:
-                self.parent.param_frame.render_mes_frame()
+            # @TODO make a better decision on backslashes vs slashes OR use pathlib
+            rel_path = os.path.relpath(path, attr.parent.get_dir()).replace('\\', '/')
+            print(attr.parent.get_dir() + " + " + rel_path)
+            attr.var.set(rel_path)
+            
+            # autofill pslf output file names if they're not already filled in
+            if attr.name == "sav_filename":
+                attrs = attr.parent.attrs
+                for a in attrs.values():
+                    if a.type == "PATH" and not a.read_only_file and not a.var.get():
+                        path = os.path.basename(attr.var.get())
+                        root, ext = os.path.splitext(path)
+                        a.var.set(root + "_sim." + a.extension)
 
 def kill_pslf():
     for i in range(10):
@@ -451,3 +592,26 @@ def kill_pslf():
                 continue
         if not found:
             break
+
+# helper class, used to make pretty separators for the testview scroll frame
+class AttributeHeader(ttk.Frame):
+    def __init__(self, parent, text, **kwargs):
+        super().__init__(parent, **kwargs)
+        
+        self.columnconfigure(2, weight=1)
+        
+        spacing_frame = ttk.Frame(self)
+        spacing_frame.grid(row=0, column=0, sticky='nesw', ipady=2)
+        
+        self.lsep_frame = ttk.Frame(self, width=20)
+        self.lsep_frame.grid(row=1, column=0, sticky='ew', ipadx=6)
+        self.lsep_frame.columnconfigure(0, weight=1)
+        
+        self.lsep = ttk.Separator(self.lsep_frame)
+        self.lsep.grid(row=1, column=0, sticky='ew')
+        
+        self.label = ttk.Label(self, text=text)
+        self.label.grid(row=1, column=1, padx=3)
+
+        self.rsep = ttk.Separator(self)
+        self.rsep.grid(row=1, column=2, sticky='ew', padx=1)

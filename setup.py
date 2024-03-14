@@ -1,5 +1,21 @@
 # config.py
 
+print("===== Printing Python Info =====")
+import sys
+import os.path
+import inspect
+
+filename = inspect.getframeinfo(inspect.currentframe()).filename # type: ignore
+path = os.path.dirname(os.path.abspath(filename))
+print("Python Version:", sys.version)
+print("Executable:    ", sys.executable)
+print("Working dir:   ", path)
+print("Running File:  ", filename)
+print("Arguments:     ", " ".join(sys.argv))
+print("Command:       ", f'"{sys.executable}" "{filename}"{" " + " ".join(sys.argv[1:])}')
+
+os.chdir(path)
+
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.filedialog import askdirectory
@@ -168,13 +184,13 @@ class SetupWindow(tk.Tk):
     # necessary for step 1, the background installer thread
     def depend_process(self):
         try:
-            import win32, psutil
+            import win32, psutil, pathvalidate
             time.sleep(0.5)
         except ModuleNotFoundError:
             try:
-                subprocess.call("python -m pip install pywin32 psutil")
+                subprocess.call("python -m pip install pywin32 psutil pathvalidate")
             except PermissionError:
-                subprocess.call("python -m pip install --user pywin32 psutil")
+                subprocess.call("python -m pip install --user pywin32 psutil pathvalidate")
 
         self.depend_prog_bar.config(mode='determinate', value=100)
         self.depend_prog_bar.stop()
@@ -295,4 +311,4 @@ try:
     print("Setup Script Complete! Exiting...")
 except Exception as e:
     print(traceback.print_exc())
-    input("\n\nERROR FOUND! Record it somehow and then Press Enter to close")
+    input("\n\nERROR: Record it somehow and then Press Enter to close")

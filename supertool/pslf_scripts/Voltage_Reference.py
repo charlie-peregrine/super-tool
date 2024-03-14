@@ -24,30 +24,46 @@ def run(test, no_gui=False):
 # Configure for your test with the following parameters
 #--------------------------------------------------------------------------------------------------
 
-    dyd_filename        = test.attrs["dyd_filename"].var.get()      # "HCPR1.dyd"
-    sav_filename        = test.attrs["sav_filename"].var.get()      # "HCPR1_VR_P0_new.sav"
-    chf_filename        = test.attrs["chf_filename"].var.get()      # "HCPR1_VR_P0_new_sim.chf"
-    csv_filename        = test.attrs["csv_filename"].var.get()      # "HCPR1_VR_P0_new_sim.csv"
-    rep_filename        = test.attrs["rep_filename"].var.get()      # "Rep.rep"
-    StepTimeInSecs      = test.attrs["StepTimeInSecs"].var.get()    # 1.7
-    UpStepInPU          = test.attrs["UpStepInPU"].var.get()        # 0.02
-    DnStepInPU          = test.attrs["DnStepInPU"].var.get()        # 0.02
-    StepLenInSecs       = test.attrs["StepLenInSecs"].var.get()     # 9.0
-    TotTimeInSecs       = test.attrs["TotTimeInSecs"].var.get()     # 15
-    PSS_On              = test.attrs["PSS_On"].var.get()            # 0                  # 0:disable PSS model, 1: enable PSS model 
-    SysFreqInHz         = test.attrs["SysFreqInHz"].var.get()       # 60.00            
-    SimPtsPerCycle      = test.attrs["SimPtsPerCycle"].var.get()    # 8.0  
-    set_loadflow        = test.attrs["set_loadflow"].var.get()      # False      # If TRUE, initializes sav case with the below parameters if FALSE, loads existing sav case.
-    save_loadflow       = test.attrs["save_loadflow"].var.get()     # False     # If TRUE, overwrites sav_filename with new set_loadflow solution. If FALSE, leaves sav_filename as is.  
-    Pinit               = test.attrs["Pinit"].var.get()             # 118.85  # MW          #----------------------------------
-    Qinit               = test.attrs["Qinit"].var.get()             # -1.98  # MVAR         # <- loadflow Parameters
-    MVAbase             = test.attrs["MVAbase"].var.get()           # 145.0                 #----------------------------------
-    Vinit               = test.attrs["Vinit"].var.get()             # 14.585  # kV
-    Vbase               = test.attrs["Vbase"].var.get()             # 14.5    # kV
-    Zbranch             = test.attrs["Zbranch"].var.get()           # 0.09    # pu
-    PFtest              = False                                     # if the test is a PF test, then 
-                                                                    #   1) the pfqrg model must come before the exciter model and after the generator model in the dyd         
-                                                                    #   2) there must be no other pss model 
+
+    dyd_filename        = test.attrs["dyd_filename"].get()      # "HCPR1.dyd"
+    sav_filename        = test.attrs["sav_filename"].get()      # "HCPR1_VR_P0_new.sav"
+    chf_filename        = test.attrs["chf_filename"].get()      # "HCPR1_VR_P0_new_sim.chf"
+    csv_filename        = test.attrs["csv_filename"].get()      # "HCPR1_VR_P0_new_sim.csv"
+    rep_filename        = test.attrs["rep_filename"].get()      # "Rep.rep"
+    StepTimeInSecs      = test.attrs["StepTimeInSecs"].get()    # 1.7
+    UpStepInPU          = test.attrs["UpStepInPU"].get()        # 0.02
+    DnStepInPU          = test.attrs["DnStepInPU"].get()        # 0.02
+    StepLenInSecs       = test.attrs["StepLenInSecs"].get()     # 9.0
+    TotTimeInSecs       = test.attrs["TotTimeInSecs"].get()     # 15
+    PSS_On              = test.attrs["PSS_On"].get()            # 0                  # 0:disable PSS model, 1: enable PSS model 
+    SysFreqInHz         = test.attrs["SysFreqInHz"].get()       # 60.00            
+    SimPtsPerCycle      = test.attrs["SimPtsPerCycle"].get()    # 8.0  
+    set_loadflow        = test.attrs["set_loadflow"].get()      # False      # If TRUE, initializes sav case with the below parameters if FALSE, loads existing sav case.
+    save_loadflow       = test.attrs["save_loadflow"].get()     # False     # If TRUE, overwrites sav_filename with new set_loadflow solution. If FALSE, leaves sav_filename as is.  
+    Pinit               = test.attrs["Pinit"].get()             # 118.85  # MW          #----------------------------------
+    Qinit               = test.attrs["Qinit"].get()             # -1.98  # MVAR         # <- loadflow Parameters
+    MVAbase             = test.attrs["MVAbase"].get()           # 145.0                 #----------------------------------
+    Vinit               = test.attrs["Vinit"].get()             # 14.585  # kV
+    Vbase               = test.attrs["Vbase"].get()             # 14.5    # kV
+    Zbranch             = test.attrs["Zbranch"].get()           # 0.09    # pu
+    PFtest              = False                                 # if the test is a PF test, then 
+                                                                #   1) the pfqrg model must come before the exciter model and after the generator model in the dyd         
+                                                                #   2) there must be no other pss model
+        
+
+
+    #----------------------------------
+    # User Defined Parameters
+    # Note that these are not accessed
+    # unless decided so by the user
+    #----------------------------------
+
+    UserVar1        = test.attrs["UserVar1"].get()
+    UserVar2        = test.attrs["UserVar2"].get()
+    UserVar3        = test.attrs["UserVar3"].get()
+    UserVar4        = test.attrs["UserVar4"].get()
+    UserVar5        = test.attrs["UserVar5"].get()
+    
 #--------------------------------------------------------------------------------------------------
 
     # Since pf model pfqrg is of type stabilizer model, pss must be enabled for an output to occur.
@@ -70,9 +86,12 @@ def run(test, no_gui=False):
     print("Down-Sampling Factors - SimResScalar:", SimResScalar, "NplotValue:", NplotValue)
 
 
-    # gets the project directory of this file and initialize the PSLF instance
-    project_directory = os.path.dirname(os.path.realpath(__file__))
-    #os.chdir(project_directory)
+#--------------------------------------------------------------------------------------------------
+
+    # gets the project directory of this test and initialize the PSLF instance
+    project_directory = test.get_dir().replace("/", "\\") # os.path.dirname(os.path.realpath(__file__))
+    
+    
     SuperTool.launch_Pslf(project_directory, silent=no_gui) # @TODO add after calls and progress bar type stuff
     SuperTool.pwd()
 

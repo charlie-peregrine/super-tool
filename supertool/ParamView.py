@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import ttk
 from idlelib.tooltip import Hovertip
 
+import supertool.consts as consts
 from supertool.SuperToolFrames import ScrollFrame
 
 # subclass of frame that holds the plot parameter view
@@ -16,9 +17,9 @@ from supertool.SuperToolFrames import ScrollFrame
 # currently a WIP  
 class ParamView(ttk.Frame):
     def __init__(self, parent):
-        self.parent = parent
-        super().__init__(self.parent, borderwidth=5, relief='groove',
+        super().__init__(parent, borderwidth=5, relief='groove',
                          height=100, width=100)
+        self.parent = parent.master
         
         self.graph_button = ttk.Button(self, text="Show Graphs",
                                         command=self.graph)
@@ -26,7 +27,7 @@ class ParamView(ttk.Frame):
 
         self.graph_button.bind("<3>", lambda e:
             self.parent.graph_menu.post(e.x_root, e.y_root))
-        self.graph_button_hover = Hovertip(self.graph_button, hover_delay=300,
+        self.graph_button_hover = Hovertip(self.graph_button, hover_delay=consts.HOVER_DELAY,
             text="Right click to open Run Menu")
 
         # self.scroller = ScrollFrame(self)
@@ -69,7 +70,6 @@ class ParamView(ttk.Frame):
         self.render_sim_frame()
         self.render_mes_frame()
 
-
     def render_sim_frame(self):
         self.sim_frame.grid_remove()
         self.sim_widgets.clear()
@@ -80,6 +80,8 @@ class ParamView(ttk.Frame):
             # @TODO watch foc[foc.plot_sim_file] to update sim frame if necessary
             if self.foc.plot_sim_file and self.foc[self.foc.plot_sim_file]:
                 self.build_frame(self.foc.plot_sim_file, self.sim_frame, self.sim_widgets, self.foc.sim_headers)
+                
+        self.parent.update_pane_widths()
     
     def render_mes_frame(self):
         self.mes_frame.grid_remove()
@@ -91,6 +93,7 @@ class ParamView(ttk.Frame):
             if self.foc.plot_mes_file and self.foc[self.foc.plot_mes_file]:
                 self.build_frame(self.foc.plot_mes_file, self.mes_frame, self.mes_widgets, self.foc.mes_headers)
         
+        self.parent.update_pane_widths() # @TODO do we need this to run twice?
             
 
     # subroutine to make building cleaner
@@ -98,11 +101,12 @@ class ParamView(ttk.Frame):
         # @TODO error check for multiplication menu (support +,-,/,*)
         
         # @check that file exists here or earlier (on read and on select?)
-        if not os.path.exists(self.foc[plot_name]):
+        if not os.path.exists(self.foc.attrs[plot_name].get()):
             # @TODO tell the user somehow that this is bad
+            print(self.foc.attrs[plot_name].get(), "does not exist")
             return
         
-        with open(self.foc[plot_name], 'r', encoding='utf-8-sig') as file:
+        with open(self.foc.attrs[plot_name].get(), 'r', encoding='utf-8-sig') as file:
             line = file.readline()
             if line[-1] == '\n': # trim trailing newline
                 line = line[:-1]
@@ -110,7 +114,7 @@ class ParamView(ttk.Frame):
             header_list = [s for s in header_list if s]
             header_text = '\n'.join(header_list)
             max_width = max([len(s) for s in header_list] + [20])
-            max_width = int(max_width * .75)
+            max_width = int(max_width * .83)
         
         
         for i, (key, regex, longname) in enumerate(self.foc.header_info):
@@ -155,9 +159,11 @@ class ParamView(ttk.Frame):
         sim_data = {}
         sim_data['ready'] = False # is it ok to graph this data
         if self.sim_widgets:
-            for k, (l,d,e) in self.sim_widgets.items():
+            for k, (_,d,e) in self.sim_widgets.items():
                 sim_data[k] = (d.get(), e.get())
-            sim_data['file'] = (self.foc[self.foc.plot_sim_file], '')
+            # veusz files need paths to use / instead of \
+            file_path = self.foc.attrs[self.foc.plot_sim_file].get().replace("\\", "/")
+            sim_data['file'] = (file_path, '')
             sim_data['ready'] = True
         
         for k,v in sim_data.items():
@@ -166,9 +172,11 @@ class ParamView(ttk.Frame):
         mes_data = {}
         mes_data['ready'] = False
         if self.mes_widgets:
-            for k, (l,d,e) in self.mes_widgets.items():
+            for k, (_,d,e) in self.mes_widgets.items():
                 mes_data[k] = (d.get(), e.get())
-            mes_data['file'] = (self.foc[self.foc.plot_mes_file], '')
+            # veusz files need paths to use / instead of \
+            file_path = self.foc.attrs[self.foc.plot_mes_file].get().replace("\\", "/")
+            mes_data['file'] = (file_path, '')
             mes_data['ready'] = True # is it ok to graph this data
         
         for k,v in mes_data.items():

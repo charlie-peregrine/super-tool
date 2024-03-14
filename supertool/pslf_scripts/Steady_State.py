@@ -27,21 +27,32 @@ def run(test, no_gui=False):
     
     # @TODO savecasefiles used? UseGenField is a bool?
         # test.attrs["dyd_filename"].var.get()
-    dyd_filename        = test.attrs["dyd_filename"].var.get()       # "HCPR1.dyd"
-    sav_filename        = test.attrs["sav_filename"].var.get()       # "HCPR1_LR.sav"
-    chf_filename        = test.attrs["chf_filename"].var.get()       # "HCPR1_LR_new_sim.chf"
-    rep_filename        = test.attrs["rep_filename"].var.get()       # "Rep.rep"
-    in_filename         = test.attrs["in_filename"].var.get()        # "HCPR1_LR_IN.csv"
-    out_filename        = test.attrs["out_filename"].var.get()       # "HCPR1_LR_OUT_new.csv"
-    # out_casename        = test.attrs["out_casename"].var.get()       # "HCPR1_LR.txt"
-    if_base             = test.attrs["if_base"].var.get()            # 740
-    if_res              = test.attrs["if_res"].var.get()             # 0.0
-    # SaveCaseFiles       = test.attrs["SaveCaseFiles"].var.get()      # 0 # generally leave as 0
-    UseGenField         = test.attrs["UseGenField"].var.get()        # 0 # set this to '1' if you want to use generator field even for brushless 
-    Vbase               = test.attrs["Vbase"].var.get()
-    Zbranch             = test.attrs["Zbranch"].var.get()
-    #mva_base           = test.attrs["mva_base"].var.get()           # 145.0
+    dyd_filename        = test.attrs["dyd_filename"].get()       # "HCPR1.dyd"
+    sav_filename        = test.attrs["sav_filename"].get()       # "HCPR1_LR.sav"
+    chf_filename        = test.attrs["chf_filename"].get()       # "HCPR1_LR_new_sim.chf"
+    rep_filename        = test.attrs["rep_filename"].get()       # "Rep.rep"
+    in_filename         = test.attrs["in_filename"].get()        # "HCPR1_LR_IN.csv"
+    out_filename        = test.attrs["out_filename"].get()       # "HCPR1_LR_OUT_new.csv"
+    # out_casename        = test.attrs["out_casename"].get()       # "HCPR1_LR.txt"
+    if_base             = test.attrs["if_base"].get()            # 740
+    if_res              = test.attrs["if_res"].get()             # 0.0
+    # SaveCaseFiles       = test.attrs["SaveCaseFiles"].get()      # 0 # generally leave as 0
+    UseGenField         = test.attrs["UseGenField"].get()        # 0 # set this to '1' if you want to use generator field even for brushless 
+    Vbase               = test.attrs["Vbase"].get()
+    Zbranch             = test.attrs["Zbranch"].get()
+    #mva_base           = test.attrs["mva_base"].get()           # 145.0
 
+    #----------------------------------
+    # User Defined Parameters
+    # Note that these are not accessed
+    # unless decided so by the user
+    #----------------------------------
+
+    UserVar1        = test.attrs["UserVar1"].get()
+    UserVar2        = test.attrs["UserVar2"].get()
+    UserVar3        = test.attrs["UserVar3"].get()
+    UserVar4        = test.attrs["UserVar4"].get()
+    UserVar5        = test.attrs["UserVar5"].get()
 
 
     # 0 initialize 4 variables used later. NOT inputs
@@ -57,9 +68,8 @@ def run(test, no_gui=False):
     ExcModIndex         = 0
 
 
-    # gets the project directory of this file and initialize the PSLF instance
-    project_directory = os.path.dirname(os.path.realpath(__file__))
-    os.chdir(project_directory)
+    # gets the project directory of this test and initialize the PSLF instance
+    project_directory = test.get_dir().replace("/", "\\") # os.path.dirname(os.path.realpath(__file__))
     SuperTool.launch_Pslf(project_directory, silent=no_gui)
 
     # print to PSLF console

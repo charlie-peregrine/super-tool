@@ -70,7 +70,11 @@ class ScrollFrame(tk.Frame):
         
         # if the pointer is inside the canvas...
         x, y = self.canvas.winfo_pointerxy()
-        if x > xl and x < xr and y > yt and y < yb:
+        try:
+            widg = self.canvas.winfo_containing(x, y)
+        except KeyError:
+            return
+        if xr > x > xl and yb > y > yt and str(widg).startswith(str(self.frame)):
             # move the canvas accordingly
             # @TODO the .05 is a scrolling speed constant, change it maybe
             p = self.scrollbar.get()[0] + (-1*event.delta//120)*.05
@@ -97,3 +101,79 @@ class ScrollFrame(tk.Frame):
     def reset_width(self):
         if self.frame.winfo_reqwidth() != self.canvas.winfo_width():
             self.canvas.config(width=self.frame.winfo_reqwidth())
+
+# Base popup class for super tool.
+class Popup(tk.Toplevel):
+    def __init__(self, root=None, title="Popup", **kwargs):
+        super().__init__(root, **kwargs)
+        # grab and hold focus
+        self.transient(root)
+        self.grab_set()
+        self.focus_force()
+        
+        # set window title, size, and resizability
+        self.title(title)
+        # find where to put the window, trying to center
+        x_point = root.winfo_rootx() + root.winfo_width()//5
+        y_point = root.winfo_rooty() + root.winfo_height()//5
+        self.geometry(f"+{x_point}+{y_point}")
+        self.resizable(False, False)
+
+class BaseOkPopup(Popup):
+    def __init__(self, root=None, title="Popup"):
+        super().__init__(root, title)
+
+        self.frame = ttk.Frame(self)
+        self.frame.grid(row=0, column=0, sticky='nesw')
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+        
+        self.bottom_frame = ttk.Frame(self)
+        self.bottom_frame.grid(row=1, column=0, sticky='ew')
+        self.bottom_frame.columnconfigure(0, weight=1)
+        self.bottom_frame.columnconfigure(1, weight=1)
+        
+        self.error_sep = ttk.Separator(self.bottom_frame)
+        self.error_sep.grid(row=0, column=0, columnspan=3, sticky='ew')
+        self.error_sep.grid_remove()
+        self.error_label = ttk.Label(self.bottom_frame, text="error_label")
+        self.error_label.grid(row=1, sticky='nesw', padx=2, pady=2)
+        self.error_label.grid_remove()
+        
+        self.sep = ttk.Separator(self.bottom_frame)
+        self.sep.grid(row=2, column=0, columnspan=3, sticky='ew')
+        self.ok_button = ttk.Button(self.bottom_frame, text="OK")
+        self.ok_button.grid(row=3, column=1, sticky='e', padx=2, pady=2)
+        self.cancel_button = ttk.Button(self.bottom_frame, text="Cancel")
+        self.cancel_button.grid(row=3, column=2, sticky='e', padx=2, pady=2)
+        
+    def wrapup(self, ok_command, cancel_command):
+        for widget in self.frame.winfo_children():
+            widget.grid_configure(padx=2, pady=2)
+        
+        self.ok_button.config(command=ok_command)
+        self.ok_button.bind("<Return>", lambda e: ok_command)
+        
+        self.cancel_button.config(command=cancel_command)
+        self.cancel_button.bind("<Return>", lambda e: cancel_command)
+        
+        self.protocol("WM_DELETE_WINDOW", cancel_command)
+        self.master.wait_window(self)
+
+    def show_errors(self, error_list: list[str] = []):
+        """
+        Show the error label and separator, and fill it with newline separated
+        elements or error_list. If error_list is empty, the error label is hidden
+        """
+        if error_list:
+            self.error_label.config(text="\n".join(error_list))
+            self.error_label.grid()
+            self.error_sep.grid()
+        else:
+            self.error_label.grid_remove()
+            self.error_sep.grid_remove()
+        
+    
+    def hide_errors(self):
+        self.error_label.grid_remove()
+        self.error_sep.grid_remove()

@@ -25,39 +25,50 @@ def run(test, no_gui=False):
     # Configure for your test with the following parameters
     #--------------------------------------------------------------------------------------------------
 
-    dyd_filename    = test.attrs["dyd_filename"].var.get()      # "U1.dyd"
-    sav_filename    = test.attrs["sav_filename"].var.get()      # "02_U1_CI.sav"
-    chf_filename    = test.attrs["chf_filename"].var.get()      # "02_U1_CI_sim_v23.chf"
-    csv_filename    = test.attrs["csv_filename"].var.get()      # "02_U1_CI_sim_v23.csv"
-    rep_filename    = test.attrs["rep_filename"].var.get()      # "Rep.rep"
-    tripTimeInSecs  = test.attrs["tripTimeInSecs"].var.get()    # 2.0
-    totTimeInSec    = test.attrs["totTimeInSec"].var.get()      # 36
-    PSS_On          = test.attrs["PSS_On"].var.get()            # 0             # 0:disable PSS model, 1: enable PSS model */
-    change_Pref     = test.attrs["change_Pref"].var.get()       # 1             # 1:Change Pref after breaker opens, 0: no change */
-    offline_Pref    = test.attrs["offline_Pref"].var.get()      # 0.004         # note GGOV model uses 1 as base offline while HYG3 and IEEE1 use 0 */
-    change_Vref     = test.attrs["change_Vref"].var.get()       # 0             # 1:Change Vref after breaker opens, 0: no change */
-    offline_Vref    = test.attrs["offline_Vref"].var.get()      # 0.79
-    AVR_On          = test.attrs["AVR_On"].var.get()            # 0             # 0: Exciter in Manual, 1: Exciter in Auto */
-    set_loadflow    = test.attrs["set_loadflow"].var.get()      # False      # If TRUE, initializes sav case with the below parameters if FALSE, loads existing sav case.
-    save_loadflow   = test.attrs["save_loadflow"].var.get()     # False     # If TRUE, overwrites sav_filename with new set_loadflow solution. If FALSE, leaves sav_filename as is.  
+    dyd_filename    = test.attrs["dyd_filename"].get()      # "U1.dyd"
+    sav_filename    = test.attrs["sav_filename"].get()      # "02_U1_CI.sav"
+    chf_filename    = test.attrs["chf_filename"].get()      # "02_U1_CI_sim_v23.chf"
+    csv_filename    = test.attrs["csv_filename"].get()      # "02_U1_CI_sim_v23.csv"
+    rep_filename    = test.attrs["rep_filename"].get()      # "Rep.rep"
+    tripTimeInSecs  = test.attrs["tripTimeInSecs"].get()    # 2.0
+    totTimeInSec    = test.attrs["totTimeInSec"].get()      # 36
+    PSS_On          = test.attrs["PSS_On"].get()            # 0             # 0:disable PSS model, 1: enable PSS model */
+    change_Pref     = test.attrs["change_Pref"].get()       # 1             # 1:Change Pref after breaker opens, 0: no change */
+    offline_Pref    = test.attrs["offline_Pref"].get()      # 0.004         # note GGOV model uses 1 as base offline while HYG3 and IEEE1 use 0 */
+    change_Vref     = test.attrs["change_Vref"].get()       # 0             # 1:Change Vref after breaker opens, 0: no change */
+    offline_Vref    = test.attrs["offline_Vref"].get()      # 0.79
+    AVR_On          = test.attrs["AVR_On"].get()            # 0             # 0: Exciter in Manual, 1: Exciter in Auto */
+    set_loadflow    = test.attrs["set_loadflow"].get()      # False      # If TRUE, initializes sav case with the below parameters if FALSE, loads existing sav case.
+    save_loadflow   = test.attrs["save_loadflow"].get()     # False     # If TRUE, overwrites sav_filename with new set_loadflow solution. If FALSE, leaves sav_filename as is.  
 
     #----------------------------------
     # loadflow Parameters
     #----------------------------------
 
-    Pinit           = test.attrs["Pinit"].var.get()     # 1.49  # MW
-    Qinit           = test.attrs["Qinit"].var.get()     # -5.25  # MVAR
-    MVAbase         = test.attrs["MVAbase"].var.get()   # 206.0
+    Pinit           = test.attrs["Pinit"].get()     # 1.49  # MW
+    Qinit           = test.attrs["Qinit"].get()     # -5.25  # MVAR
+    MVAbase         = test.attrs["MVAbase"].get()   # 206.0
 
-    Vinit           = test.attrs["Vinit"].var.get()     # 13.266  # kV
-    Vbase           = test.attrs["Vbase"].var.get()     # 13.8    # kV
-    Zbranch         = test.attrs["Zbranch"].var.get()   # 0.123    # pu
+    Vinit           = test.attrs["Vinit"].get()     # 13.266  # kV
+    Vbase           = test.attrs["Vbase"].get()     # 13.8    # kV
+    Zbranch         = test.attrs["Zbranch"].get()   # 0.123    # pu
+
+    #----------------------------------
+    # User Defined Parameters
+    # Note that these are not accessed
+    # unless decided so by the user
+    #----------------------------------
+
+    UserVar1        = test.attrs["UserVar1"].get()
+    UserVar2        = test.attrs["UserVar2"].get()
+    UserVar3        = test.attrs["UserVar3"].get()
+    UserVar4        = test.attrs["UserVar4"].get()
+    UserVar5        = test.attrs["UserVar5"].get()
 
     #--------------------------------------------------------------------------------------------------
 
-    # gets the project directory of this file
-    project_directory = os.path.dirname(os.path.realpath(__file__))
-
+    # gets the project directory of this test and initialize the PSLF instance
+    project_directory = test.get_dir().replace("/", "\\") # os.path.dirname(os.path.realpath(__file__))
     SuperTool.launch_Pslf(project_directory, silent=no_gui)
 
     SuperTool.print_to_pslf("-----------------------------------------------------------------------------------------")

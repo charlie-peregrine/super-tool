@@ -28,7 +28,7 @@ class SuperToolFatalError(Exception):
         super().__init__(message)
 
 class SuperToolMessage():
-    def __init__(self, message_type: str, message: str):
+    def __init__(self, message_type: str, message: str = ""):
         self.lock = threading.Lock()
         self.type = message_type
         self.text = message
@@ -89,11 +89,13 @@ class SuperTool:
 
     @staticmethod
     def pwd():
-        # print working directory and project directory
-        project_directory = os.path.dirname(os.path.realpath(__file__))
-        SuperTool.print_to_pslf("\nProject directory: ",project_directory)
-        print("project directory: ",project_directory)
-        os.chdir(project_directory)
+        # # print working directory and project directory
+        # project_directory = os.path.dirname(os.path.realpath(__file__))
+        # SuperTool.print_to_pslf("\nProject directory: ",project_directory)
+        # print("project directory: ",project_directory)
+        # os.chdir(project_directory)
+        
+        # print working directory
         print("working directory: ", os.getcwd())
         return
     
@@ -104,10 +106,10 @@ class SuperTool:
         os.chdir(project_directory) # changes the python working directory to the project directory
         # Initializes the PSLF instance
         try:
-            init_pslf(use_existing=True, working_directory=project_directory, silent = silent) 
+            init_pslf(use_existing=True, path="Pslf.exe", working_directory=project_directory, silent = silent) 
             print("GUI already launched")
         except:
-            init_pslf(use_existing=False, working_directory=project_directory, silent = silent) 
+            init_pslf(use_existing=False, path="Pslf.exe", working_directory=project_directory, silent = silent) 
             print("launching GUI")
         finally:
             pass

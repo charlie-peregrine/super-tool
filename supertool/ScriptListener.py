@@ -6,18 +6,27 @@
 
 import threading
 import traceback
-from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 import queue
+import re
 
-from tkinter.messagebox import askyesno
+from urllib.error import URLError
+from urllib.request import urlopen
+import tkinter.messagebox as messagebox
+
+import supertool.consts as consts
+from supertool.Version import Version
+from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 
 class ScriptListener(threading.Thread):
     def __init__(self, root):
         super().__init__()
         self.root = root
+        self.daemon = True
+        self.running = False
     
     def run(self):
-        while self.root.running:
+        self.running = True
+        while self.running:
             # try to grab something from the queue, if there's nothing reset
             # the loop
             try:
@@ -28,12 +37,19 @@ class ScriptListener(threading.Thread):
             print(f">>> ScriptListener Processing:\n>>> {message}")
             try:
                 if message.type == 'ynprompt':
-                    message.return_val = askyesno(message=message.text)
+                    message.return_val = messagebox.askyesno(message=message.text)
                     message.done()
-                
-                
+                elif message.type == 'scriptalreadyrunning':
+                    messagebox.showinfo(message=message.text)
+                elif message.type == 'check4update':
+                    self.check_for_update()
+                elif message.type == 'stopscriptlistener':
+                    print("stopscriptlistener")
+                    message.done()
+                    self.running = False
+                    
                 else:
-                    raise Exception("SuperToolMessage " + message
+                    raise TypeError("SuperToolMessage " + message
                                     + " does not have a valid type")
             except Exception as err:
                 print(">>> ScriptListener Encountered an error while processing:")
@@ -48,3 +64,29 @@ class ScriptListener(threading.Thread):
             
             print(f">>> ScriptListener Done Processing:\n>>> {message}")
             ScriptQueue.task_done()
+        
+        print(">>> ScriptListener Closing...\n")
+    
+    def check_for_update(self):
+        try:
+            new_url = urlopen(consts.GITHUB_REPO, timeout=3).url
+            if len(new_url) > 40 and "github" in new_url:
+                ver = new_url.split('/')[-1]
+                m = re.match(r'^v(\d+)\.(\d+)\.(\d+)$', ver)
+                if m: # request worked
+                    remote_ver = Version(*(int(m.group(i)) for i in [1,2,3]))
+                    if remote_ver > consts.VERSION:
+                        print(f"Current Version: {consts.VERSION}, Update to version {remote_ver}")
+                    elif remote_ver < consts.VERSION:
+                        print(f"Current Version: {consts.VERSION}, Ahead of version {remote_ver}")
+                    else:
+                        print(f"Up to date with version: {consts.VERSION}")
+                        
+                else: # request failed, printout update checker failed
+                    pass
+            else: # request failed, printout update checker failed
+                pass
+        
+        except (URLError, TimeoutError):
+            pass
+    
