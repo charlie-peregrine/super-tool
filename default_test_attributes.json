@@ -1163,124 +1163,124 @@
             "type": "STR",
             "group": "PLAIN",
             "default": "genqec",
-            "full_name": "",
-            "description": ""
+            "full_name": "Generator Model",
+            "description": "Generator model that is used for the unit. Should match what is in the dyd. This updates the syncmod.p script with the appropriate generator"
         },
         "SyncTimeInSecs": {
             "type": "NUM",
             "group": "PLAIN",
-            "default": 0,
+            "default": 1.0,
             "unit": "sec",
-            "full_name": "",
-            "description": ""
+            "full_name": "Sychronization Time (s)",
+            "description": "The time in the test at which the synchronization occurs."
         },
         "TotTimeInSec": {
             "type": "NUM",
             "group": "PLAIN",
-            "default": 0,
+            "default": 5.0,
             "unit": "sec",
-            "full_name": "",
-            "description": ""
+            "full_name": "Total Test time",
+            "description": "The total simulation time of the test."
         },
         "PreSyncHz": {
             "type": "NUM",
             "group": "PLAIN",
-            "default": 0,
+            "default": 60.0,
             "unit": "Hz",
-            "full_name": "",
-            "description": ""
+            "full_name": "Pre Sync Frequency",
+            "description": "The frequency of the unit just prior to the synchronization."
         },
         "PostSyncHz": {
             "type": "NUM",
             "group": "PLAIN",
-            "default": 0,
+            "default": 60.0,
             "unit": "Hz",
-            "full_name": "",
-            "description": ""
+            "full_name": "Post Sync Frequency",
+            "description": "The frequency of the unit just after the synchronization."
         },
         "BaseHz": {
             "type": "NUM",
             "group": "PLAIN",
-            "default": 0,
+            "default": 60.0,
             "unit": "Hz",
-            "full_name": "",
-            "description": ""
+            "full_name": "Rated Speed",
+            "description": "The machine and grid rated speed."
         },
         "SyncAngleDegs": {
             "type": "NUM",
             "group": "PLAIN",
-            "default": 0,
-            "unit": "degree",
-            "full_name": "",
-            "description": ""
+            "default": -1.0,
+            "unit": "degrees",
+            "full_name": "Syncrhronization Angle",
+            "description": "The voltage phase angle between the unit and the grid at the moment of synchronization"
         },
         "PSS_On": {
             "type": "BOOL",
             "group": "PLAIN",
             "default": false,
-            "full_name": "",
-            "description": ""
+            "full_name": "Power System Stabilizer Enable",
+            "description": "0: Disable PSS. 1: Enable PSS. The status of the power system stabilizer during the sync test. 99% of the time this is disabled."
         },
         "AVR_On": {
             "type": "BOOL",
             "group": "PLAIN",
             "default": true,
-            "full_name": "",
-            "description": ""
+            "full_name": "Automatic Voltage Regulation Mode",
+            "description": "0: Manual Excitation, 1:AVR. The control mode of the voltage regulator during the sync test. 99% of the time this is enabled."
         },
         "ChangePref": {
             "type": "BOOL",
             "group": "PLAIN",
-            "default": true,
-            "full_name": "",
-            "description": ""
+            "default": false,
+            "full_name": "Change MW Reference",
+            "description": "1: Change to MW reference post sync, 0: No change."
         },
         "OnlinePref": {
             "type": "NUM",
             "group": "PLAIN",
-            "default": 0,
+            "default": 0.0,
             "unit": "",
-            "full_name": "",
-            "description": ""
+            "full_name": "MW Reference",
+            "description": "~1.0 for GGOV1, ~0.0 for most other models."
         },
         "PrefDelay": {
             "type": "NUM",
             "group": "PLAIN",
             "default": 0,
-            "unit": "",
-            "full_name": "",
-            "description": ""
+            "unit": "sec",
+            "full_name": "MW reference delay",
+            "description": "time in seconds after the synchronization when the MW reference is changed."
         },
         "ChangeVref": {
             "type": "BOOL",
             "group": "PLAIN",
             "default": true,
-            "full_name": "",
-            "description": ""
+            "full_name": "Change Vt Reference",
+            "description": "1: Change to terminal voltage reference post sync, 0: No change."
         },
         "OnlineVref": {
             "type": "NUM",
             "group": "PLAIN",
-            "default": 0,
+            "default": 1.0,
             "unit": "",
-            "full_name": "",
-            "description": ""
+            "full_name": "Vt Reference",
+            "description": "The terminal voltage reference of the unit after synchronization."
         },
         "GenVinit": {
             "type": "NUM",
             "group": "LOADFLOW",
-            "default": 0,
+            "default": 13.8,
             "unit": "kV",
-            "full_name": "",
-            "description": ""
+            "full_name": "Pre Sync Generator Voltage",
+            "description": "The generator voltage just prior to the synchronization."
         },
         "GenVbase": {
             "type": "NUM",
             "group": "LOADFLOW",
-            "default": 0,
-            "unit": "",
-            "full_name": "",
-            "description": ""
+            "default": 13.8,
+            "unit": "kV",
+            "full_name": "Generator Rated Voltage",
+            "description": "Generator Voltage Base."
         },
         "Zbranch": {
             "type": "NUM",
@@ -1288,23 +1288,23 @@
             "default": 0.05,
             "unit": "pu",
             "full_name": "System Impedance",
-            "description": "The impedance of the system, as seen by the unit, on a 100MVA base. Can use per unitized measured X=dV/dQ to approximate impedance."
+            "description": "The impedance of the system, as seen by the unit, on a 100MVA base."
         },
         "SmibVinit": {
             "type": "NUM",
             "group": "LOADFLOW",
-            "default": 0,
+            "default": 13.8,
             "unit": "kV",
             "full_name": "",
-            "description": ""
+            "description": "The single machine infinite bus voltage. Adjust this number to set the unit's post sync generator voltage"
         },
         "SmibVbase": {
             "type": "NUM",
             "group": "LOADFLOW",
             "default": 0,
             "unit": "",
-            "full_name": "",
-            "description": ""
+            "full_name": "SMIB Rated Voltage",
+            "description": "Single machien infinite bus voltage rating."
         },
         "UserVar1": {
             "type": "STR",
