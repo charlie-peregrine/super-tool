@@ -41,6 +41,8 @@ class SuperToolGUI(tk.Tk):
         self.project = stproject.Project()
         self.focused_test = None
         
+        self.set_window_title()
+        
         # setup backend listener script and its boolean signal flag
         self.running = True
         self.listener = ScriptListener.ScriptListener(self)
@@ -405,6 +407,8 @@ class SuperToolGUI(tk.Tk):
     def set_project(self, proj):
         del self.project
         self.project = proj
+        # set window title
+        self.set_window_title()
         # re-render project pane
         self.proj_frame.render()
         self.proj_frame.update_proj_header()
@@ -413,7 +417,14 @@ class SuperToolGUI(tk.Tk):
         self.test_frame.show_focused_test()
         self.param_frame.render()
         self.update_pane_widths()
+    
+    def set_window_title(self):
+        text = f"Super Tool - {self.project.title}"
+        if self.project.file_name:
+            text += f" ({self.project.file_name})"
         
+        self.title(text)
+    
     def show_dir_details(self):
         s = tk.Toplevel(self)
         
@@ -468,6 +479,9 @@ class SuperToolGUI(tk.Tk):
             
             # change project header in project pane
             self.proj_frame.update_proj_header()
+            
+            # set window title
+            self.set_window_title()
 
     def validate_working_dir(self, proj=None):
         if not proj:
@@ -571,7 +585,7 @@ class SuperToolGUI(tk.Tk):
         filename = fd.asksaveasfilename(defaultextension="*.*", filetypes=[("Super Tool Project Files", "*.pec")])
         if filename:
             self.project.file_name = filename
-            self.project.write_to_file_name()
+            self.save_project()
 
     def show_about_popup(self):
         win = Popup(self, title="About")
