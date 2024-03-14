@@ -6,15 +6,16 @@
 
 import threading
 import traceback
-from supertool.Version import Version
-from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 import queue
+import re
 
 from urllib.error import URLError
 from urllib.request import urlopen
 import tkinter.messagebox as messagebox
+
 import supertool.consts as consts
-import re
+from supertool.Version import Version
+from supertool.pslf_scripts.Super_Tool import ScriptQueue, SuperToolMessage
 
 class ScriptListener(threading.Thread):
     def __init__(self, root):
