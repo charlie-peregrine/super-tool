@@ -74,7 +74,7 @@ class SuperToolGUI(tk.Tk):
         # self.grid_rowconfigure(0, minsize=150, weight=1)
         # self.grid_columnconfigure(0, minsize=50, weight=1)
         # self.grid_columnconfigure(1, minsize=50, weight=1)
-        # self.grid_columnconfigure(2, minsize=50, weight=1)
+        self.grid_columnconfigure(0, minsize=50, weight=1)
 
         # create the sub-frames
         self.proj_frame = ProjectView(self.panedwindow)
@@ -173,29 +173,33 @@ class SuperToolGUI(tk.Tk):
     
     # method to call when the program exits
     def on_quit(self):
-        # set running to false, indicating that the listener thread should stop
-        self.running = False
-        print("===== Waiting for ScriptListener to finish =====")
-        stop_message = SuperToolMessage("stopscriptlistener")
-        ScriptQueue.put(stop_message)
-        stop_message.wait()
-        # queue.join instead of listener because
-        # listener.join causes a program freeze
-        ScriptQueue.join()
-        print("===== ScriptListener has finished  =====", end='')
+        def close():
+            # set running to false, indicating that the listener thread should stop
+            self.running = False
+            print("===== Waiting for ScriptListener to finish =====")
+            stop_message = SuperToolMessage("stopscriptlistener")
+            ScriptQueue.put(stop_message)
+            stop_message.wait()
+            # queue.join instead of listener because
+            # listener.join causes a program freeze
+            ScriptQueue.join()
+            print("===== ScriptListener has finished  =====", end='')
+            
+            # close the window
+            self.destroy()
+            
+            # save use pslf gui value
+            print("===== Saving Modified Configuration Data =====")
+            if self.save_config_data():
+                print("===== Modified Configuration Data Saved =====")
+            
+            # close the pslf window while we're on the way out
+            print("===== Closing PSLF =====")
+            kill_pslf()
+            print("===== PSLF Closed =====")
         
-        # close the window
-        self.destroy()
-        
-        # save use pslf gui value
-        print("===== Saving Modified Configuration Data =====")
-        if self.save_config_data():
-            print("===== Modified Configuration Data Saved =====")
-        
-        # close the pslf window while we're on the way out
-        print("===== Closing PSLF =====")
-        kill_pslf()
-        print("===== PSLF Closed =====")
+        self.set_status("Closing Super Tool...")
+        self.after(5, close)
 
     def save_config_data(self):
         try:
@@ -209,7 +213,7 @@ class SuperToolGUI(tk.Tk):
 
     # wrapper for statusbar text setting
     # needs some work
-    def set_status(self, string):
+    def set_status(self, string: str):
         self.statusbar_frame.set_text(string)
 
     def update_pane_widths(self):
@@ -419,7 +423,7 @@ class SuperToolGUI(tk.Tk):
         self.update_pane_widths()
     
     def set_window_title(self):
-        text = f"Super Tool - {self.project.title}"
+        text = f"Super Tool {consts.VERSION} - {self.project.title}"
         if self.project.file_name:
             text += f" ({self.project.file_name})"
         

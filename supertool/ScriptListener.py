@@ -68,6 +68,7 @@ class ScriptListener(threading.Thread):
         print(">>> ScriptListener Closing...\n")
     
     def check_for_update(self):
+        self.root.set_status("Checking for Updates...")
         try:
             new_url = urlopen(consts.GITHUB_REPO, timeout=3).url
             if len(new_url) > 40 and "github" in new_url:
@@ -76,17 +77,19 @@ class ScriptListener(threading.Thread):
                 if m: # request worked
                     remote_ver = Version(*(int(m.group(i)) for i in [1,2,3]))
                     if remote_ver > consts.VERSION:
-                        print(f"Current Version: {consts.VERSION}, Update to version {remote_ver}")
+                        text = f"Super Tool Version:  {consts.VERSION}, Update to version {remote_ver}"
                     elif remote_ver < consts.VERSION:
-                        print(f"Current Version: {consts.VERSION}, Ahead of version {remote_ver}")
+                        text = f"Super Tool Version:  {consts.VERSION}, Ahead of version {remote_ver}"
                     else:
-                        print(f"Up to date with version: {consts.VERSION}")
+                        text = f"Super Tool Version: {consts.VERSION}, Up to date"
+                    self.root.set_status(text)
+                    print(text)
                         
                 else: # request failed, printout update checker failed
-                    pass
+                    self.root.set_status("Update Check Failed.")
             else: # request failed, printout update checker failed
-                pass
+                self.root.set_status("Update Check Failed.")
         
         except (URLError, TimeoutError):
-            pass
+            self.root.set_status("Update Check Failed.")
     

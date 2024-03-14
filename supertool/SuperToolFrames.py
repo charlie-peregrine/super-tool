@@ -8,14 +8,19 @@ from tkinter import ttk
 # happening, such as loading times, file opening and closing info,
 # and other info that is relevant to the whole application and can be presented
 # as out of the way text
-class StatusBar(ttk.Frame):
+class StatusBar(tk.Frame):
     def __init__(self, parent):
         self.parent = parent
-        super().__init__(self.parent, borderwidth=2, relief='groove')
+        super().__init__(self.parent, borderwidth=2, relief='groove') #, background='red')
+
+        self.columnconfigure(0, weight=1)
 
         
         self.main_text = ttk.Label(self, text="Status Bar")
-        self.main_text.grid(row=0, column=0)
+        self.main_text.grid(row=0, column=0, sticky='w')
+        
+        self.history_button = ttk.Button(self, text="VVV", width=5)
+        self.history_button.grid(row=0, column=1, sticky='e')
 
     # helper method to let other methods easily set the status bar's main
     # text field
