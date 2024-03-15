@@ -3,6 +3,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+from collections import deque
 
 # the statusbar frame should hold details about current background tasks
 # happening, such as loading times, file opening and closing info,
@@ -14,18 +15,29 @@ class StatusBar(tk.Frame):
         super().__init__(self.parent, borderwidth=2, relief='groove') #, background='red')
 
         self.columnconfigure(0, weight=1)
-
         
-        self.main_text = ttk.Label(self, text="Loading Super Tool...")
+        initial_text = "Loading Super Tool..."
+        self.history = deque([initial_text], maxlen=10)
+        
+        self.main_text = ttk.Label(self, text=initial_text)
         self.main_text.grid(row=0, column=0, sticky='w')
         
-        self.history_button = ttk.Button(self, text="VVV", width=5)
+        self.history_button = ttk.Button(self, text="VVV",
+                command=self.show_history, width=5)
         self.history_button.grid(row=0, column=1, sticky='e')
 
     # helper method to let other methods easily set the status bar's main
     # text field
     def set_text(self, text):
+        self.history.append(text)
         self.main_text.config(text=text)
+    
+    def show_history(self):
+        hist_window = Popup(self.parent, "Status Bar History", force=False)
+        for i, line in enumerate(self.history, start=1):
+            print(i, line)
+            label = ttk.Label(hist_window, text=f"{i:<4} {line}")
+            label.grid(row=i, column=0, sticky='w', padx=5)
 
 
 # A multiple use scrollbar frame
