@@ -16,7 +16,7 @@ class StatusBar(tk.Frame):
         self.columnconfigure(0, weight=1)
 
         
-        self.main_text = ttk.Label(self, text="Status Bar")
+        self.main_text = ttk.Label(self, text="Loading Super Tool...")
         self.main_text.grid(row=0, column=0, sticky='w')
         
         self.history_button = ttk.Button(self, text="VVV", width=5)

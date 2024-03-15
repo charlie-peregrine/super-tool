@@ -22,7 +22,7 @@ class Unit:
         
     # add a test to this unit given a name and type
     def add_test(self, name, type_):
-        self.tests[name] = Test(name=name, type=type_)
+        self.tests[name] = Test(name=name, type_=type_)
         self.tests[name].parent = self
         return self.tests[name]
     

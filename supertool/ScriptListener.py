@@ -47,6 +47,9 @@ class ScriptListener(threading.Thread):
                     print("stopscriptlistener")
                     message.done()
                     self.running = False
+                elif message.type == 'setstatus':
+                    self.root.set_status(message.text)
+                    self.root.after(5, message.done)
                     
                 else:
                     raise TypeError("SuperToolMessage " + message
