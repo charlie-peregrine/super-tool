@@ -47,6 +47,9 @@ class ScriptListener(threading.Thread):
                     print("stopscriptlistener")
                     message.done()
                     self.running = False
+                elif message.type == 'setstatus':
+                    self.root.set_status(message.text)
+                    self.root.after(5, message.done)
                     
                 else:
                     raise TypeError("SuperToolMessage " + message
@@ -68,7 +71,7 @@ class ScriptListener(threading.Thread):
         print(">>> ScriptListener Closing...\n")
     
     def check_for_update(self):
-        self.root.set_status("Checking for Updates...")
+        self.root.set_status("Checking for Updates...", spin=True)
         try:
             new_url = urlopen(consts.GITHUB_REPO, timeout=3).url
             if len(new_url) > 40 and "github" in new_url:

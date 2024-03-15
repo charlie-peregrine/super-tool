@@ -213,8 +213,8 @@ class SuperToolGUI(tk.Tk):
 
     # wrapper for statusbar text setting
     # needs some work
-    def set_status(self, string: str):
-        self.statusbar_frame.set_text(string)
+    def set_status(self, string: str, error: bool=False, spin: bool=False):
+        self.statusbar_frame.set_text(string, error=error, spin=spin)
 
     def update_pane_widths(self):
         # def printout():
@@ -399,14 +399,19 @@ class SuperToolGUI(tk.Tk):
     def open_project(self, e=None):
         filename = fd.askopenfilename(filetypes=[("Super Tool Project Files", "*.pec")])
         if filename:
+            self.set_status(f"Opening '{os.path.basename(filename)}' ...", spin=True)
             p = stproject.Project()
             p.file_name = filename
             if not p.read_from_file_name():
+                self.set_status(f"Opening '{os.path.basename(filename)}' failed!", error=True)
                 return
             
             # double check that there's a working directory
             if self.validate_working_dir(proj=p):
                 self.set_project(p)
+                self.set_status(f"Opened '{p.title}' Successfully.")
+            else:
+                self.set_status("Open cancelled.")
             
     def set_project(self, proj):
         del self.project
@@ -478,7 +483,9 @@ class SuperToolGUI(tk.Tk):
         new_project_name = simpledialog.askstring(title="Rename Project",
             prompt=f"Enter a new project name to replace\n{self.project.title}.")
         if new_project_name:
+            self.set_status(f"Renaming '{self.project.title}'")
             # set the project name
+            old_project_name = self.project.title
             self.project.title = new_project_name
             
             # change project header in project pane
@@ -486,6 +493,8 @@ class SuperToolGUI(tk.Tk):
             
             # set window title
             self.set_window_title()
+            
+            self.set_status(f"Renamed '{old_project_name}' to '{self.project.title}'.")
 
     def validate_working_dir(self, proj=None):
         if not proj:
@@ -553,6 +562,8 @@ class SuperToolGUI(tk.Tk):
                 if self.focused_test:
                     # rerender focused test to update hovertext @TODO do it better
                     self.test_frame.show_focused_test()
+                
+                self.set_status(f"Working directory changed to '{os.path.normpath(self.project.get_dir())}'.")
         
         def cancel_command():
             set_dir_window.destroy()
@@ -577,11 +588,13 @@ class SuperToolGUI(tk.Tk):
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file
     def save_project(self, e=None):
+        self.set_status("Saving...", spin=True)
         self.save_config_data()
         if self.project.file_name:
             self.project.write_to_file_name()
         else:
             self.save_as_project()
+        self.set_status(f"Saved '{self.project.title}' to {self.project.file_name}")
 
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file

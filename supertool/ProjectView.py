@@ -295,10 +295,12 @@ class ProjectView(ttk.Frame):
     # uses a messagebox to ask the user for confirmation
     def delete_test(self):
         test = self.get_clicked_test_or_unit()
-        if messagebox.askyesno(message=
-                "Are you sure you want to delete the following test:\n\n"
-                + test.name, title="Delete Test"):
-
+        answer = messagebox.askyesno(
+            message="Are you sure you want to delete the following test:\n\n"
+                    + test.name,
+            title="Delete Test"
+        )
+        if answer:
             if self.parent.focused_test == test:
                 self.parent.focused_test = None
                 self.parent.test_frame.show_focused_test()
@@ -308,6 +310,8 @@ class ProjectView(ttk.Frame):
             test.parent.remove_test(test.name)
             if len(test.parent.tests) == 0:
                 test.parent.no_tests_label.pack(anchor='w', padx=10)
+            self.parent.set_status(
+                f"Deleted test '{test.name}' in unit '{test.parent.name}'")
 
     # method used to rename a test
     # uses a dialog box to ask for the new test name
@@ -320,8 +324,11 @@ class ProjectView(ttk.Frame):
         elif new_name in test.parent.tests:
             print(f"test {new_name} already exists. renaming test {test.name} failed")
         else:
+            old_name = test.name
             test.parent.rename_test(test.name, new_name)
             test.frame.children['!label']['text'] = new_name
+            self.parent.set_status(
+                f"Renamed test '{old_name}' to '{test.name}' in unit '{test.parent.name}'.")
 
     def set_test_sub_dir(self):
         test = self.get_clicked_test_or_unit()
@@ -372,6 +379,8 @@ class ProjectView(ttk.Frame):
                     if test == self.parent.focused_test:
                         # rerender focused test to update hovertext @TODO do it better
                         self.parent.test_frame.show_focused_test()
+                self.parent.set_status(
+                    f"Test '{test.name}' sub-directory changed to '{os.path.normpath(test.get_dir())}'.")
         
         def cancel_command():
             set_dir_window.destroy()
@@ -519,6 +528,9 @@ class ProjectView(ttk.Frame):
                 # build the test frame and save it for later
                 test_frame = self.build_test_frame(test, unit.frame)
                 test.frame = test_frame
+                
+                self.parent.set_status(
+                    f"Added test '{test.name}' to unit '{test.parent.name}'.")
 
         def cancel_command():
             test_prompt_window.destroy()
@@ -537,10 +549,12 @@ class ProjectView(ttk.Frame):
     # delete the clicked unit
     def delete_unit(self):
         unit = self.get_clicked_test_or_unit()
-        if messagebox.askyesno(message=
-                "Are you sure you want to delete the following unit and all of its tests:\n\n"
-                + unit.name, title="Delete Unit"):
-            
+        answer = messagebox.askyesno(
+            message="Are you sure you want to delete the following unit and all of its tests:\n\n"
+                    + unit.name,
+            title="Delete Unit"
+        )
+        if answer:
             if self.parent.focused_test and self.parent.focused_test.name in unit.tests:
                 self.parent.focused_test = None
                 self.parent.test_frame.show_focused_test()
@@ -551,6 +565,7 @@ class ProjectView(ttk.Frame):
             self.proj.remove_unit(unit.name)
             if len(self.proj.units) == 0:
                 self.show_no_units()
+            self.parent.set_status(f"Deleted unit '{unit.name}'.")
 
     # rename the clicked unit
     # @TODO handle a cancel in the askstring popup
@@ -564,8 +579,10 @@ class ProjectView(ttk.Frame):
         elif new_name in self.proj.units:
             print(f"unit {new_name} already exists. renaming unit {unit.name} failed")
         else:
+            old_name = unit.name
             self.proj.rename_unit(unit.name, new_name)
             unit.frame.children['!label']['text'] = new_name
+            self.parent.set_status(f"Renamed unit '{old_name}' to '{unit.name}'.")
 
     def set_unit_sub_dir(self):
         unit = self.get_clicked_test_or_unit()
@@ -616,6 +633,9 @@ class ProjectView(ttk.Frame):
                     if self.parent.focused_test.name in unit.tests:
                         # rerender focused test to update hovertext @TODO do it better
                         self.parent.test_frame.show_focused_test()
+                
+                self.parent.set_status(
+                    f"Unit '{unit.name}' sub-directory changed to '{os.path.normpath(unit.get_dir())}'.")
         
         def cancel_command():
             set_dir_window.destroy()
@@ -716,6 +736,9 @@ class ProjectView(ttk.Frame):
 
                 unit_frame = self.build_unit_frame(unit, self.scroller.frame)
                 unit.frame = unit_frame
+                
+                self.parent.set_status(
+                    f"Created unit '{unit.name}'.")
         
         def cancel_command(e=None):
             unit_prompt_window.destroy()
