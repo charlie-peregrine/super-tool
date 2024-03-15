@@ -150,6 +150,7 @@ class ParamView(ttk.Frame):
         
         if not self.foc:
             print("no focused test yet")
+            self.parent.set_status("No focused test to graph!", error=True)
             return
         
         # save the project before graphing
@@ -182,6 +183,7 @@ class ParamView(ttk.Frame):
         for k,v in mes_data.items():
             print(k, v)
         
+        warnings = []
         x_min = self.foc.x_range_min.get()
         if x_min.lower() == '' or x_min.lower() == 'auto':
             sim_data['xmin'] = "'Auto'"
@@ -192,7 +194,7 @@ class ParamView(ttk.Frame):
                 sim_data['xmin'] = x_min
                 mes_data['xmin'] = x_min
             except ValueError:
-                print(f"X Minimum value of {x_min} is invalid, defaulting to Auto")
+                warnings.append(f"Warning: Minimum x value of {x_min} is invalid, defaulting to Auto.")
                 sim_data['xmin'] = "'Auto'"
                 mes_data['xmin'] = "'Auto'"
         
@@ -206,10 +208,15 @@ class ParamView(ttk.Frame):
                 sim_data['xmax'] = x_max
                 mes_data['xmax'] = x_max
             except ValueError:
-                print(f"X Maximum value of {x_max} is invalid, defaulting to Auto")
+                warnings.append(f"Warning: Maximum x value of {x_max} is invalid, defaulting to Auto.")
                 sim_data['xmax'] = "'Auto'"
                 mes_data['xmax'] = "'Auto'"
         
+        for w in warnings:
+            print(w)
+            self.parent.set_status(w)
+        
+        self.parent.set_status("Plotting graphs. " + " ".join(warnings))
         self.foc.plot(sim_dict=sim_data, mes_dict=mes_data)
         
     

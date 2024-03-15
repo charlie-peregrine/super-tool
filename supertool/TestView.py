@@ -349,12 +349,12 @@ class TestView(ttk.Frame):
                 traceback.print_exception(e)
                 name = v.full_name if v.full_name else k
                 print(f"ERROR: Test parameter {name} is not valid. See above error message.")
-                self.parent.set_status(f"ERROR: Test Parameter {name} is not valid. See console for details.")
+                self.parent.set_status(f"Test Parameter {name} is not valid. See console for details.", error=True)
                 self.run_sim_active = False
                 return
 
             def status_running():
-                self.parent.set_status(f"Running {self.parent.focused_test.type} test...")
+                self.parent.set_status(f"Running {self.parent.focused_test.type} test...", spin=True)
             
             # run script thread
             def run_script():
@@ -379,14 +379,14 @@ class TestView(ttk.Frame):
                         if not hide and last_hide:
                             print("last hide and not hide")
                             # kill pslf (in terminal), rerun with gui
-                            self.parent.set_status("Restarting PSLF with GUI...")
+                            self.parent.set_status("Restarting PSLF with GUI...", spin=True)
                             kill_pslf()
                             status_running()
                         
                         if hide and not last_hide:
                             print("not last hide and hide")
                             # kill pslf (as gui), rerun in terminal
-                            self.parent.set_status("Restarting PSLF without GUI...")
+                            self.parent.set_status("Restarting PSLF without GUI...", spin=True)
                             kill_pslf()
                             status_running()
                             
@@ -405,7 +405,7 @@ class TestView(ttk.Frame):
                             if not open_windows:
                                 # if window is closed but process still running, 
                                 # kill pslf then rerun with gui
-                                self.parent.set_status("Restarting PSLF with GUI...")
+                                self.parent.set_status("Restarting PSLF with GUI...", spin=True)
                                 kill_pslf()
                                 status_running()
                                 
@@ -417,13 +417,13 @@ class TestView(ttk.Frame):
                     print("=== Working Directory:", os.getcwd())
                     traceback.print_exception(err)
                     print("\n===== SuperToolFatalError while running Supertool Script - end =====")
-                    self.parent.set_status("ERROR: SuperToolFatalError, see console for details.")
+                    self.parent.set_status("SuperToolFatalError, see console for details.", error=True)
                 except Exception as err:
                     print("===== General Exception while running Supertool Script - start =====\n")
                     print("=== Working Directory:", os.getcwd())
                     traceback.print_exception(err)
                     print("\n===== General Exception while running Supertool Script - end =====")
-                    self.parent.set_status("ERROR: General Exception, see console for details.")
+                    self.parent.set_status("General Exception, see console for details.", error=True)
                 
                 
                 self.parent.param_frame.render_sim_frame()
@@ -441,7 +441,7 @@ class TestView(ttk.Frame):
         else:
             # @TODO make this more elegant
             print("No focused test to run a script for!")
-            self.parent.set_status("ERROR: No focused test to run!")
+            self.parent.set_status("No focused test to run!", error=True)
             self.unlock_run_button()
         
         self.run_sim_active = False
@@ -536,23 +536,25 @@ class TestView(ttk.Frame):
         
     # @TODO needs typechecking?
     def open_path(self, attr):
+        error = True
         if attr.var.get():
             if os.path.exists(attr.get()):
                 os.startfile(attr.get())
                 printout = f"Starting '{os.path.basename(attr.get())}' in default application."
+                error = False
             else:
                 if attr.read_only_file:
                     printout = f"File: '{attr.get()}' does not exist. " + \
-                          "Select a file using the left button first"
+                          "Select a file using the left button first."
                 else:
                     printout = f"File: '{attr.get()}' does not exist. " + \
                           "Run the simulation or select a file " + \
-                          "using the left button first"
+                          "using the left button first."
         else:
-            printout = "Open failed. Select a file with the left button first"
+            printout = "Open failed. Select a file with the left button first."
         
         print(printout)
-        self.parent.set_status(printout)
+        self.parent.set_status(printout, error=error)
     
     # get a new path for path type attributes
     # need to pick between input and output files because the file

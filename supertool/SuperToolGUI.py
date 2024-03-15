@@ -213,8 +213,8 @@ class SuperToolGUI(tk.Tk):
 
     # wrapper for statusbar text setting
     # needs some work
-    def set_status(self, string: str):
-        self.statusbar_frame.set_text(string)
+    def set_status(self, string: str, error: bool=False, spin: bool=False):
+        self.statusbar_frame.set_text(string, error=error, spin=spin)
 
     def update_pane_widths(self):
         # def printout():
@@ -399,11 +399,11 @@ class SuperToolGUI(tk.Tk):
     def open_project(self, e=None):
         filename = fd.askopenfilename(filetypes=[("Super Tool Project Files", "*.pec")])
         if filename:
-            self.set_status(f"Opening '{os.path.basename(filename)}' ...")
+            self.set_status(f"Opening '{os.path.basename(filename)}' ...", spin=True)
             p = stproject.Project()
             p.file_name = filename
             if not p.read_from_file_name():
-                self.set_status(f"Opening '{os.path.basename(filename)}' failed!")
+                self.set_status(f"Opening '{os.path.basename(filename)}' failed!", error=True)
                 return
             
             # double check that there's a working directory
@@ -588,7 +588,7 @@ class SuperToolGUI(tk.Tk):
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file
     def save_project(self, e=None):
-        self.set_status("Saving...")
+        self.set_status("Saving...", spin=True)
         self.save_config_data()
         if self.project.file_name:
             self.project.write_to_file_name()

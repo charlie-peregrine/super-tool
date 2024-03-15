@@ -2,6 +2,7 @@
 # where the frame classes for supertool live
 
 import tkinter as tk
+import tkinter.font
 from tkinter import ttk
 from collections import deque
 
@@ -14,23 +15,46 @@ class StatusBar(tk.Frame):
         self.parent = parent
         super().__init__(self.parent, borderwidth=2, relief='groove') #, background='red')
 
-        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
         
         initial_text = "Loading Super Tool..."
         self.history = deque([initial_text], maxlen=10)
         
         self.main_text = ttk.Label(self, text=initial_text)
-        self.main_text.grid(row=0, column=0, sticky='w')
+        self.main_text.grid(row=0, column=1, sticky='w')
         
-        self.history_button = ttk.Button(self, text="VVV",
-                command=self.show_history, width=5)
-        self.history_button.grid(row=0, column=1, sticky='e')
+        self.history_button = ttk.Button(self, text="History",
+                command=self.show_history)
+        self.history_button.grid(row=0, column=2, sticky='e')
+        
+        self.spinner = SpinnerLabel(self, ms_delay=250)
+        self.spinner.grid(row=0, column=0, sticky='w')
+        
+        style = ttk.Style()
+        
+        # create style for path buttons with paths that don't exist 
+        font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
+        style.configure('ErrorLabel.TLabel', foreground='red',
+            font=(font.cget('family'), font.cget('size'), 'bold'))
+        
 
     # helper method to let other methods easily set the status bar's main
     # text field
-    def set_text(self, text):
+    def set_text(self, text, error=False, spin=False):
         self.history.append(text)
-        self.main_text.config(text=text)
+        
+        if error:
+            self.main_text.config(style='ErrorLabel.TLabel',
+                text="ERROR: " + text)
+        else:
+            self.main_text.config(text=text, style='TLabel')
+        
+        if spin:
+            self.spinner.start()
+            self.spinner.grid()
+        else:
+            self.spinner.grid_remove()
+            self.spinner.stop()
     
     def show_history(self):
         hist_window = Popup(self.parent, "Status Bar History", force=False)
@@ -39,6 +63,38 @@ class StatusBar(tk.Frame):
             label = ttk.Label(hist_window, text=f"{i:<4} {line}")
             label.grid(row=i, column=0, sticky='w', padx=5)
 
+class SpinnerLabel(ttk.Label):
+    chars = "|/-\\"
+    length = len(chars)
+    
+    def __init__(self, parent, ms_delay=250, **kwargs):
+        super().__init__(parent, style="Spinner.TLabel", **kwargs)
+        
+        self.ms_delay = ms_delay
+        self.index = 0
+        
+        self.config(text=SpinnerLabel.chars[self.index])
+        
+        self.after_code = ""
+        
+        style = ttk.Style(self)
+        font = tkinter.font.nametofont('TkFixedFont')
+        style.configure('Spinner.TLabel', font=font)
+        self.start()
+    
+    def next(self):
+        self.index = (self.index + 1) % SpinnerLabel.length
+        self.config(text=SpinnerLabel.chars[self.index])
+        self.after_code = self.after(self.ms_delay, self.next)
+    
+    def start(self):
+        if not self.after_code:
+            self.next()
+    
+    def stop(self):
+        if self.after_code:
+            self.after_cancel(self.after_code)
+            self.after_code = ""
 
 # A multiple use scrollbar frame
 # the .frame frame is the one to place other widgets into,
