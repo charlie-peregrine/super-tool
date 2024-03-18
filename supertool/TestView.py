@@ -478,7 +478,9 @@ class TestView(ttk.Frame):
         # add test type interactible combobox (aka dropdown menu)
         type_var = tk.StringVar(type_prompt_window)
         type_dropdown = ttk.Combobox(type_prompt_window, textvariable=type_var)
-        test_types = ("Voltage Reference", "Load Reference", "Current Interruption", "Speed Reference", "Steady State")
+        test_types = ("Voltage Reference", "Load Reference",
+                      "Current Interruption", "Speed Reference",
+                      "Steady State", "Synchronization")
         type_dropdown['values'] = test_types
         # set default option to the current type
         type_dropdown.current(test_types.index(foc.type))
