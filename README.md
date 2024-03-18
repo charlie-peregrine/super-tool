@@ -3,7 +3,7 @@
 ### Dependencies
 - PSLF 23.2.6 or newer
 - Python 3.11 installed through PSLF
-- Veusz
+- Veusz 3.6.2 or newer (as early as 3.4 is probably fine)
 - pywin32, psutil, and pathvalidate (automatically installed with setup script) 
 
 ### Install
