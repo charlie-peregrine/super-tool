@@ -85,13 +85,6 @@ class TestView(ttk.Frame):
         # the scrollbar would still act like the frame was large
         self.scroller.scroll_to_top()
         
-        style = ttk.Style()
-        
-        # create style for path buttons with paths that don't exist 
-        button_font = tkinter.font.nametofont(style.lookup('TButton', 'font'))
-        style.configure('badpath.TButton', foreground='red',
-            font=(button_font.cget('family'), button_font.cget('size'), 'bold'))
-        
         focused = self.parent.focused_test
         if focused: # if there is a focused test
             # put labels and buttons for the top of the scrollable frame
@@ -329,6 +322,7 @@ class TestView(ttk.Frame):
         
         self.run_sim_active = True
         
+        
         if self.parent.focused_test:
             
             print("save_on_run:", save_on_run)
@@ -346,9 +340,15 @@ class TestView(ttk.Frame):
             except tk.TclError as e:
                 print()
                 traceback.print_exception(e)
-                print("ERROR: A test parameter is not valid. See above error message.")
+                name = v.full_name if v.full_name else k
+                print(f"ERROR: Test parameter {name} is not valid. See above error message.")
+                self.parent.set_status(f"Test Parameter {name} is not valid. See console for details.", error=True)
+                self.run_sim_active = False
                 return
 
+            def status_running():
+                self.parent.set_status(f"Running {self.parent.focused_test.type} test...", spin=True)
+            
             # run script thread
             def run_script():
                 # save working directory
@@ -362,6 +362,7 @@ class TestView(ttk.Frame):
                         print("last hide == None")
                         kill_pslf()
                         self.parent.focused_test.script(hide)
+                        self.parent.set_status("Test completed!")
                     else:
                         
                         if hide and last_hide:
@@ -371,12 +372,16 @@ class TestView(ttk.Frame):
                         if not hide and last_hide:
                             print("last hide and not hide")
                             # kill pslf (in terminal), rerun with gui
+                            self.parent.set_status("Restarting PSLF with GUI...", spin=True)
                             kill_pslf()
+                            status_running()
                         
                         if hide and not last_hide:
                             print("not last hide and hide")
                             # kill pslf (as gui), rerun in terminal
+                            self.parent.set_status("Restarting PSLF without GUI...", spin=True)
                             kill_pslf()
+                            status_running()
                             
                         if not hide and not last_hide:
                             print("not last hide and not hide")
@@ -390,24 +395,29 @@ class TestView(ttk.Frame):
                             open_windows = []
                             win32gui.EnumWindows(win_enum_handler, open_windows)
                             print("window open:", open_windows)
-                            if open_windows == "":
+                            if not open_windows:
                                 # if window is closed but process still running, 
                                 # kill pslf then rerun with gui
+                                self.parent.set_status("Restarting PSLF with GUI...", spin=True)
                                 kill_pslf()
+                                status_running()
                                 
                         self.parent.focused_test.script(hide)
-                    
+                        self.parent.set_status("Test completed!")
                     
                 except SuperToolFatalError as err:
                     print("===== SuperToolFatalError while running Supertool Script - start =====\n")
                     print("=== Working Directory:", os.getcwd())
                     traceback.print_exception(err)
                     print("\n===== SuperToolFatalError while running Supertool Script - end =====")
+                    self.parent.set_status("SuperToolFatalError, see console for details.", error=True)
                 except Exception as err:
                     print("===== General Exception while running Supertool Script - start =====\n")
                     print("=== Working Directory:", os.getcwd())
                     traceback.print_exception(err)
                     print("\n===== General Exception while running Supertool Script - end =====")
+                    self.parent.set_status("General Exception, see console for details.", error=True)
+                
                 
                 self.parent.param_frame.render_sim_frame()
                 self.parent.last_hide_pslf_gui_val = hide
@@ -416,6 +426,7 @@ class TestView(ttk.Frame):
                 # return to old working directory
                 os.chdir(working_dir)
             
+            status_running()
             self.running_thread = threading.Thread(target=run_script)
             self.running_thread.start()
             self.lock_run_button()
@@ -423,6 +434,7 @@ class TestView(ttk.Frame):
         else:
             # @TODO make this more elegant
             print("No focused test to run a script for!")
+            self.parent.set_status("No focused test to run!", error=True)
             self.unlock_run_button()
         
         self.run_sim_active = False
@@ -500,6 +512,8 @@ class TestView(ttk.Frame):
                 self.show_focused_test()
                 self.parent.proj_frame.update_test_type(foc)
                 self.parent.param_frame.render()
+                
+                self.parent.set_status(f"Changed type of test '{foc.name}' to {foc.type}.")
 
         # add a button for creating a new test
         done_button = ttk.Button(type_prompt_window, text="Done",
@@ -515,19 +529,25 @@ class TestView(ttk.Frame):
         
     # @TODO needs typechecking?
     def open_path(self, attr):
+        error = True
         if attr.var.get():
             if os.path.exists(attr.get()):
                 os.startfile(attr.get())
+                printout = f"Starting '{os.path.basename(attr.get())}' in default application."
+                error = False
             else:
                 if attr.read_only_file:
-                    print(f"File: '{attr.get()}' does not exist. "
-                          "Select a file using the left button first")
+                    printout = f"File: '{attr.get()}' does not exist. " + \
+                          "Select a file using the left button first."
                 else:
-                    print(f"File: '{attr.get()}' does not exist. "
-                          "Run the simulation or select a file "
-                          "using the left button first")
+                    printout = f"File: '{attr.get()}' does not exist. " + \
+                          "Run the simulation or select a file " + \
+                          "using the left button first."
         else:
-            print("No file to open!!!! uh oh")
+            printout = "Open failed. Select a file with the left button first."
+        
+        print(printout)
+        self.parent.set_status(printout, error=error)
     
     # get a new path for path type attributes
     # need to pick between input and output files because the file

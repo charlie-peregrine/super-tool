@@ -14,9 +14,9 @@ from supertool.SuperToolProject.Attribute import Attribute
 # a dictionary of attributes, and a script to run based on the type
 # of test that it is
 class Test:
-    def __init__(self, name="Untitled Test", type="None", parent=None): #, **kwargs):
+    def __init__(self, name="Untitled Test", type_="None", parent=None): #, **kwargs):
         self.name = name
-        self.type = type
+        self.type = type_
         self.parent = parent
         self.attrs = {}
         

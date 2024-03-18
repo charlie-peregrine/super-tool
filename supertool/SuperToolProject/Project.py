@@ -131,7 +131,7 @@ class Project:
                     # print("unit dir:", unit.sub_dir)
                 for test_node in unit_node:
                     test = Test(name=test_node.attrib['name'],
-                                type=test_node.attrib['type'],
+                                type_=test_node.attrib['type'],
                                 parent=unit)
                     if 'subdir' in test_node.attrib:
                         test.sub_dir = test_node.attrib['subdir']

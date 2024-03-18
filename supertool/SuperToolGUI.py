@@ -49,6 +49,7 @@ class SuperToolGUI(tk.Tk):
         self.listener.start()
         
         # run the helper methods to set up widgets and full window keybinds
+        self.styles()
         self.widgets()
         self.keybinds()
         
@@ -62,6 +63,29 @@ class SuperToolGUI(tk.Tk):
         
         self.protocol('WM_DELETE_WINDOW', self.on_quit)
         
+    # helper method to create relevant styles for the application
+    def styles(self):
+        
+        style = ttk.Style(self)
+        
+        font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
+        fixed_font = tkinter.font.nametofont('TkFixedFont')
+        
+        # create style for error labels in the statusbar 
+        style.configure('ErrorLabel.TLabel', foreground='red',
+            font=(font.cget('family'), font.cget('size'), 'bold'))
+        
+        # create style for the spinner label 
+        style.configure('FixedFont.TLabel', font=fixed_font)
+        style.configure('Spinner.TLabel', font=fixed_font)
+        
+        # create style for hyperlink labels
+        style.configure('hyperlink.TLabel', foreground='blue',
+            font=(font.cget('family'), font.cget('size'), 'underline'))
+        
+        # create style for path buttons with paths that don't exist
+        style.configure('badpath.TButton', foreground='red',
+            font=(font.cget('family'), font.cget('size'), 'bold'))
 
     # helper method to create and add all of the high level widgets to the 
     # main window. also handles making each row and column resize-able
@@ -74,7 +98,7 @@ class SuperToolGUI(tk.Tk):
         # self.grid_rowconfigure(0, minsize=150, weight=1)
         # self.grid_columnconfigure(0, minsize=50, weight=1)
         # self.grid_columnconfigure(1, minsize=50, weight=1)
-        # self.grid_columnconfigure(2, minsize=50, weight=1)
+        self.grid_columnconfigure(0, minsize=50, weight=1)
 
         # create the sub-frames
         self.proj_frame = ProjectView(self.panedwindow)
@@ -173,29 +197,33 @@ class SuperToolGUI(tk.Tk):
     
     # method to call when the program exits
     def on_quit(self):
-        # set running to false, indicating that the listener thread should stop
-        self.running = False
-        print("===== Waiting for ScriptListener to finish =====")
-        stop_message = SuperToolMessage("stopscriptlistener")
-        ScriptQueue.put(stop_message)
-        stop_message.wait()
-        # queue.join instead of listener because
-        # listener.join causes a program freeze
-        ScriptQueue.join()
-        print("===== ScriptListener has finished  =====", end='')
+        def close():
+            # set running to false, indicating that the listener thread should stop
+            self.running = False
+            print("===== Waiting for ScriptListener to finish =====")
+            stop_message = SuperToolMessage("stopscriptlistener")
+            ScriptQueue.put(stop_message)
+            stop_message.wait()
+            # queue.join instead of listener because
+            # listener.join causes a program freeze
+            ScriptQueue.join()
+            print("===== ScriptListener has finished  =====", end='')
+            
+            # close the window
+            self.destroy()
+            
+            # save use pslf gui value
+            print("===== Saving Modified Configuration Data =====")
+            if self.save_config_data():
+                print("===== Modified Configuration Data Saved =====")
+            
+            # close the pslf window while we're on the way out
+            print("===== Closing PSLF =====")
+            kill_pslf()
+            print("===== PSLF Closed =====")
         
-        # close the window
-        self.destroy()
-        
-        # save use pslf gui value
-        print("===== Saving Modified Configuration Data =====")
-        if self.save_config_data():
-            print("===== Modified Configuration Data Saved =====")
-        
-        # close the pslf window while we're on the way out
-        print("===== Closing PSLF =====")
-        kill_pslf()
-        print("===== PSLF Closed =====")
+        self.set_status("Closing Super Tool...")
+        self.after(5, close)
 
     def save_config_data(self):
         try:
@@ -209,8 +237,8 @@ class SuperToolGUI(tk.Tk):
 
     # wrapper for statusbar text setting
     # needs some work
-    def set_status(self, string):
-        self.statusbar_frame.set_text(string)
+    def set_status(self, string: str, error: bool=False, spin: bool=False):
+        self.statusbar_frame.set_text(string, error=error, spin=spin)
 
     def update_pane_widths(self):
         # def printout():
@@ -395,14 +423,19 @@ class SuperToolGUI(tk.Tk):
     def open_project(self, e=None):
         filename = fd.askopenfilename(filetypes=[("Super Tool Project Files", "*.pec")])
         if filename:
+            self.set_status(f"Opening '{os.path.basename(filename)}' ...", spin=True)
             p = stproject.Project()
             p.file_name = filename
             if not p.read_from_file_name():
+                self.set_status(f"Opening '{os.path.basename(filename)}' failed!", error=True)
                 return
             
             # double check that there's a working directory
             if self.validate_working_dir(proj=p):
                 self.set_project(p)
+                self.set_status(f"Opened '{p.title}' Successfully.")
+            else:
+                self.set_status("Open cancelled.")
             
     def set_project(self, proj):
         del self.project
@@ -419,7 +452,7 @@ class SuperToolGUI(tk.Tk):
         self.update_pane_widths()
     
     def set_window_title(self):
-        text = f"Super Tool - {self.project.title}"
+        text = f"Super Tool {consts.VERSION} - {self.project.title}"
         if self.project.file_name:
             text += f" ({self.project.file_name})"
         
@@ -474,7 +507,9 @@ class SuperToolGUI(tk.Tk):
         new_project_name = simpledialog.askstring(title="Rename Project",
             prompt=f"Enter a new project name to replace\n{self.project.title}.")
         if new_project_name:
+            self.set_status(f"Renaming '{self.project.title}'")
             # set the project name
+            old_project_name = self.project.title
             self.project.title = new_project_name
             
             # change project header in project pane
@@ -482,6 +517,8 @@ class SuperToolGUI(tk.Tk):
             
             # set window title
             self.set_window_title()
+            
+            self.set_status(f"Renamed '{old_project_name}' to '{self.project.title}'.")
 
     def validate_working_dir(self, proj=None):
         if not proj:
@@ -549,6 +586,8 @@ class SuperToolGUI(tk.Tk):
                 if self.focused_test:
                     # rerender focused test to update hovertext @TODO do it better
                     self.test_frame.show_focused_test()
+                
+                self.set_status(f"Working directory changed to '{os.path.normpath(self.project.get_dir())}'.")
         
         def cancel_command():
             set_dir_window.destroy()
@@ -573,11 +612,13 @@ class SuperToolGUI(tk.Tk):
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file
     def save_project(self, e=None):
+        self.set_status("Saving...", spin=True)
         self.save_config_data()
         if self.project.file_name:
             self.project.write_to_file_name()
         else:
             self.save_as_project()
+        self.set_status(f"Saved '{self.project.title}' to {self.project.file_name}")
 
     # method called by ctrl+shift+s and the file menu
     # shows a prompt allowing the user to save to a pec file
@@ -595,11 +636,6 @@ class SuperToolGUI(tk.Tk):
         
         version_label = ttk.Label(win, text=f"Version: {consts.VERSION}")
         version_label.grid(row=1, column=0)
-        
-        style = ttk.Style(win)
-        label_font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
-        style.configure('hyperlink.TLabel', foreground='blue',
-            font=(label_font.cget('family'), label_font.cget('size'), 'underline'))
         
         link_label = ttk.Label(win, text="Project Website", cursor="hand2",
                 style='hyperlink.TLabel')
