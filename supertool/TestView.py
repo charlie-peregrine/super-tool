@@ -85,13 +85,6 @@ class TestView(ttk.Frame):
         # the scrollbar would still act like the frame was large
         self.scroller.scroll_to_top()
         
-        style = ttk.Style()
-        
-        # create style for path buttons with paths that don't exist 
-        button_font = tkinter.font.nametofont(style.lookup('TButton', 'font'))
-        style.configure('badpath.TButton', foreground='red',
-            font=(button_font.cget('family'), button_font.cget('size'), 'bold'))
-        
         focused = self.parent.focused_test
         if focused: # if there is a focused test
             # put labels and buttons for the top of the scrollable frame

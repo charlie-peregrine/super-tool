@@ -49,6 +49,7 @@ class SuperToolGUI(tk.Tk):
         self.listener.start()
         
         # run the helper methods to set up widgets and full window keybinds
+        self.styles()
         self.widgets()
         self.keybinds()
         
@@ -62,6 +63,29 @@ class SuperToolGUI(tk.Tk):
         
         self.protocol('WM_DELETE_WINDOW', self.on_quit)
         
+    # helper method to create relevant styles for the application
+    def styles(self):
+        
+        style = ttk.Style(self)
+        
+        # create style for error labels in the statusbar 
+        font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
+        style.configure('ErrorLabel.TLabel', foreground='red',
+            font=(font.cget('family'), font.cget('size'), 'bold'))
+        
+        # create style for the spinner label 
+        font = tkinter.font.nametofont('TkFixedFont')
+        style.configure('Spinner.TLabel', font=font)
+        
+        # create style for hyperlink labels
+        font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
+        style.configure('hyperlink.TLabel', foreground='blue',
+            font=(font.cget('family'), font.cget('size'), 'underline'))
+        
+        # create style for path buttons with paths that don't exist
+        font = tkinter.font.nametofont(style.lookup('TButton', 'font'))
+        style.configure('badpath.TButton', foreground='red',
+            font=(font.cget('family'), font.cget('size'), 'bold'))
 
     # helper method to create and add all of the high level widgets to the 
     # main window. also handles making each row and column resize-able
@@ -612,11 +636,6 @@ class SuperToolGUI(tk.Tk):
         
         version_label = ttk.Label(win, text=f"Version: {consts.VERSION}")
         version_label.grid(row=1, column=0)
-        
-        style = ttk.Style(win)
-        label_font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
-        style.configure('hyperlink.TLabel', foreground='blue',
-            font=(label_font.cget('family'), label_font.cget('size'), 'underline'))
         
         link_label = ttk.Label(win, text="Project Website", cursor="hand2",
                 style='hyperlink.TLabel')

@@ -30,12 +30,6 @@ class StatusBar(tk.Frame):
         self.spinner = SpinnerLabel(self, ms_delay=250)
         self.spinner.grid(row=0, column=0, sticky='w')
         
-        style = ttk.Style()
-        
-        # create style for path buttons with paths that don't exist 
-        font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
-        style.configure('ErrorLabel.TLabel', foreground='red',
-            font=(font.cget('family'), font.cget('size'), 'bold'))
         
 
     # helper method to let other methods easily set the status bar's main
@@ -80,9 +74,6 @@ class SpinnerLabel(ttk.Label):
         
         self.after_code = ""
         
-        style = ttk.Style(self)
-        font = tkinter.font.nametofont('TkFixedFont')
-        style.configure('Spinner.TLabel', font=font)
         self.start()
     
     def next(self):
