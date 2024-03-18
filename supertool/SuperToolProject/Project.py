@@ -170,6 +170,10 @@ class Project:
             return False
         return True
     
+    def compress(self, zip_file_name: str, include_all_files: bool):
+        
+        return False
+
     # add a unit to the unit dictionary
     def add_unit(self, name):
         self.units[name] = Unit(self, name)

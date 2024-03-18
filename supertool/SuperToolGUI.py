@@ -151,13 +151,14 @@ class SuperToolGUI(tk.Tk):
         # add options to the file menu
         # accelerators don't actually do anything, they need to be set
         # in the keybinds method
-        file_menu.add_command(label="New Project", command=self.new_project, accelerator="ctrl+n") #@TODO make the accelerators do something
+        file_menu.add_command(label="New Project", command=self.new_project, accelerator="ctrl+n")
         file_menu.add_command(label="Open Project", command=self.open_project, accelerator="ctrl+o")
         file_menu.add_command(label="Save Project", command=self.save_project, accelerator="ctrl+s")
         file_menu.add_command(label="Save Project As", command=self.save_as_project, accelerator="ctrl+shift+s")
         file_menu.add_separator()
-        file_menu.add_command(label="New Unit", command=print)
-        file_menu.add_command(label="New Test")
+        # file_menu.add_command(label="New Unit", command=print)
+        # file_menu.add_command(label="New Test")
+        file_menu.add_command(label="Zip Project", command=self.zip_n_send)
         # file_menu.add_separator()
         # file_menu.add_command(label="Open Workspace", command=open_workspace)
         file_menu.add_separator()
@@ -627,6 +628,96 @@ class SuperToolGUI(tk.Tk):
         if filename:
             self.project.file_name = filename
             self.save_project()
+
+    def zip_n_send(self):
+        zip_n_send_window = BaseOkPopup(self, title="Zip Project")
+        
+        explanation_label = ttk.Label(zip_n_send_window.frame,
+                text="This will package up all of the required files in your "
+                     "project into a zip file, which you can then send to "
+                     "someone else with Super Tool for them to use.",
+                wraplength=400)
+        explanation_label.grid(row=0, column=0, columnspan=2)
+        
+        choose_file_label = ttk.Label(zip_n_send_window.frame,
+                text="Select a location and name for the zip file.")
+        choose_file_label.grid(row=1, column=0, columnspan=1)
+
+        def choose_file():
+            filename = fd.asksaveasfilename(initialdir=os.path.dirname(self.project.file_name),
+                    defaultextension="*.*",
+                    filetypes=[("Zip File", "*.zip"), ("All Files", "*.*")])
+            if filename:
+                file_var.set(filename)
+        choose_file_button = ttk.Button(zip_n_send_window.frame,
+                text="Select File", command=choose_file)
+        choose_file_button.grid(row=1, column=1)
+        
+        file_init_val = os.path.splitext(self.project.file_name)[0]
+        if file_init_val:
+            file_init_val += ".zip"
+        file_var = tk.StringVar(master=zip_n_send_window.frame,
+                value=file_init_val)
+        choose_file_entry = ttk.Entry(zip_n_send_window.frame,
+                textvariable=file_var, width=60)
+        choose_file_entry.grid(row=2, column=0, columnspan=2)
+        
+        opt_label_frame = ttk.LabelFrame(zip_n_send_window.frame, text="Options")
+        opt_label_frame.grid(row=3, column=0, sticky='nesw', columnspan=2)
+        opt_label_frame.columnconfigure(0, weight=1)
+        opt_label_frame.columnconfigure(1, weight=1)
+        
+        # checkboxes for various options
+        include_all_label = ttk.Label(opt_label_frame,
+                text="Include all files in working directory, not just files "
+                     "necessary to run the tool.", wraplength=300)
+        include_all_label.grid(row=0, column=0)
+        include_all_checkbox = ttk.Checkbutton(opt_label_frame)
+        include_all_checkbox.grid(row=0, column=1)
+        include_all_checkbox.state(['!alternate']) # set as disabled
+        
+        for child in opt_label_frame.children.values():
+            child.grid_configure(padx=4, pady=4)
+        
+        def ok_command():
+            zip_name = file_var.get()
+            message_list = []
+            
+            if zip_name:
+                if os.path.exists(os.path.dirname(zip_name)):
+                    if not pathvalidate.is_valid_filename(os.path.basename(zip_name)):
+                        message_list.append("The entered zip file contains illegal characters for a file name")
+                
+                    root, ext = os.path.splitext(os.path.basename(zip_name))
+                    if not root:
+                        message_list.append("Enter a file name before the extension. (eg. file.zip)")
+                    if not ext:
+                        message_list.append("The zip file needs an extenstion! (eg. file.zip)")
+                else:
+                    message_list.append("The zip file needs to be created in an existing folder.")
+            else:
+                message_list.append("Please enter a zip file name.")
+            
+            if message_list:
+                zip_n_send_window.show_errors(message_list)
+            else:
+                zip_n_send_window.hide_errors()
+                zip_n_send_window.destroy()
+                print(zip_name, include_all_checkbox.instate(['selected']))
+                self.set_status(f"Creating zip file: {zip_name}.", spin=True)
+                complete = self.project.compress(zip_name,
+                            include_all_checkbox.instate(['selected']))
+                if complete:
+                    self.set_status(f"Project compressed to {zip_name}.")
+                else:
+                    self.set_status(f"Compressing project to {zip_name} failed."
+                                    " See console for details.")
+                    
+        
+        def cancel_command():
+            zip_n_send_window.destroy()
+        
+        zip_n_send_window.wrapup(ok_command, cancel_command)
 
     def show_about_popup(self):
         win = Popup(self, title="About")
