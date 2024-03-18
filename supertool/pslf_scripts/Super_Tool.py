@@ -1,5 +1,7 @@
 from PSLF_PYTHON import *
 import csv
+import struct
+import traceback
 
 import queue
 import threading
@@ -212,16 +214,6 @@ class SuperTool:
                 gensIndex+=1
         return
 
-    @staticmethod
-    def chf_to_csv(csv_filename):
-        # converts chf to csv
-        ret = Pslf.channel_to_csv(True, False, "", csv_filename)
-        if(ret<0):
-            errmsg = "Error: could not create .csv file."
-            SuperTool.print_to_pslf(errmsg)
-            print(errmsg)
-        return ret
-    
 
     @staticmethod
     def set_loadflow_parameters(Pgen,Qgen,Vgen,Vbase,Zbranch):
@@ -290,3 +282,167 @@ class SuperTool:
 
         return
 
+
+    @staticmethod
+    def chf_to_csv_pslf(csv_filename):
+        # converts chf to csv
+        ret = Pslf.channel_to_csv(True, False, "", csv_filename)
+        if(ret<0):
+            errmsg = "Error: could not create .csv file."
+            SuperTool.print_to_pslf(errmsg)
+            print(errmsg)
+        return ret
+
+
+    @staticmethod
+    def TupleToString(tup):
+        str = ''
+        for item in tup:
+            str = str + item.decode('unicode_escape')
+        str = str.strip(' ')
+        str = str.strip('\x00')
+        return str
+
+    @staticmethod
+    def chf_to_csv(chf_filename,csv_filename):
+        if not ".chf" in chf_filename:
+            print("not a .chf file")
+            return 1
+        #csv_filename = chf_filename.replace('.chf','.csv')
+        
+        devMode=0
+        dataMode=0
+
+        with open(chf_filename, mode="rb") as file:
+            with open(csv_filename, "w", newline='') as f:
+                csvOutFile = csv.writer(f)
+        
+                majorversion = struct.unpack('<i', file.read(4))[0]
+                minorversion = struct.unpack('<i', file.read(4))[0]
+                date01       = struct.unpack('<i', file.read(4))[0]
+                spare01      = struct.unpack('<i', file.read(4))[0]
+                nchannel     = struct.unpack('<i', file.read(4))[0]
+                nheadergroup = struct.unpack('<i', file.read(4))[0]
+                time01       = struct.unpack('<f', file.read(4))[0]
+                time02       = struct.unpack('<f', file.read(4))[0]
+                timelabel    = SuperTool.TupleToString(struct.unpack('<33c', file.read(33)))
+                
+                if devMode:
+                    print("majorversion: ",majorversion)
+                    print("minorversion: ",minorversion)
+                    print("date01: ",date01)
+                    print("spare01: ",spare01)
+                    print("nchannel: ",nchannel)
+                    print("nheadergroup: ",nheadergroup)
+                    print("time01: ",time01)
+                    print("time02: ",time02)
+                    print("timelabel: ",timelabel)
+                ##-----------------------------------------------------##
+                #yname = [[0 for i in range(1)] for j in range(nchannel)] 
+                yname = [0 for i in range(nchannel+1+1)] 
+                namelength = 12
+                ichannel = 0
+                yname[0] = "Unknown"
+                yname[1] = "Time"
+                ##-----------------------------------------------------##
+                for iheadergroup in range(nheadergroup):
+                    busnumber           = struct.unpack('<i', file.read(4))[0]
+                    busname             = SuperTool.TupleToString(struct.unpack('<12c', file.read(12)))
+                    buskv               = round(struct.unpack('<f', file.read(4))[0],2)
+                    id                  = SuperTool.TupleToString(struct.unpack('<2c', file.read(2)))
+                    ck                  = SuperTool.TupleToString(struct.unpack('<2c', file.read(2)))
+                    section             = struct.unpack('<i', file.read(4))[0]
+                    area                = struct.unpack('<i', file.read(4))[0]
+                    zone                = struct.unpack('<i', file.read(4))[0]
+                    selnumber           = struct.unpack('<i', file.read(4))[0]
+                    modelname           = SuperTool.TupleToString(struct.unpack('<8c', file.read(8)))
+                    nchannelperheader   = struct.unpack('<i', file.read(4))[0]
+                    unknown40           = struct.unpack('<40c', file.read(40))
+
+                    if devMode:
+                        print("\nloop ", iheadergroup)
+                        print("busnumber: ",busnumber)
+                        print("busname: ",busname)
+                        print("buskv: ",buskv)
+                        print("id: ",id)
+                        print("ck: ",ck)
+                        print("section: ",section)
+                        print("area: ",area)
+                        print("zone: ",zone)
+                        print("selnumber: ",selnumber)
+                        print("modelname: ",modelname)
+                        print("nchannelperheader: ",nchannelperheader)
+                        #print("unknown40: ",unknown40)
+
+                    for ichannelperheader in range(nchannelperheader):
+                        tobus      = struct.unpack('<i', file.read(4))[0]
+                        toname     = SuperTool.TupleToString(struct.unpack('<12c', file.read(12)))
+                        tokv       = round(struct.unpack('<f', file.read(4))[0],2)
+                        variable   = SuperTool.TupleToString(struct.unpack('<4c', file.read(4)))
+                        cmin       = round(struct.unpack('<f', file.read(4))[0],2)
+                        cmax       = round(struct.unpack('<f', file.read(4))[0],2)
+                        ichannel   = ichannel + 1
+                        header     = variable + '-'+ modelname+'-Bus('+str(busnumber)+')'
+                        #yname[ichannel-1][0] = header
+                        yname[ichannel+1] = header
+
+                        if devMode:
+                            print("tobus: ", tobus)
+                            print("toname: ", toname)
+                            print("tokv: ", tokv)
+                            print("variable: ", variable)
+                            print("cmin: ", cmin)
+                            print("cmax: ", cmax)
+                            print("ichannel: ",ichannel)
+                            print("-----")
+                
+                if devMode: print("yname: ",yname)
+                csvOutFile.writerow(yname)
+
+                ##-----------------------------------------------------## 
+                titletext     = SuperTool.TupleToString(struct.unpack('<400c', file.read(400)))
+                comments      = SuperTool.TupleToString(struct.unpack('<1200c', file.read(1200)))
+                for itmp in range(100):
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpinteger = struct.unpack('<i', file.read(4))
+                    tmpchar    = struct.unpack('<32B', file.read(32))
+                for itmp in range(10):
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                    tmpinteger = struct.unpack('<i', file.read(4))
+                for itmp in range(13):
+                    tmpfloat   = struct.unpack('<f', file.read(4))
+                ##-----------------------------------------------------##
+                eof=False
+                error=False
+                while not (eof or error):  
+                    datarow=''
+                    j=0
+                    for i in range(nchannel+2):  
+                        try:
+                            data = str(round(struct.unpack('<f', file.read(4))[0],5))
+                            yname[j] = data
+                            datarow = datarow + data + ","
+                            j+=1
+                        except struct.error as err:
+                            #print(err)
+                            eof=True
+                            break
+                        except Exception as err:
+                            traceback.print_exception(err)
+                            break
+
+                    if dataMode: print("yname",yname)
+                    csvOutFile.writerow(yname)
+        return

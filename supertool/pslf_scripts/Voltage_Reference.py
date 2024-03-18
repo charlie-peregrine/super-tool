@@ -46,7 +46,7 @@ def run(test, no_gui=False):
     Vinit               = test.attrs["Vinit"].get()             # 14.585  # kV
     Vbase               = test.attrs["Vbase"].get()             # 14.5    # kV
     Zbranch             = test.attrs["Zbranch"].get()           # 0.09    # pu
-    PFtest              = False                                 # if the test is a PF test, then 
+    #PFtest              = False                                 # if the test is a PF test, then 
                                                                 #   1) the pfqrg model must come before the exciter model and after the generator model in the dyd         
                                                                 #   2) there must be no other pss model
         
@@ -58,7 +58,7 @@ def run(test, no_gui=False):
     # unless decided so by the user
     #----------------------------------
 
-    UserVar1        = test.attrs["UserVar1"].get()
+    UserVar1        = test.attrs["UserVar1"].get()  # PFtest (T/F) is this a power Factor Test?
     UserVar2        = test.attrs["UserVar2"].get()
     UserVar3        = test.attrs["UserVar3"].get()
     UserVar4        = test.attrs["UserVar4"].get()
@@ -67,7 +67,7 @@ def run(test, no_gui=False):
 #--------------------------------------------------------------------------------------------------
 
     # Since pf model pfqrg is of type stabilizer model, pss must be enabled for an output to occur.
-    if PFtest:
+    if int(UserVar1):  # if  PFtest:
         PSS_On=True
         print("PFtest = 1, This is a power factor step test, which uses pfqrg model and no other PSS models. Adjust UpStepInPU and DnStepInPU until the output channel pf matches measured test data. ")
         ## add future functionality for error handling the presence of the pfqrg model? This script will likely barf if 
@@ -75,15 +75,13 @@ def run(test, no_gui=False):
         ## 2) you try to run in normal mode with pfqrg model. 
         ## maybe a good way to test for this is to check for all stabilizer models, and see if the model name corresponds to the specific test mode.
 
-    # SimResScalar adjusts the number of points written to chf (and by extension the csv). if the total sim time is too large,
-    # we run into memory overflow error specifically with dumping a large chf to csv. Thus, the solution is to downsample the output
-    SimResScalar = round((TotTimeInSecs/250)+0.5)
 
-    #NplotValue should be odd to reduce possiblility of simulation instability
-    NplotValue = round(SimPtsPerCycle) * SimResScalar
-    if NplotValue % 2 == 0:
-        NplotValue -= 1
-    print("Down-Sampling Factors - SimResScalar:", SimResScalar, "NplotValue:", NplotValue)
+    # There is limited memory for converting using chf_to_csv(). This function downscales the plot output chf 
+    StackMemSize = 16383                                            # probably the size of the available memory?? (14kB)
+    MaxUnitySecs=round((StackMemSize)/(SysFreqInHz*SimPtsPerCycle)) # max sim time @ max resolution that can be written using chf_to_csv()
+    print("MaxUnitySecs: ", MaxUnitySecs)                 
+    SimResScalar = 2*round(TotTimeInSecs/(2*MaxUnitySecs))+1         # downsample scale factor for writing using chf_to_csv() into Nplot, and can only be odd output
+    print("SimResScalar: ",SimResScalar)
 
 
 #--------------------------------------------------------------------------------------------------
@@ -111,13 +109,13 @@ def run(test, no_gui=False):
     SuperTool.print_to_pslf("\n--- Establishing the Pre-Step State")
     dp.Delt = 1 / (SimPtsPerCycle * SysFreqInHz)                    # sets the delta time step 
     dp.Conv_Mon = 0                                                 # set to 1 to display convergence monitor
-    dp.Nplot = NplotValue                                           # save data every # of cycle
+    dp.Nplot = 1* SimResScalar                                      # save data every # of cycle
     dp.Nscreen = round(SysFreqInHz * SimPtsPerCycle) * SimResScalar #  display values on screen every 0.5 second
     dp.Tpause = StepTimeInSecs                                      # pauses at the beginning of the voltage step
     ret = Pslf.run_dyn()
 
     SuperTool.print_to_pslf("\n--- Applying the Step")
-    if not PFtest:
+    if not int(UserVar1):   #if not PFtest
         GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref + UpStepInPU
     else:
         pfqrg_ref = Pslf.get_model_parameters(1, 1, -1, "1 ", 1, "pfqrg","ref")
@@ -127,7 +125,7 @@ def run(test, no_gui=False):
     ret = Pslf.run_dyn()
 
     SuperTool.print_to_pslf("\n--- Removing the Step")
-    if not PFtest:
+    if not int(UserVar1):   #if not PFtest
         GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref - DnStepInPU
     else:
         pfqrg_ref = Pslf.get_model_parameters(1, 1, -1, "1 ", 1, "pfqrg","ref")
@@ -137,7 +135,7 @@ def run(test, no_gui=False):
     dp.Tpause = TotTimeInSecs
     ret = Pslf.run_dyn()
     ret = Pslf.end_dyn_run()
-    ret = SuperTool.chf_to_csv(csv_filename)
+    ret = SuperTool.chf_to_csv(chf_filename,csv_filename)
 
     SuperTool.print_to_pslf("\n-----------------------------------------------------------------------------------------")
     SuperTool.print_to_pslf("Previous Voltage Reference Step Simulation Used:")

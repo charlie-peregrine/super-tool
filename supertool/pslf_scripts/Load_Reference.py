@@ -146,7 +146,7 @@ def run(test, no_gui=False):
 
     # attempts to create csv file
     ret = Pslf.end_dyn_run()
-    ret = SuperTool.chf_to_csv(csv_filename)
+    ret = SuperTool.chf_to_csv(chf_filename,csv_filename)
 
 
     SuperTool.print_to_pslf("-----------------------------------------------------------------------------------------")

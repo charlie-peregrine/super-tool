@@ -222,7 +222,7 @@ def run(test, no_gui=False):
         dp.Tpause = TotTimeInSec
         i = Pslf.run_dyn()
         i = Pslf.end_dyn_run()
-        i = SuperTool.chf_to_csv(csv_filename)
+        i = SuperTool.chf_to_csv(chf_filename,csv_filename)
 
     else:
         SuperTool.print_to_pslf("--- Closing the Breaker")
@@ -242,7 +242,7 @@ def run(test, no_gui=False):
         dp.Tpause = TotTimeInSec
         i = Pslf.run_dyn()
         i = Pslf.end_dyn_run()
-        i = SuperTool.chf_to_csv(csv_filename)
+        i = SuperTool.chf_to_csv(chf_filename,csv_filename)
 
     ##----------------------------------------------##
     ## Remind the user what settings were just used ##
