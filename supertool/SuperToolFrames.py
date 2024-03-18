@@ -57,7 +57,7 @@ class StatusBar(tk.Frame):
             if i >= len(self.history):
                 sep = '>'
             print(i, sep, line)
-            label = ttk.Label(hist_window, text=f"{sep:<1} {i:<2} {line}", style="Spinner.TLabel")
+            label = ttk.Label(hist_window, text=f"{sep:<1} {i:<2} {line}", style="FixedFont.TLabel")
             label.grid(row=i, column=0, sticky='w', padx=5)
 
 class SpinnerLabel(ttk.Label):

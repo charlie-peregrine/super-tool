@@ -68,22 +68,22 @@ class SuperToolGUI(tk.Tk):
         
         style = ttk.Style(self)
         
-        # create style for error labels in the statusbar 
         font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
+        fixed_font = tkinter.font.nametofont('TkFixedFont')
+        
+        # create style for error labels in the statusbar 
         style.configure('ErrorLabel.TLabel', foreground='red',
             font=(font.cget('family'), font.cget('size'), 'bold'))
         
         # create style for the spinner label 
-        font = tkinter.font.nametofont('TkFixedFont')
-        style.configure('Spinner.TLabel', font=font)
+        style.configure('FixedFont.TLabel', font=fixed_font)
+        style.configure('Spinner.TLabel', font=fixed_font)
         
         # create style for hyperlink labels
-        font = tkinter.font.nametofont(style.lookup('TLabel', 'font'))
         style.configure('hyperlink.TLabel', foreground='blue',
             font=(font.cget('family'), font.cget('size'), 'underline'))
         
         # create style for path buttons with paths that don't exist
-        font = tkinter.font.nametofont(style.lookup('TButton', 'font'))
         style.configure('badpath.TButton', foreground='red',
             font=(font.cget('family'), font.cget('size'), 'bold'))
 
