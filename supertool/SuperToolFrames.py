@@ -58,9 +58,12 @@ class StatusBar(tk.Frame):
     
     def show_history(self):
         hist_window = Popup(self.parent, "Status Bar History", force=False)
+        sep = ''
         for i, line in enumerate(self.history, start=1):
-            print(i, line)
-            label = ttk.Label(hist_window, text=f"{i:<4} {line}")
+            if i >= len(self.history):
+                sep = '>'
+            print(i, sep, line)
+            label = ttk.Label(hist_window, text=f"{sep:<1} {i:<2} {line}", style="Spinner.TLabel")
             label.grid(row=i, column=0, sticky='w', padx=5)
 
 class SpinnerLabel(ttk.Label):
