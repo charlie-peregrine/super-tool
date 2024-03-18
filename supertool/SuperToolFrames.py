@@ -217,7 +217,7 @@ class BaseOkPopup(Popup):
         
     def wrapup(self, ok_command, cancel_command):
         for widget in self.frame.winfo_children():
-            widget.grid_configure(padx=2, pady=2)
+            widget.grid_configure(padx=3, pady=3)
         
         self.ok_button.config(command=ok_command)
         self.ok_button.bind("<Return>", lambda e: ok_command)
