@@ -151,7 +151,7 @@ def run(test, no_gui=False):
     dp.Tpause = TotalSimTime                              # pauses at the beginning of the voltage step
     ret = Pslf.run_dyn()
     ret = Pslf.end_dyn_run()
-    ret = SuperTool.chf_to_csv(csv_filename)
+    ret = SuperTool.chf_to_csv(chf_filename,csv_filename)
 
 
     SuperTool.print_to_pslf("-----------------------------------------------------------------------------------------")

@@ -30,9 +30,12 @@ def run(test, no_gui=False):
     chf_filename    = test.attrs["chf_filename"].get()      # "02_U1_CI_sim_v23.chf"
     csv_filename    = test.attrs["csv_filename"].get()      # "02_U1_CI_sim_v23.csv"
     rep_filename    = test.attrs["rep_filename"].get()      # "Rep.rep"
+    GenModelName    = test.attrs["GenModelName"].get()      # Generator Name 
     tripTimeInSecs  = test.attrs["tripTimeInSecs"].get()    # 2.0
     totTimeInSec    = test.attrs["totTimeInSec"].get()      # 36
     PSS_On          = test.attrs["PSS_On"].get()            # 0             # 0:disable PSS model, 1: enable PSS model */
+    SysFreqInHz     = test.attrs["SysFreqInHz"].get()       # 60.00            
+    SimPtsPerCycle  = test.attrs["SimPtsPerCycle"].get()    # 8.0  
     change_Pref     = test.attrs["change_Pref"].get()       # 1             # 1:Change Pref after breaker opens, 0: no change */
     offline_Pref    = test.attrs["offline_Pref"].get()      # 0.004         # note GGOV model uses 1 as base offline while HYG3 and IEEE1 use 0 */
     change_Vref     = test.attrs["change_Vref"].get()       # 0             # 1:Change Vref after breaker opens, 0: no change */
@@ -59,6 +62,7 @@ def run(test, no_gui=False):
     # unless decided so by the user
     #----------------------------------
 
+
     UserVar1        = test.attrs["UserVar1"].get()
     UserVar2        = test.attrs["UserVar2"].get()
     UserVar3        = test.attrs["UserVar3"].get()
@@ -66,6 +70,14 @@ def run(test, no_gui=False):
     UserVar5        = test.attrs["UserVar5"].get()
 
     #--------------------------------------------------------------------------------------------------
+
+
+    # There is limited memory for converting using chf_to_csv(). This function downscales the plot output chf 
+    StackMemSize = 16383                                            # probably the size of the available memory?? (14kB)
+    MaxUnitySecs=round((StackMemSize)/(SysFreqInHz*SimPtsPerCycle)) # max sim time @ max resolution that can be written using chf_to_csv()
+    print("MaxUnitySecs: ", MaxUnitySecs)                 
+    SimResScalar = 2*round(totTimeInSec/(2*MaxUnitySecs))+1         # downsample scale factor for writing using chf_to_csv() into Nplot, and can only be odd output
+    print("SimResScalar: ",SimResScalar)
 
     # gets the project directory of this test and initialize the PSLF instance
     project_directory = test.get_dir().replace("/", "\\") # os.path.dirname(os.path.realpath(__file__))
@@ -106,7 +118,7 @@ def run(test, no_gui=False):
     X = Secdd[i].Zsecx 
 
     dp.Conv_Mon = 0                     # set to 1 to display convergence monitor
-    dp.Nplot = 1                        # save data every cycle
+    dp.Nplot = 1 * SimResScalar         # save data every cycle
     dp.Nscreen = 100                    # display values on screen every 0.5 second
     dp.Tpause = tripTimeInSecs          # pauses after this amount of time
 
@@ -117,7 +129,7 @@ def run(test, no_gui=False):
 
 
     # As needed changing load and voltage reference
-    nMod = Pslf.model_index(1,"gentpj",1,-1,"1 ",1,-1)
+    nMod = Pslf.model_index(1,GenModelName,1,-1,"1 ",1,-1)
     k = Model[nMod].K
 
     if(change_Pref ==1):
@@ -136,7 +148,7 @@ def run(test, no_gui=False):
     ret = Pslf.end_dyn_run()
 
     # attempts to create csv file
-    SuperTool.chf_to_csv(csv_filename)
+    SuperTool.chf_to_csv(chf_filename,csv_filename)
 
     SuperTool.print_to_pslf("\n-----------------------------------------------------------------------------------------")
     SuperTool.print_to_pslf(" This Current Interruption Test used the following:")
