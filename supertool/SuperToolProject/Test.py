@@ -18,7 +18,7 @@ class Test:
         self.name = name
         self.type = type_
         self.parent = parent
-        self.attrs = {}
+        self.attrs: dict[str,Attribute] = {}
         
         self.sub_dir = ''
         

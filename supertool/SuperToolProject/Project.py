@@ -21,7 +21,7 @@ class Project:
         self.title = title
         self.file_name = filename
         self.working_dir = ''
-        self.units = {}
+        self.units: dict[str,Unit] = {}
     
     def write_to_file_name(self, *args):
         print("--- building xml ElementTree for writing")

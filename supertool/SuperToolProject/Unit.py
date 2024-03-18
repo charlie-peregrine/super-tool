@@ -9,7 +9,7 @@ from supertool.SuperToolProject.Test import Test
 class Unit:
     def __init__(self, parent, name="Untitled Unit"):
         self.name = name
-        self.tests = {}
+        self.tests: dict[str,Test] = {}
         self.sub_dir = ''
         # @TODO put more unit specific info here
         
