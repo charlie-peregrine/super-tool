@@ -60,6 +60,17 @@ def run(test, no_gui=False):
     SmibVinit        = test.attrs["SmibVinit"].get()        # 12.7705  # kV  # changes system bus voltage
     SmibVbase        = test.attrs["SmibVbase"].get()        # 12.47
 
+    #----------------------------------
+    # User Defined Parameters
+    # Note that these are not accessed
+    # unless decided so by the user
+    #----------------------------------
+
+    UserVar1        = test.attrs["UserVar1"].get()
+    UserVar2        = test.attrs["UserVar2"].get()
+    UserVar3        = test.attrs["UserVar3"].get()
+    UserVar4        = test.attrs["UserVar4"].get()
+    UserVar5        = test.attrs["UserVar5"].get()
 
     #--------------------------------------------------------------------------------------------------
 
@@ -222,7 +233,7 @@ def run(test, no_gui=False):
         dp.Tpause = TotTimeInSec
         i = Pslf.run_dyn()
         i = Pslf.end_dyn_run()
-        i = SuperTool.chf_to_csv(csv_filename)
+        i = SuperTool.chf_to_csv(chf_filename,csv_filename)
 
     else:
         SuperTool.print_to_pslf("--- Closing the Breaker")
@@ -242,7 +253,7 @@ def run(test, no_gui=False):
         dp.Tpause = TotTimeInSec
         i = Pslf.run_dyn()
         i = Pslf.end_dyn_run()
-        i = SuperTool.chf_to_csv(csv_filename)
+        i = SuperTool.chf_to_csv(chf_filename,csv_filename)
 
     ##----------------------------------------------##
     ## Remind the user what settings were just used ##

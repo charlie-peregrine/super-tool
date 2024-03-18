@@ -182,37 +182,44 @@
         "UserVar1": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 1",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar2": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 2",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar3": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 3",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar4": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 4",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar5": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 5",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
+        },
+        "PFtest": {
+            "type": "BOOL",
+            "group": "PLAIN",
+            "default": false,
+            "full_name": "Power Factor Test",
+            "description": "If this is a power factor test, then check this box. It will enable the Stabilizer model in the dyd. You should also include the power factor model pfqrg (which is type stabilizer)."
         }
     },
     "steadystate": {
@@ -312,35 +319,35 @@
         "UserVar1": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 1",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar2": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 2",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar3": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 3",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar4": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 4",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar5": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 5",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         }
@@ -400,6 +407,13 @@
             "full_name": "Meas Data File - csv",
             "description": "This contains the Site recorded measured data presented in the csv format, used to compare against the simulated data. "
         },
+        "GenModelName": {
+            "type": "STR",
+            "group": "PLAIN",
+            "default": "genqec",
+            "full_name": "Generator Model",
+            "description": "Generator model that is used for the unit. Should match what is in the dyd. This updates the syncmod.p script with the appropriate generator"
+        },
         "tripTimeInSecs": {
             "type": "NUM",
             "group": "PLAIN",
@@ -422,6 +436,22 @@
             "default": false,
             "full_name": "PSS On?",
             "description": "If a relevant Power System Stabilizer Model is included in the Dynamics Data File, then unchecking this box disables the PSS model in the simulation run."
+        },
+        "SysFreqInHz": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 60,
+            "unit": "Hz",
+            "full_name": "System Frequency",
+            "description": "In general, the system frequency in the US is 60 Hz."
+        },
+        "SimPtsPerCycle": {
+            "type": "NUM",
+            "group": "PLAIN",
+            "default": 8,
+            "unit": "",
+            "full_name": "Sim Pts per Cycle",
+            "description": "The simulation delta step is calculated as 1 / (System Frequency * Simulation Points Per Cycle). This number is usually 4 or 8"
         },
         "change_Pref": {
             "type": "BOOL",
@@ -525,35 +555,35 @@
         "UserVar1": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 1",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar2": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 2",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar3": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 3",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar4": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 4",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar5": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 5",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         }
@@ -798,35 +828,35 @@
         "UserVar1": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 1",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar2": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 2",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar3": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 3",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar4": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 4",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar5": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 5",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         }
@@ -1062,35 +1092,35 @@
         "UserVar1": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 1",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar2": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 2",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar3": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 3",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar4": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 4",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar5": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 5",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         }
@@ -1309,35 +1339,35 @@
         "UserVar1": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 1",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar2": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 2",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar3": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 3",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar4": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 4",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         },
         "UserVar5": {
             "type": "STR",
             "group": "USER",
-            "default": "",
+            "default": 0,
             "full_name": "User Variable 5",
             "description": "A user defined string variable. Changing the value of this variable will do nothing, unless you have made changes to the python script specifically associated with this test. Do not make changes to those scripts that you aren't ready to debug yourself and potentially lose on a program update."
         }
