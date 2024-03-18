@@ -60,6 +60,17 @@ def run(test, no_gui=False):
     SmibVinit        = test.attrs["SmibVinit"].get()        # 12.7705  # kV  # changes system bus voltage
     SmibVbase        = test.attrs["SmibVbase"].get()        # 12.47
 
+    #----------------------------------
+    # User Defined Parameters
+    # Note that these are not accessed
+    # unless decided so by the user
+    #----------------------------------
+
+    UserVar1        = test.attrs["UserVar1"].get()
+    UserVar2        = test.attrs["UserVar2"].get()
+    UserVar3        = test.attrs["UserVar3"].get()
+    UserVar4        = test.attrs["UserVar4"].get()
+    UserVar5        = test.attrs["UserVar5"].get()
 
     #--------------------------------------------------------------------------------------------------
 

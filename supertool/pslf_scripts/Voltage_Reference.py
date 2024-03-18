@@ -46,7 +46,7 @@ def run(test, no_gui=False):
     Vinit               = test.attrs["Vinit"].get()             # 14.585  # kV
     Vbase               = test.attrs["Vbase"].get()             # 14.5    # kV
     Zbranch             = test.attrs["Zbranch"].get()           # 0.09    # pu
-    #PFtest              = False                                 # if the test is a PF test, then 
+    PFtest              = test.attrs["PFtest"].get()            # T/F if the test is a PF test, then 
                                                                 #   1) the pfqrg model must come before the exciter model and after the generator model in the dyd         
                                                                 #   2) there must be no other pss model
         
@@ -58,7 +58,7 @@ def run(test, no_gui=False):
     # unless decided so by the user
     #----------------------------------
 
-    UserVar1        = test.attrs["UserVar1"].get()  # PFtest (T/F) is this a power Factor Test?
+    UserVar1        = test.attrs["UserVar1"].get()
     UserVar2        = test.attrs["UserVar2"].get()
     UserVar3        = test.attrs["UserVar3"].get()
     UserVar4        = test.attrs["UserVar4"].get()
@@ -67,7 +67,7 @@ def run(test, no_gui=False):
 #--------------------------------------------------------------------------------------------------
 
     # Since pf model pfqrg is of type stabilizer model, pss must be enabled for an output to occur.
-    if int(UserVar1):  # if  PFtest:
+    if PFtest:
         PSS_On=True
         print("PFtest = 1, This is a power factor step test, which uses pfqrg model and no other PSS models. Adjust UpStepInPU and DnStepInPU until the output channel pf matches measured test data. ")
         ## add future functionality for error handling the presence of the pfqrg model? This script will likely barf if 
@@ -115,7 +115,7 @@ def run(test, no_gui=False):
     ret = Pslf.run_dyn()
 
     SuperTool.print_to_pslf("\n--- Applying the Step")
-    if not int(UserVar1):   #if not PFtest
+    if not PFtest:
         GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref + UpStepInPU
     else:
         pfqrg_ref = Pslf.get_model_parameters(1, 1, -1, "1 ", 1, "pfqrg","ref")
@@ -125,7 +125,7 @@ def run(test, no_gui=False):
     ret = Pslf.run_dyn()
 
     SuperTool.print_to_pslf("\n--- Removing the Step")
-    if not int(UserVar1):   #if not PFtest
+    if not PFtest:
         GeneratorInitialConditions[0].Vref = GeneratorInitialConditions[0].Vref - DnStepInPU
     else:
         pfqrg_ref = Pslf.get_model_parameters(1, 1, -1, "1 ", 1, "pfqrg","ref")
