@@ -13,5 +13,4 @@ Go to the most [latest release](https://github.com/charlie-peregrine/super-tool/
 Download the [latest release](https://github.com/charlie-peregrine/super-tool/releases/latest). Extract the source code, then copy it onto the old supertool directory.
 
 ### Development
-Depends on pslf 23.2.6 or newer
 Create a python virtual environment in your download directory, then install pywin32, psutil, and pathvalidate with pip.
