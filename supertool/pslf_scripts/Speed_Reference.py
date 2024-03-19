@@ -95,17 +95,12 @@ def run(test, no_gui=False):
     StepSizeInPu[0]    = 0
 
 
-    # gets the project directory of this test
-    project_directory = test.get_dir().replace("/", "\\") # os.path.dirname(os.path.realpath(__file__))
-    SuperTool.launch_Pslf(project_directory, silent=no_gui)
-    SuperTool.pwd()
-
-
-    # checks if time steps are enterred in ascending order
-    for i in range(TotalSteps-1):
-        #print("i: ", i)
-        #print("TimeStepInSec[i+1] ", StepTimeInSecs[i+1])
-        #print("TimeStepInSec[i] ", StepTimeInSecs[i])
+    for i in range(len(StepTimeInSecs)-1):
+        # if user leaves some step times at zero, then times are overwritten to be the last value.
+        if StepTimeInSecs[i+1]==0: 
+            StepTimeInSecs[i+1]=StepTimeInSecs[i] 
+            StepSizeInPu[i+1]=0
+        # checks if time steps are enterred in ascending order
         if(StepTimeInSecs[i+1]<StepTimeInSecs[i]):
             SuperTool.fatal_error("TimeStepInSec[] values must be in ascending order.")
 
@@ -113,12 +108,26 @@ def run(test, no_gui=False):
     if(TotalSimTime<StepTimeInSecs[TotalSteps-1]):
         SuperTool.fatal_error("Total simulation time must be greater than last step time.")
 
+    # gets the project directory of this test
+    project_directory = test.get_dir().replace("/", "\\") # os.path.dirname(os.path.realpath(__file__))
+    SuperTool.launch_Pslf(project_directory, silent=no_gui)
+    SuperTool.pwd()
+
+
 
     SuperTool.psds()
     SuperTool.getf(sav_filename) 
     SuperTool.setf(Pinit,Qinit,MVAbase,Vinit,Vbase,Zbranch,set_loadflow,save_loadflow,sav_filename)
     SuperTool.soln(0)
     SuperTool.rdyd(dyd_filename, rep_filename, 1,0,1)
+
+
+    # Checks if governor is GGOV3. If not, send error.
+    dp = DynamicsParameters()   # gets all the dynamics parameters
+    for i in range(dp.Nmodels): # searches through the models to find model library number
+            mln = Model[i].ModLibNo 
+            if((ModelLibrary[mln].Type=="t") & ('ggov3' not in ModelLibrary[mln].Name)):              # searches for turbine governor models "x" that arent ggov3
+                 SuperTool.fatal_error("The governor must be of type GGOV3 for this Speed reference test. ")
 
 
     ret = Pslf.set_model_parameters(1, 1, -1,GenBusID, 1,"ggov3","t1", StepTimeInSecs[1])
