@@ -23,8 +23,9 @@ class Project:
         self.working_dir = ''
         self.units: dict[str,Unit] = {}
     
-    def write_to_file_name(self, *args):
-        print("--- building xml ElementTree for writing")
+    def write_to_file_name(self, verbose=2):
+        if verbose >= 1:
+            print("--- building xml ElementTree for writing")
         tree = ET.ElementTree(
             ET.Element("project", 
                        {"title": self.title,
@@ -44,7 +45,8 @@ class Project:
                                            {"name": attr_name})
                     attr_node.text = str(attr.var.get())
                     test_node.append(attr_node)
-                    print(unit_name, test_name, attr_name, attr.var.get())
+                    if verbose >= 2:
+                        print(unit_name, test_name, attr_name, attr.var.get())
                 
                 header_loop_data = (("sim", test.sim_headers),
                                     ("mes", test.mes_headers))
@@ -75,8 +77,9 @@ class Project:
         tree.write(tmp_name, short_empty_elements=False)
         if tmp_proj.read_from_file_name():
             os.replace(tmp_name, self.file_name)
-            print(f"--- Successfully saved '{self.title}' to")
-            print(self.file_name)
+            if verbose >= 1:
+                print(f"--- Successfully saved '{self.title}' to")
+                print(self.file_name)
         else:
             print("--- Could not successfully save file")
     
