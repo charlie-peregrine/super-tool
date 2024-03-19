@@ -433,6 +433,7 @@ class SuperTool:
                             break
                         except Exception as err:
                             traceback.print_exception(err)
+                            error=True
                             break
 
                     if dataMode: print("yname",yname)
