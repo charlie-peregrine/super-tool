@@ -20,6 +20,7 @@ class Project:
     def __init__(self, title="Untitled Project", filename=''):
         self.title = title
         self.file_name = filename
+        self.just_unzipped = False
         self.working_dir = ''
         self.units: dict[str,Unit] = {}
     
@@ -32,6 +33,9 @@ class Project:
                         "working_dir": self.working_dir,
                         "version": str(consts.VERSION)}))
         root = tree.getroot()
+        if self.just_unzipped:
+            root.attrib["just_unzipped"] = str(self.just_unzipped)
+        
         for unit_name, unit in self.units.items():
             unit_node = ET.Element("unit", {"name": unit_name,
                                             "subdir": unit.sub_dir})
@@ -112,6 +116,9 @@ class Project:
             if 'working_dir' in root.attrib:
                 self.working_dir = root.attrib['working_dir']
                 # print("working dir:", self.working_dir)
+            
+            if 'just_unzipped' in root.attrib:
+                self.just_unzipped = root.attrib['just_unzipped'] == "True"
             
             # read the version that was last used to save this file
             if 'version' in root.attrib:
