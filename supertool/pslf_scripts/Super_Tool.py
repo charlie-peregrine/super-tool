@@ -284,7 +284,8 @@ class SuperTool:
 
 
     @staticmethod
-    def chf_to_csv_pslf(csv_filename):
+    def __chf_to_csv(chf_filename, csv_filename):
+        """Deprecated chf to csv file converter. Use chf_to_csv instead."""
         # converts chf to csv
         ret = Pslf.channel_to_csv(True, False, "", csv_filename)
         if(ret<0):
