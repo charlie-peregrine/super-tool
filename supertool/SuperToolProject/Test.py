@@ -279,27 +279,29 @@ class Test:
             else:
                 raise ValueError()
         
+        def set_val(attr, conversion, value):
+            try:
+                attr.var.set(conversion(value))
+            except ValueError:
+                print(f"Could not set attribute {attr.name} of type " + \
+                        f"{attr.type} to value {value} of type " + \
+                        f"{type(value).__name__}. Ignoring this attribute.")
+        
         if name in self.attrs:
-            type_ = self.attrs[name].type
-            match type_:
+            attr = self.attrs[name]
+            match attr.type:
                 case 'PATH':
-                    convert_type = str      # type: ignore
+                    set_val(attr, str, val)
                 case 'BOOL':
-                    convert_type = str2bool
+                    set_val(attr, str2bool, val)
                 case 'NUM':
-                    convert_type = float    # type: ignore
+                    set_val(attr, float, val)
                 case 'STR':
-                    convert_type = str      # type: ignore
+                    set_val(attr, str, val)
                 case _:
-                    print(type_ + " is not a valid attribute type. ignoring.")
+                    print(attr.type + " is not a valid attribute type. ignoring.")
                     return
             
-            try:
-                self.attrs[name].var.set(convert_type(val))
-            except ValueError:
-                print(f"Could not set attribute {name} of type " + \
-                        f"{type_} to value {val} of type " + \
-                        f"{type(val).__name__}. Ignoring this attribute.")
         else:
             print(f"error: {name} not a valid test attribute. it will be ignored.")
             
