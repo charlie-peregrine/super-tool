@@ -234,7 +234,8 @@ class Project:
                                 print("not copying zip file")
                             else:
                                 zf.write(full_file, arcname=arcname(full_file))
-                            
+                
+                paths2copy_set = set()
                 for unit in tmp_proj.units.values():
                     for test in unit.tests.values():
                         for attr in test.attrs.values():
@@ -243,8 +244,10 @@ class Project:
                                     write_outside_file(attr)
                                     tmp_proj.just_unzipped = tmp_proj.just_unzipped | 2
                                 elif not include_all_files:
-                                    zf.write(attr.get(), arcname=arcname(attr.get())) # type: ignore
-
+                                    paths2copy_set.add(attr.get())
+                for path2copy in paths2copy_set:
+                    zf.write(path2copy, arcname=arcname(path2copy))
+                    
                 tmp_proj.just_unzipped = tmp_proj.just_unzipped | 1
                 tmp_proj.file_name = tmp_proj.file_name + ".tmp"
                 tmp_proj.write_to_file_name(verbose=0)
