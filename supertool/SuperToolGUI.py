@@ -433,10 +433,15 @@ class SuperToolGUI(tk.Tk):
             
             if p.just_unzipped:
                 self.set_unzipped_proj(proj=p)
-                self.set_project(p)
-                self.set_status(f"Opened '{p.title}' Successfully.")
+                if p.just_unzipped:
+                    self.set_status("Open cancelled.")
+                    return
+                else:
+                    self.set_project(p)
+                    self.set_status(f"Opened '{p.title}' Successfully.")
+            
             # double check that there's a working directory
-            elif self.validate_working_dir(proj=p):
+            if self.validate_working_dir(proj=p):
                 self.set_project(p)
                 self.set_status(f"Opened '{p.title}' Successfully.")
             else:
