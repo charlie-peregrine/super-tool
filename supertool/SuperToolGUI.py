@@ -431,8 +431,12 @@ class SuperToolGUI(tk.Tk):
                 self.set_status(f"Opening '{os.path.basename(filename)}' failed!", error=True)
                 return
             
+            if p.just_unzipped:
+                self.set_unzipped_proj(proj=p)
+                self.set_project(p)
+                self.set_status(f"Opened '{p.title}' Successfully.")
             # double check that there's a working directory
-            if self.validate_working_dir(proj=p):
+            elif self.validate_working_dir(proj=p):
                 self.set_project(p)
                 self.set_status(f"Opened '{p.title}' Successfully.")
             else:
@@ -533,6 +537,89 @@ class SuperToolGUI(tk.Tk):
             self.prompt_for_new_working_dir(proj=proj)
         return bool(proj.working_dir)
         
+    def set_unzipped_proj(self, proj: stproject.Project):
+        win = BaseOkPopup(self, title="Setup Imported Project")
+        win.frame.columnconfigure(0, weight=1)
+        
+        explain_label = ttk.Label(win.frame, wraplength=350,
+                text="It looks like this project file was recently unzipped. "
+                     "Use this window to get it set up on your system.")
+        explain_label.grid(row=0, column=0, columnspan=2)
+        
+        explain_label2 = ttk.Label(win.frame, wraplength=350,
+                text=f"The working directory for project {proj.title} is likely"
+                     f" a directory named '{os.path.basename(proj.working_dir)}'"
+                      ". Select the working directory below.")
+        explain_label2.grid(row=1, column=0, columnspan=2)
+        
+        dir_var = tk.StringVar(win.frame)
+        # set dir var
+        working_dir_base = os.path.basename(proj.working_dir)
+        proj_file_name_dir = os.path.dirname(proj.file_name)
+        if working_dir_base in os.listdir(proj_file_name_dir):
+            dir_var.set(os.path.normpath(
+                os.path.join(proj_file_name_dir, working_dir_base)
+            ))
+        
+        
+        def dir_select():
+            dirname = fd.askdirectory(mustexist=True,
+                    initialdir=os.path.dirname(proj.file_name))
+            if dirname:
+                # @TODO add a printout of the number of paths that are valid from
+                # choosing a new directory. maybe add a verify button?
+                dir_var.set(dirname)
+        
+        dir_entry = ttk.Entry(win.frame, textvariable=dir_var, width=45)
+        dir_entry.grid(row=2, column=0)
+        
+        dir_select_button = ttk.Button(win.frame, text="Choose Folder",
+                                       command=dir_select)
+        dir_select_button.grid(row=2, column=1, sticky='ew')
+        dir_select_button.bind("<Return>", lambda e: dir_select())
+        
+        def ok_command():
+            work_dir = dir_var.get()
+            message_list = []
+            
+            if work_dir:
+                if work_dir[-1] in '/\\':
+                    work_dir = work_dir[:-1]
+                
+                if os.path.exists(work_dir):
+                    # if it's not a directory, complain
+                    if not os.path.isdir(work_dir):
+                        message_list.append("The entered working directory is not a directory.")
+                else:
+                    message_list.append("The entered working directory does not exist.")
+            else:
+                message_list.append("Please Select the working directory")
+        
+            if message_list:
+                win.show_errors(message_list)
+            else:
+                win.hide_errors()
+        
+                proj.working_dir = work_dir
+                proj.just_unzipped = 0
+                
+                win.destroy()
+                
+                self.set_status(f"Working directory changed to '{os.path.normpath(self.project.get_dir())}'.")
+        
+        def cancel_command():
+            win.destroy()
+        
+        if proj.just_unzipped & 2:
+            outside_label = ttk.Label(win.frame, wraplength=350,
+                    text="This project has some files that were not in the working directory "
+                    "of the project when it was compressed. These files are stored in the "
+                    "\"outside_working_dir\" folder, which should now be in the working "
+                    "directory for this project. Reorganize these files as you see fit.")
+            outside_label.grid(row=3, column=0, columnspan=2)
+        
+        win.wrapup(ok_command, cancel_command)
+        
     def prompt_for_new_working_dir(self, e=None, proj=None):
         
         if proj is None:
@@ -582,7 +669,6 @@ class SuperToolGUI(tk.Tk):
                     proj.working_dir = work_dir
                     if proj != self.project:
                         self.set_project(proj)
-                    # else:
                 self.proj_frame.update_proj_header()
                 if self.focused_test:
                     # rerender focused test to update hovertext @TODO do it better
@@ -681,6 +767,7 @@ class SuperToolGUI(tk.Tk):
         
         def ok_command():
             zip_name = file_var.get()
+            include_all = 'selected' in include_all_checkbox.state()
             message_list = []
             
             if zip_name:
@@ -703,10 +790,9 @@ class SuperToolGUI(tk.Tk):
             else:
                 zip_n_send_window.hide_errors()
                 zip_n_send_window.destroy()
-                print(zip_name, include_all_checkbox.instate(['selected']))
+                print(zip_name, include_all)
                 self.set_status(f"Creating zip file: {zip_name}.", spin=True)
-                complete = self.project.compress(zip_name,
-                            include_all_checkbox.instate(['selected']))
+                complete = self.project.compress(zip_name, include_all)
                 if complete:
                     self.set_status(f"Project compressed to {zip_name}.")
                 else:

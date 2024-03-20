@@ -5,7 +5,9 @@
 
 import os
 import tkinter as tk
+import traceback
 import xml.etree.ElementTree as ET
+import zipfile
 from supertool.Version import Version
 
 import supertool.consts as consts
@@ -20,7 +22,7 @@ class Project:
     def __init__(self, title="Untitled Project", filename=''):
         self.title = title
         self.file_name = filename
-        self.just_unzipped = False
+        self.just_unzipped = 0
         self.working_dir = ''
         self.units: dict[str,Unit] = {}
     
@@ -118,7 +120,7 @@ class Project:
                 # print("working dir:", self.working_dir)
             
             if 'just_unzipped' in root.attrib:
-                self.just_unzipped = root.attrib['just_unzipped'] == "True"
+                self.just_unzipped = int(root.attrib['just_unzipped'])
             
             # read the version that was last used to save this file
             if 'version' in root.attrib:
@@ -180,10 +182,82 @@ class Project:
             return False
         return True
     
-    def compress(self, zip_file_name: str, include_all_files: bool):
-        
-        return False
+    def compress(self, zip_file_name: str, include_all_files=False):
+        try:
+            tmp_proj = Project(filename=self.file_name)
+            tmp_proj.read_from_file_name()
+            tmp_proj.just_unzipped = 0
 
+            def arcname(path):
+                return os.path.normpath(os.path.join(
+                    os.path.basename(tmp_proj.working_dir),
+                    os.path.relpath(path, tmp_proj.working_dir)
+                ))
+
+            def arcname_in_working_dir(attr):
+                return arcname(attr.get()).startswith(os.path.basename(tmp_proj.working_dir))
+            
+            def write_outside_file(attr):
+                # adjust file location in attr
+                zf.write(attr.get(), arcname=os.path.basename(tmp_proj.working_dir)
+                                    + "/outside_working_dir/"
+                                    + os.path.basename(attr.get()))
+                rel2testdir = os.path.relpath(
+                        tmp_proj.working_dir + "/outside_working_dir/",
+                        attr.parent.get_dir()
+                )
+                zip_name = os.path.join(rel2testdir, os.path.basename(attr.get()))
+                attr.var.set(zip_name)
+
+
+            # @TODO check if any of the sub directories go outside of the working dir
+
+            # print(arcname(r"C:\CODE\blah.dyd"))
+            # print(arcname(r"C:\CODE\tool\blah.dyd"))
+            # print(arcname(r"C:\CODE\demo super tool gui\blah.dyd"))
+            # print(arcname(r"C:\CODE\demo super tool gui\dump\blah.dyd"))
+
+            with zipfile.ZipFile(zip_file_name, 'w',
+                    compression=zipfile.ZIP_DEFLATED, compresslevel=5) as zf:
+
+                if include_all_files:
+                    for path, dirs, files in os.walk(tmp_proj.working_dir):
+                        for directory in dirs:
+                            full_dir = os.path.join(path, directory)
+                            zf.write(full_dir, arcname=arcname(full_dir))
+                        for file in files:
+                            full_file = os.path.normpath(os.path.join(path, file))
+                            # don't copy the pec file or the zip file
+                            if full_file == os.path.normpath(tmp_proj.file_name):
+                                print("not copying save filename")
+                            if full_file == os.path.normpath(zip_file_name):
+                                print("not copying zip file")
+                            else:
+                                zf.write(full_file, arcname=arcname(full_file))
+                            
+                for unit in tmp_proj.units.values():
+                    for test in unit.tests.values():
+                        for attr in test.attrs.values():
+                            if attr.type == 'PATH' and os.path.exists(attr.get()): # type: ignore
+                                if not arcname_in_working_dir(attr):
+                                    write_outside_file(attr)
+                                    tmp_proj.just_unzipped = tmp_proj.just_unzipped | 2
+                                elif not include_all_files:
+                                    zf.write(attr.get(), arcname=arcname(attr.get())) # type: ignore
+
+                tmp_proj.just_unzipped = tmp_proj.just_unzipped | 1
+                tmp_proj.file_name = tmp_proj.file_name + ".tmp"
+                tmp_proj.write_to_file_name(verbose=0)
+                zf.write(tmp_proj.file_name, arcname=os.path.basename(
+                    tmp_proj.file_name[:tmp_proj.file_name.index(".tmp")]
+                ))
+                os.remove(tmp_proj.file_name)
+                print()
+        except Exception as e:
+            traceback.print_exception(e)
+            return False
+        return True
+    
     # add a unit to the unit dictionary
     def add_unit(self, name):
         self.units[name] = Unit(self, name)
