@@ -197,11 +197,13 @@ class Project:
             def arcname_in_working_dir(attr):
                 return arcname(attr.get()).startswith(os.path.basename(tmp_proj.working_dir))
             
-            def write_outside_file(attr):
+            def write_outside_file(attr, dont_copy):
                 # adjust file location in attr
-                zf.write(attr.get(), arcname=os.path.basename(tmp_proj.working_dir)
+                if attr.get() not in dont_copy:
+                    zf.write(attr.get(), arcname=os.path.basename(tmp_proj.working_dir)
                                     + "/outside_working_dir/"
                                     + os.path.basename(attr.get()))
+                
                 rel2testdir = os.path.relpath(
                         tmp_proj.working_dir + "/outside_working_dir/",
                         attr.parent.get_dir()
@@ -235,13 +237,17 @@ class Project:
                             else:
                                 zf.write(full_file, arcname=arcname(full_file))
                 
+                # these 2 sets are used to avoid putting a file in the zip twice
+                # when it is referred to twice by 2 different tests
                 paths2copy_set = set()
+                outside_paths_copied = set()
                 for unit in tmp_proj.units.values():
                     for test in unit.tests.values():
                         for attr in test.attrs.values():
                             if attr.type == 'PATH' and os.path.exists(attr.get()): # type: ignore
                                 if not arcname_in_working_dir(attr):
-                                    write_outside_file(attr)
+                                    outside_paths_copied.add(attr.get())
+                                    write_outside_file(attr, outside_paths_copied)
                                     tmp_proj.just_unzipped = tmp_proj.just_unzipped | 2
                                 elif not include_all_files:
                                     paths2copy_set.add(attr.get())
