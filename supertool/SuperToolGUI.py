@@ -12,7 +12,6 @@ import os
 import webbrowser
 import pathvalidate
 
-
 import supertool.consts as consts
 from supertool.SuperToolFrames import BaseOkPopup, StatusBar, Popup
 import supertool.SuperToolProject.Project as stproject
@@ -761,18 +760,27 @@ class SuperToolGUI(tk.Tk):
         # checkboxes for various options
         include_all_label = ttk.Label(opt_label_frame,
                 text="Include all files in working directory, not just files "
-                     "necessary to run the tool.", wraplength=300)
-        include_all_label.grid(row=0, column=0)
+                     "necessary to run the tool.", wraplength=350)
+        include_all_label.grid(row=0, column=1, sticky='w')
         include_all_checkbox = ttk.Checkbutton(opt_label_frame)
-        include_all_checkbox.grid(row=0, column=1)
+        include_all_checkbox.grid(row=0, column=0)
         include_all_checkbox.state(['!alternate']) # set as disabled
         
+        path_on_clipboard_label = ttk.Label(opt_label_frame,
+                text="Copy zip file to clipboard for easy emailing",
+                wraplength=350)
+        path_on_clipboard_label.grid(row=1, column=1, sticky='w')
+        path_on_clipboard_checkbox = ttk.Checkbutton(opt_label_frame)
+        path_on_clipboard_checkbox.grid(row=1, column=0)
+        path_on_clipboard_checkbox.state(['selected', '!alternate']) # set active
+        
         for child in opt_label_frame.children.values():
-            child.grid_configure(padx=4, pady=4)
+            child.grid_configure(pady=4)
         
         def ok_command():
             zip_name = file_var.get()
             include_all = 'selected' in include_all_checkbox.state()
+            path_on_clipboard = 'selected' in path_on_clipboard_checkbox.state()
             message_list = []
             
             if zip_name:
@@ -801,7 +809,12 @@ class SuperToolGUI(tk.Tk):
                 def compress_func():
                     complete = self.project.compress(zip_name, include_all)
                     if complete:
+                        if path_on_clipboard:
+                            win_zip_name = zip_name.replace("/", "\\")
+                            os.system(f"powershell Set-Clipboard -Path '{win_zip_name}'")
+                        
                         self.set_status(f"Project compressed to {zip_name}.")
+                        
                     else:
                         self.set_status(f"Compressing project to {zip_name} failed."
                                         " See console for details.")
