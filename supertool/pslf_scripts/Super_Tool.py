@@ -30,10 +30,10 @@ class SuperToolFatalError(Exception):
         super().__init__(message)
 
 class SuperToolMessage():
-    def __init__(self, message_type: str, message: str = ""):
+    def __init__(self, message_type: str, data=None):
         self.lock = threading.Lock()
         self.type = message_type
-        self.text = message
+        self.data = data
         # return_val is a value that needs to be passed back to the backend
         # script's execution
         self.return_val = None
@@ -62,7 +62,7 @@ class SuperToolMessage():
         return self.lock.locked()
     
     def __repr__(self):
-        return f"[t:{self.type}|m:\"{self.text}\"|r:{self.return_val}|L:{self.waiting()}]"
+        return f"[t:{self.type}|r:{self.return_val}|L:{self.waiting()}|data:\"{self.data}\"]"
 
 class SuperTool:
     def __init__():
