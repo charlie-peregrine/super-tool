@@ -50,6 +50,8 @@ class ScriptListener(threading.Thread):
                 elif message.type == 'setstatus':
                     self.root.set_status(message.data)
                     self.root.after(5, message.done)
+                elif message.type == 'compress':
+                    message.data() # data is a function
                     
                 else:
                     raise TypeError("SuperToolMessage " + message

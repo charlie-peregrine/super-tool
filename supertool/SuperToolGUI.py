@@ -797,13 +797,17 @@ class SuperToolGUI(tk.Tk):
                 zip_n_send_window.destroy()
                 print(zip_name, include_all)
                 self.set_status(f"Creating zip file: {zip_name}.", spin=True)
-                complete = self.project.compress(zip_name, include_all)
-                if complete:
-                    self.set_status(f"Project compressed to {zip_name}.")
-                else:
-                    self.set_status(f"Compressing project to {zip_name} failed."
-                                    " See console for details.")
-                    
+                
+                def compress_func():
+                    complete = self.project.compress(zip_name, include_all)
+                    if complete:
+                        self.set_status(f"Project compressed to {zip_name}.")
+                    else:
+                        self.set_status(f"Compressing project to {zip_name} failed."
+                                        " See console for details.")
+                
+                ScriptQueue.put(SuperToolMessage("compress", data=compress_func))
+                
         
         def cancel_command():
             zip_n_send_window.destroy()
