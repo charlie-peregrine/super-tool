@@ -182,7 +182,7 @@ class Project:
             return False
         return True
     
-    def compress(self, zip_file_name: str, include_all_files=False):
+    def compress(self, zip_file_name: str, include_which_files=1):
         try:
             tmp_proj = Project(filename=self.file_name)
             tmp_proj.read_from_file_name()
@@ -222,7 +222,7 @@ class Project:
             with zipfile.ZipFile(zip_file_name, 'w',
                     compression=zipfile.ZIP_DEFLATED, compresslevel=5) as zf:
 
-                if include_all_files:
+                if include_which_files == 2:
                     for path, dirs, files in os.walk(tmp_proj.working_dir):
                         for directory in dirs:
                             full_dir = os.path.join(path, directory)
@@ -245,12 +245,19 @@ class Project:
                     for test in unit.tests.values():
                         for attr in test.attrs.values():
                             if attr.type == 'PATH' and os.path.exists(attr.get()): # type: ignore
-                                if not arcname_in_working_dir(attr):
-                                    outside_paths_copied.add(attr.get())
+                                if include_which_files == 2 and not arcname_in_working_dir(attr):
+                                    path = attr.get()
                                     write_outside_file(attr, outside_paths_copied)
+                                    outside_paths_copied.add(path)
                                     tmp_proj.just_unzipped = tmp_proj.just_unzipped | 2
-                                elif not include_all_files:
-                                    paths2copy_set.add(attr.get())
+                                elif (include_which_files != 2 and attr.read_only_file) or include_which_files == 1:
+                                    if not arcname_in_working_dir(attr):
+                                        path = attr.get()
+                                        write_outside_file(attr, outside_paths_copied)
+                                        outside_paths_copied.add(path)
+                                        tmp_proj.just_unzipped = tmp_proj.just_unzipped | 2
+                                    else:
+                                        paths2copy_set.add(attr.get())
                 for path2copy in paths2copy_set:
                     zf.write(path2copy, arcname=arcname(path2copy))
                     

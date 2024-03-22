@@ -757,21 +757,40 @@ class SuperToolGUI(tk.Tk):
         opt_label_frame.columnconfigure(0, weight=1)
         opt_label_frame.columnconfigure(1, weight=1)
         
-        # checkboxes for various options
+        # radiobuttons for how much to zip
+        include_var = tk.IntVar(zip_n_send_window, value=1)
+        include_required_label = ttk.Label(opt_label_frame, wraplength=350,
+                text="Include only the files that are required to run a simulation "
+                     "and input data for simulations or plots.")
+        include_required_label.grid(row=0, column=1, sticky='w')
+        include_required_radio = ttk.Radiobutton(opt_label_frame,
+                variable=include_var, value=0)
+        include_required_radio.grid(row=0, column=0)
+        
+        
+        include_some_label = ttk.Label(opt_label_frame, wraplength=350,
+                text="Include input and output files for each test, but not "
+                     "anything else.")
+        include_some_label.grid(row=1, column=1, sticky='w')
+        include_some_radio = ttk.Radiobutton(opt_label_frame,
+                variable=include_var, value=1)
+        include_some_radio.grid(row=1, column=0)
+        
         include_all_label = ttk.Label(opt_label_frame,
                 text="Include all files in working directory, not just files "
                      "necessary to run the tool.", wraplength=350)
-        include_all_label.grid(row=0, column=1, sticky='w')
-        include_all_checkbox = ttk.Checkbutton(opt_label_frame)
-        include_all_checkbox.grid(row=0, column=0)
-        include_all_checkbox.state(['!alternate']) # set as disabled
+        include_all_label.grid(row=2, column=1, sticky='w')
+        include_all_radio = ttk.Radiobutton(opt_label_frame,
+                variable=include_var, value=2)
+        include_all_radio.grid(row=2, column=0)
         
+        # checkboxes for various options
         path_on_clipboard_label = ttk.Label(opt_label_frame,
                 text="Copy zip file to clipboard for easy emailing",
                 wraplength=350)
-        path_on_clipboard_label.grid(row=1, column=1, sticky='w')
+        path_on_clipboard_label.grid(row=3, column=1, sticky='w')
         path_on_clipboard_checkbox = ttk.Checkbutton(opt_label_frame)
-        path_on_clipboard_checkbox.grid(row=1, column=0)
+        path_on_clipboard_checkbox.grid(row=3, column=0)
         path_on_clipboard_checkbox.state(['selected', '!alternate']) # set active
         
         for child in opt_label_frame.children.values():
@@ -779,7 +798,8 @@ class SuperToolGUI(tk.Tk):
         
         def ok_command():
             zip_name = file_var.get()
-            include_all = 'selected' in include_all_checkbox.state()
+            # include_all = 'selected' in include_all_checkbox.state()
+            include_amount = include_var.get()
             path_on_clipboard = 'selected' in path_on_clipboard_checkbox.state()
             message_list = []
             
@@ -803,11 +823,11 @@ class SuperToolGUI(tk.Tk):
             else:
                 zip_n_send_window.hide_errors()
                 zip_n_send_window.destroy()
-                print(zip_name, include_all)
+                print(zip_name, include_amount)
                 self.set_status(f"Creating zip file: {zip_name}.", spin=True)
                 
                 def compress_func():
-                    complete = self.project.compress(zip_name, include_all)
+                    complete = self.project.compress(zip_name, include_amount)
                     if complete:
                         if path_on_clipboard:
                             win_zip_name = zip_name.replace("/", "\\")
