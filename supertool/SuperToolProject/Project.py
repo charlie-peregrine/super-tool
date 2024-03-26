@@ -260,7 +260,11 @@ class Project:
                                         paths2copy_set.add(attr.get())
                 for path2copy in paths2copy_set:
                     zf.write(path2copy, arcname=arcname(path2copy))
-                    
+                
+                if len(paths2copy_set) == 0 and include_which_files != 2:
+                    work_dir_basename = os.path.basename(tmp_proj.working_dir)
+                    zf.write(work_dir_basename, arcname=work_dir_basename)
+                
                 tmp_proj.just_unzipped = tmp_proj.just_unzipped | 1
                 tmp_proj.file_name = tmp_proj.file_name + ".tmp"
                 tmp_proj.write_to_file_name(verbose=0)
