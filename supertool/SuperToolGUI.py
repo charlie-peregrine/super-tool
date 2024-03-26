@@ -720,12 +720,29 @@ class SuperToolGUI(tk.Tk):
             self.save_project()
 
     def zip_n_send(self):
+        # check that project has working directory
+        if not self.validate_working_dir():
+            return
+        
+        # check that filename exists and project has a save file
+        if self.project.file_name:
+            if not os.path.exists(self.project.file_name):
+                self.save_project()
+        else:
+            messagebox.showinfo(title="No Project Save File",
+                message="This project has not been saved yet.\n" +
+                    "Use the next window to save your project.")
+            self.save_as_project()
+        
+        if not self.project.file_name or not os.path.exists(self.project.file_name):
+            return
+        
         zip_n_send_window = BaseOkPopup(self, title="Zip Project")
         
         explanation_label = ttk.Label(zip_n_send_window.frame,
                 text="This will package up all of the required files in your "
                      "project into a zip file, which you can then send to "
-                     "someone else with Super Tool for them to use.",
+                     "someone else with Super Tool for them to extract and use.",
                 wraplength=400)
         explanation_label.grid(row=0, column=0, columnspan=2)
         
