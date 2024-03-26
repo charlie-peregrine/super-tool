@@ -284,7 +284,8 @@ class SuperTool:
 
 
     @staticmethod
-    def chf_to_csv_pslf(csv_filename):
+    def __chf_to_csv(chf_filename, csv_filename):
+        """Deprecated chf to csv file converter. Use chf_to_csv instead."""
         # converts chf to csv
         ret = Pslf.channel_to_csv(True, False, "", csv_filename)
         if(ret<0):
@@ -308,10 +309,9 @@ class SuperTool:
         if not ".chf" in chf_filename:
             print("not a .chf file")
             return 1
-        #csv_filename = chf_filename.replace('.chf','.csv')
         
-        devMode=0
-        dataMode=0
+        debugMode=False     # if True, then it prints to the console the chf details.
+        dataMode=False      # if True, then it outputs the data contents to the console.
 
         with open(chf_filename, mode="rb") as file:
             with open(csv_filename, "w", newline='') as f:
@@ -327,7 +327,7 @@ class SuperTool:
                 time02       = struct.unpack('<f', file.read(4))[0]
                 timelabel    = SuperTool.TupleToString(struct.unpack('<33c', file.read(33)))
                 
-                if devMode:
+                if debugMode:
                     print("majorversion: ",majorversion)
                     print("minorversion: ",minorversion)
                     print("date01: ",date01)
@@ -338,12 +338,11 @@ class SuperTool:
                     print("time02: ",time02)
                     print("timelabel: ",timelabel)
                 ##-----------------------------------------------------##
-                #yname = [[0 for i in range(1)] for j in range(nchannel)] 
-                yname = [0 for i in range(nchannel+1+1)] 
-                namelength = 12
-                ichannel = 0
+                yname = [0 for i in range(nchannel+2)]
                 yname[0] = "Unknown"
                 yname[1] = "Time"
+                namelength = 12
+                ichannel = 2
                 ##-----------------------------------------------------##
                 for iheadergroup in range(nheadergroup):
                     busnumber           = struct.unpack('<i', file.read(4))[0]
@@ -359,7 +358,7 @@ class SuperTool:
                     nchannelperheader   = struct.unpack('<i', file.read(4))[0]
                     unknown40           = struct.unpack('<40c', file.read(40))
 
-                    if devMode:
+                    if debugMode:
                         print("\nloop ", iheadergroup)
                         print("busnumber: ",busnumber)
                         print("busname: ",busname)
@@ -381,12 +380,11 @@ class SuperTool:
                         variable   = SuperTool.TupleToString(struct.unpack('<4c', file.read(4)))
                         cmin       = round(struct.unpack('<f', file.read(4))[0],2)
                         cmax       = round(struct.unpack('<f', file.read(4))[0],2)
-                        ichannel   = ichannel + 1
                         header     = variable + '-'+ modelname+'-Bus('+str(busnumber)+')'
-                        #yname[ichannel-1][0] = header
-                        yname[ichannel+1] = header
+                        yname[ichannel] = header
+                        ichannel+=1
 
-                        if devMode:
+                        if debugMode:
                             print("tobus: ", tobus)
                             print("toname: ", toname)
                             print("tokv: ", tokv)
@@ -394,9 +392,10 @@ class SuperTool:
                             print("cmin: ", cmin)
                             print("cmax: ", cmax)
                             print("ichannel: ",ichannel)
+                            print("ichannelperheader: ", ichannelperheader)
                             print("-----")
                 
-                if devMode: print("yname: ",yname)
+                if debugMode: print("yname: ",yname)
                 csvOutFile.writerow(yname)
 
                 ##-----------------------------------------------------## 
@@ -427,20 +426,15 @@ class SuperTool:
                 eof=False
                 error=False
                 while not (eof or error):  
-                    datarow=''
-                    j=0
                     for i in range(nchannel+2):  
                         try:
-                            data = str(round(struct.unpack('<f', file.read(4))[0],5))
-                            yname[j] = data
-                            datarow = datarow + data + ","
-                            j+=1
+                            yname[i] = str(round(struct.unpack('<f', file.read(4))[0],5))
                         except struct.error as err:
-                            #print(err)
                             eof=True
                             break
                         except Exception as err:
                             traceback.print_exception(err)
+                            error=True
                             break
 
                     if dataMode: print("yname",yname)
