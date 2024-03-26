@@ -37,10 +37,10 @@ class ScriptListener(threading.Thread):
             print(f">>> ScriptListener Processing:\n>>> {message}")
             try:
                 if message.type == 'ynprompt':
-                    message.return_val = messagebox.askyesno(message=message.text)
+                    message.return_val = messagebox.askyesno(message=message.data)
                     message.done()
                 elif message.type == 'scriptalreadyrunning':
-                    messagebox.showinfo(message=message.text)
+                    messagebox.showinfo(message=message.data)
                 elif message.type == 'check4update':
                     self.check_for_update()
                 elif message.type == 'stopscriptlistener':
@@ -48,8 +48,10 @@ class ScriptListener(threading.Thread):
                     message.done()
                     self.running = False
                 elif message.type == 'setstatus':
-                    self.root.set_status(message.text)
+                    self.root.set_status(message.data)
                     self.root.after(5, message.done)
+                elif message.type == 'compress':
+                    message.data() # data is a function
                     
                 else:
                     raise TypeError("SuperToolMessage " + message

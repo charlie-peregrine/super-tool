@@ -5,7 +5,9 @@
 
 import os
 import tkinter as tk
+import traceback
 import xml.etree.ElementTree as ET
+import zipfile
 from supertool.Version import Version
 
 import supertool.consts as consts
@@ -20,17 +22,22 @@ class Project:
     def __init__(self, title="Untitled Project", filename=''):
         self.title = title
         self.file_name = filename
+        self.just_unzipped = 0
         self.working_dir = ''
-        self.units = {}
+        self.units: dict[str,Unit] = {}
     
-    def write_to_file_name(self, *args):
-        print("--- building xml ElementTree for writing")
+    def write_to_file_name(self, verbose=2):
+        if verbose >= 1:
+            print("--- building xml ElementTree for writing")
         tree = ET.ElementTree(
             ET.Element("project", 
                        {"title": self.title,
                         "working_dir": self.working_dir,
                         "version": str(consts.VERSION)}))
         root = tree.getroot()
+        if self.just_unzipped:
+            root.attrib["just_unzipped"] = str(self.just_unzipped)
+        
         for unit_name, unit in self.units.items():
             unit_node = ET.Element("unit", {"name": unit_name,
                                             "subdir": unit.sub_dir})
@@ -44,7 +51,8 @@ class Project:
                                            {"name": attr_name})
                     attr_node.text = str(attr.var.get())
                     test_node.append(attr_node)
-                    print(unit_name, test_name, attr_name, attr.var.get())
+                    if verbose >= 2:
+                        print(unit_name, test_name, attr_name, attr.var.get())
                 
                 header_loop_data = (("sim", test.sim_headers),
                                     ("mes", test.mes_headers))
@@ -75,8 +83,9 @@ class Project:
         tree.write(tmp_name, short_empty_elements=False)
         if tmp_proj.read_from_file_name():
             os.replace(tmp_name, self.file_name)
-            print(f"--- Successfully saved '{self.title}' to")
-            print(self.file_name)
+            if verbose >= 1:
+                print(f"--- Successfully saved '{self.title}' to")
+                print(self.file_name)
         else:
             print("--- Could not successfully save file")
     
@@ -109,6 +118,9 @@ class Project:
             if 'working_dir' in root.attrib:
                 self.working_dir = root.attrib['working_dir']
                 # print("working dir:", self.working_dir)
+            
+            if 'just_unzipped' in root.attrib:
+                self.just_unzipped = int(root.attrib['just_unzipped'])
             
             # read the version that was last used to save this file
             if 'version' in root.attrib:
@@ -167,6 +179,102 @@ class Project:
         except ET.ParseError as e:
             print(f"--- ParseError occured while trying to read {self.file_name}:")
             print("---", e.msg)
+            return False
+        return True
+    
+    def compress(self, zip_file_name: str, include_which_files=1):
+        try:
+            tmp_proj = Project(filename=self.file_name)
+            tmp_proj.read_from_file_name()
+            tmp_proj.just_unzipped = 0
+
+            def arcname(path):
+                return os.path.normpath(os.path.join(
+                    os.path.basename(tmp_proj.working_dir),
+                    os.path.relpath(path, tmp_proj.working_dir)
+                ))
+
+            def arcname_in_working_dir(attr):
+                return arcname(attr.get()).startswith(os.path.basename(tmp_proj.working_dir))
+            
+            def write_outside_file(attr, dont_copy):
+                # adjust file location in attr
+                if attr.get() not in dont_copy:
+                    zf.write(attr.get(), arcname=os.path.basename(tmp_proj.working_dir)
+                                    + "/outside_working_dir/"
+                                    + os.path.basename(attr.get()))
+                
+                rel2testdir = os.path.relpath(
+                        tmp_proj.working_dir + "/outside_working_dir/",
+                        attr.parent.get_dir()
+                )
+                zip_name = os.path.join(rel2testdir, os.path.basename(attr.get()))
+                attr.var.set(zip_name)
+
+
+            # @TODO check if any of the sub directories go outside of the working dir
+
+            # print(arcname(r"C:\CODE\blah.dyd"))
+            # print(arcname(r"C:\CODE\tool\blah.dyd"))
+            # print(arcname(r"C:\CODE\demo super tool gui\blah.dyd"))
+            # print(arcname(r"C:\CODE\demo super tool gui\dump\blah.dyd"))
+
+            with zipfile.ZipFile(zip_file_name, 'w',
+                    compression=zipfile.ZIP_DEFLATED, compresslevel=5) as zf:
+
+                if include_which_files == 2:
+                    for path, dirs, files in os.walk(tmp_proj.working_dir):
+                        for directory in dirs:
+                            full_dir = os.path.join(path, directory)
+                            zf.write(full_dir, arcname=arcname(full_dir))
+                        for file in files:
+                            full_file = os.path.normpath(os.path.join(path, file))
+                            # don't copy the pec file or the zip file
+                            if full_file == os.path.normpath(tmp_proj.file_name):
+                                print("not copying save filename")
+                            if full_file == os.path.normpath(zip_file_name):
+                                print("not copying zip file")
+                            else:
+                                zf.write(full_file, arcname=arcname(full_file))
+                
+                # these 2 sets are used to avoid putting a file in the zip twice
+                # when it is referred to twice by 2 different tests
+                paths2copy_set = set()
+                outside_paths_copied = set()
+                for unit in tmp_proj.units.values():
+                    for test in unit.tests.values():
+                        for attr in test.attrs.values():
+                            if attr.type == 'PATH' and os.path.exists(attr.get()): # type: ignore
+                                if include_which_files == 2 and not arcname_in_working_dir(attr):
+                                    path = attr.get()
+                                    write_outside_file(attr, outside_paths_copied)
+                                    outside_paths_copied.add(path)
+                                    tmp_proj.just_unzipped = tmp_proj.just_unzipped | 2
+                                elif (include_which_files != 2 and attr.read_only_file) or include_which_files == 1:
+                                    if not arcname_in_working_dir(attr):
+                                        path = attr.get()
+                                        write_outside_file(attr, outside_paths_copied)
+                                        outside_paths_copied.add(path)
+                                        tmp_proj.just_unzipped = tmp_proj.just_unzipped | 2
+                                    else:
+                                        paths2copy_set.add(attr.get())
+                for path2copy in paths2copy_set:
+                    zf.write(path2copy, arcname=arcname(path2copy))
+                
+                if len(paths2copy_set) == 0 and include_which_files != 2:
+                    work_dir_basename = os.path.basename(tmp_proj.working_dir)
+                    zf.write(work_dir_basename, arcname=work_dir_basename)
+                
+                tmp_proj.just_unzipped = tmp_proj.just_unzipped | 1
+                tmp_proj.file_name = tmp_proj.file_name + ".tmp"
+                tmp_proj.write_to_file_name(verbose=0)
+                zf.write(tmp_proj.file_name, arcname=os.path.basename(
+                    tmp_proj.file_name[:tmp_proj.file_name.index(".tmp")]
+                ))
+                os.remove(tmp_proj.file_name)
+                print()
+        except Exception as e:
+            traceback.print_exception(e)
             return False
         return True
     

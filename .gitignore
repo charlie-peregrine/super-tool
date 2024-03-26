@@ -2,6 +2,7 @@
 __pycache__
 *.log
 *.pec
+*.zip
 dump/*
 *.dyd
 *.tmp
@@ -13,3 +14,5 @@ Docs/Supertool Meeting Notes 12-15-2023.docx
 *.bat
 classes.png
 packages.png
+zip_testing/
+

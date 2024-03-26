@@ -487,8 +487,8 @@
             "type": "BOOL",
             "group": "PLAIN",
             "default": false,
-            "full_name": "",
-            "description": ""
+            "full_name": "Auto Voltage Regulation",
+            "description": "0: Manual Excitation, 1:AVR. The control mode of the voltage regulator during the sync test. 99% of the time this is enabled."
         },
         "set_loadflow": {
             "type": "BOOL",
@@ -1255,7 +1255,7 @@
             "type": "BOOL",
             "group": "PLAIN",
             "default": true,
-            "full_name": "Automatic Voltage Regulation Mode",
+            "full_name": "Auto Voltage Regulation",
             "description": "0: Manual Excitation, 1:AVR. The control mode of the voltage regulator during the sync test. 99% of the time this is enabled."
         },
         "ChangePref": {

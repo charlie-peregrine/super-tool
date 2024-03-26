@@ -12,7 +12,6 @@ import os
 import webbrowser
 import pathvalidate
 
-
 import supertool.consts as consts
 from supertool.SuperToolFrames import BaseOkPopup, StatusBar, Popup
 import supertool.SuperToolProject.Project as stproject
@@ -151,13 +150,14 @@ class SuperToolGUI(tk.Tk):
         # add options to the file menu
         # accelerators don't actually do anything, they need to be set
         # in the keybinds method
-        file_menu.add_command(label="New Project", command=self.new_project, accelerator="ctrl+n") #@TODO make the accelerators do something
+        file_menu.add_command(label="New Project", command=self.new_project, accelerator="ctrl+n")
         file_menu.add_command(label="Open Project", command=self.open_project, accelerator="ctrl+o")
         file_menu.add_command(label="Save Project", command=self.save_project, accelerator="ctrl+s")
         file_menu.add_command(label="Save Project As", command=self.save_as_project, accelerator="ctrl+shift+s")
         file_menu.add_separator()
-        file_menu.add_command(label="New Unit", command=print)
-        file_menu.add_command(label="New Test")
+        # file_menu.add_command(label="New Unit", command=print)
+        # file_menu.add_command(label="New Test")
+        file_menu.add_command(label="Zip Project", command=self.zip_n_send)
         # file_menu.add_separator()
         # file_menu.add_command(label="Open Workspace", command=open_workspace)
         file_menu.add_separator()
@@ -430,6 +430,15 @@ class SuperToolGUI(tk.Tk):
                 self.set_status(f"Opening '{os.path.basename(filename)}' failed!", error=True)
                 return
             
+            if p.just_unzipped:
+                self.set_unzipped_proj(proj=p)
+                if p.just_unzipped:
+                    self.set_status("Open cancelled.")
+                    return
+                else:
+                    self.set_project(p)
+                    self.set_status(f"Opened '{p.title}' Successfully.")
+            
             # double check that there's a working directory
             if self.validate_working_dir(proj=p):
                 self.set_project(p)
@@ -532,6 +541,89 @@ class SuperToolGUI(tk.Tk):
             self.prompt_for_new_working_dir(proj=proj)
         return bool(proj.working_dir)
         
+    def set_unzipped_proj(self, proj: stproject.Project):
+        win = BaseOkPopup(self, title="Setup Imported Project")
+        win.frame.columnconfigure(0, weight=1)
+        
+        explain_label = ttk.Label(win.frame, wraplength=350,
+                text="It looks like this project file was recently unzipped. "
+                     "Use this window to get it set up on your system.")
+        explain_label.grid(row=0, column=0, columnspan=2)
+        
+        explain_label2 = ttk.Label(win.frame, wraplength=350,
+                text=f"The working directory for project {proj.title} is likely"
+                     f" a directory named '{os.path.basename(proj.working_dir)}'"
+                      ". Select the working directory below.")
+        explain_label2.grid(row=1, column=0, columnspan=2)
+        
+        dir_var = tk.StringVar(win.frame)
+        # set dir var
+        working_dir_base = os.path.basename(proj.working_dir)
+        proj_file_name_dir = os.path.dirname(proj.file_name)
+        if working_dir_base in os.listdir(proj_file_name_dir):
+            dir_var.set(os.path.normpath(
+                os.path.join(proj_file_name_dir, working_dir_base)
+            ))
+        
+        
+        def dir_select():
+            dirname = fd.askdirectory(mustexist=True,
+                    initialdir=os.path.dirname(proj.file_name))
+            if dirname:
+                # @TODO add a printout of the number of paths that are valid from
+                # choosing a new directory. maybe add a verify button?
+                dir_var.set(dirname)
+        
+        dir_entry = ttk.Entry(win.frame, textvariable=dir_var, width=45)
+        dir_entry.grid(row=2, column=0)
+        
+        dir_select_button = ttk.Button(win.frame, text="Choose Folder",
+                                       command=dir_select)
+        dir_select_button.grid(row=2, column=1, sticky='ew')
+        dir_select_button.bind("<Return>", lambda e: dir_select())
+        
+        def ok_command():
+            work_dir = dir_var.get()
+            message_list = []
+            
+            if work_dir:
+                if work_dir[-1] in '/\\':
+                    work_dir = work_dir[:-1]
+                
+                if os.path.exists(work_dir):
+                    # if it's not a directory, complain
+                    if not os.path.isdir(work_dir):
+                        message_list.append("The entered working directory is not a directory.")
+                else:
+                    message_list.append("The entered working directory does not exist.")
+            else:
+                message_list.append("Please Select the working directory")
+        
+            if message_list:
+                win.show_errors(message_list)
+            else:
+                win.hide_errors()
+        
+                proj.working_dir = work_dir
+                proj.just_unzipped = 0
+                
+                win.destroy()
+                
+                self.set_status(f"Working directory changed to '{os.path.normpath(self.project.get_dir())}'.")
+        
+        def cancel_command():
+            win.destroy()
+        
+        if proj.just_unzipped & 2:
+            outside_label = ttk.Label(win.frame, wraplength=350,
+                    text="This project has some files that were not in the working directory "
+                    "of the project when it was compressed. These files are stored in the "
+                    "\"outside_working_dir\" folder, which should now be in the working "
+                    "directory for this project. Reorganize these files as you see fit.")
+            outside_label.grid(row=3, column=0, columnspan=2)
+        
+        win.wrapup(ok_command, cancel_command)
+        
     def prompt_for_new_working_dir(self, e=None, proj=None):
         
         if proj is None:
@@ -581,7 +673,6 @@ class SuperToolGUI(tk.Tk):
                     proj.working_dir = work_dir
                     if proj != self.project:
                         self.set_project(proj)
-                    # else:
                 self.proj_frame.update_proj_header()
                 if self.focused_test:
                     # rerender focused test to update hovertext @TODO do it better
@@ -627,6 +718,151 @@ class SuperToolGUI(tk.Tk):
         if filename:
             self.project.file_name = filename
             self.save_project()
+
+    def zip_n_send(self):
+        # check that project has working directory
+        if not self.validate_working_dir():
+            return
+        
+        # check that filename exists and project has a save file
+        if self.project.file_name:
+            if not os.path.exists(self.project.file_name):
+                self.save_project()
+        else:
+            messagebox.showinfo(title="No Project Save File",
+                message="This project has not been saved yet.\n" +
+                    "Use the next window to save your project.")
+            self.save_as_project()
+        
+        if not self.project.file_name or not os.path.exists(self.project.file_name):
+            return
+        
+        zip_n_send_window = BaseOkPopup(self, title="Zip Project")
+        
+        explanation_label = ttk.Label(zip_n_send_window.frame,
+                text="This will package up all of the required files in your "
+                     "project into a zip file, which you can then send to "
+                     "someone else with Super Tool for them to extract and use.",
+                wraplength=400)
+        explanation_label.grid(row=0, column=0, columnspan=2)
+        
+        choose_file_label = ttk.Label(zip_n_send_window.frame,
+                text="Select a location and name for the zip file.")
+        choose_file_label.grid(row=1, column=0, columnspan=1)
+
+        def choose_file():
+            filename = fd.asksaveasfilename(initialdir=os.path.dirname(self.project.file_name),
+                    defaultextension="*.*",
+                    filetypes=[("Zip File", "*.zip"), ("All Files", "*.*")])
+            if filename:
+                file_var.set(filename)
+        choose_file_button = ttk.Button(zip_n_send_window.frame,
+                text="Select File", command=choose_file)
+        choose_file_button.grid(row=1, column=1)
+        
+        file_init_val = os.path.splitext(self.project.file_name)[0]
+        if file_init_val:
+            file_init_val += ".zip"
+        file_var = tk.StringVar(master=zip_n_send_window.frame,
+                value=file_init_val)
+        choose_file_entry = ttk.Entry(zip_n_send_window.frame,
+                textvariable=file_var, width=60)
+        choose_file_entry.grid(row=2, column=0, columnspan=2)
+        
+        opt_label_frame = ttk.LabelFrame(zip_n_send_window.frame, text="Options")
+        opt_label_frame.grid(row=3, column=0, sticky='nesw', columnspan=2)
+        opt_label_frame.columnconfigure(0, weight=1)
+        opt_label_frame.columnconfigure(1, weight=1)
+        
+        # radiobuttons for how much to zip
+        include_var = tk.IntVar(zip_n_send_window, value=1)
+        include_required_label = ttk.Label(opt_label_frame, wraplength=350,
+                text="Include only the files that are required to run a simulation "
+                     "and input data for simulations or plots.")
+        include_required_label.grid(row=0, column=1, sticky='w')
+        include_required_radio = ttk.Radiobutton(opt_label_frame,
+                variable=include_var, value=0)
+        include_required_radio.grid(row=0, column=0)
+        
+        
+        include_some_label = ttk.Label(opt_label_frame, wraplength=350,
+                text="Include input and output files for each test, but not "
+                     "anything else.")
+        include_some_label.grid(row=1, column=1, sticky='w')
+        include_some_radio = ttk.Radiobutton(opt_label_frame,
+                variable=include_var, value=1)
+        include_some_radio.grid(row=1, column=0)
+        
+        include_all_label = ttk.Label(opt_label_frame,
+                text="Include all files in working directory, not just files "
+                     "necessary to run the tool.", wraplength=350)
+        include_all_label.grid(row=2, column=1, sticky='w')
+        include_all_radio = ttk.Radiobutton(opt_label_frame,
+                variable=include_var, value=2)
+        include_all_radio.grid(row=2, column=0)
+        
+        # checkboxes for various options
+        path_on_clipboard_label = ttk.Label(opt_label_frame,
+                text="Copy zip file to clipboard for easy emailing",
+                wraplength=350)
+        path_on_clipboard_label.grid(row=3, column=1, sticky='w')
+        path_on_clipboard_checkbox = ttk.Checkbutton(opt_label_frame)
+        path_on_clipboard_checkbox.grid(row=3, column=0)
+        path_on_clipboard_checkbox.state(['selected', '!alternate']) # set active
+        
+        for child in opt_label_frame.children.values():
+            child.grid_configure(pady=4)
+        
+        def ok_command():
+            zip_name = file_var.get()
+            # include_all = 'selected' in include_all_checkbox.state()
+            include_amount = include_var.get()
+            path_on_clipboard = 'selected' in path_on_clipboard_checkbox.state()
+            message_list = []
+            
+            if zip_name:
+                if os.path.exists(os.path.dirname(zip_name)):
+                    if not pathvalidate.is_valid_filename(os.path.basename(zip_name)):
+                        message_list.append("The entered zip file contains illegal characters for a file name")
+                
+                    root, ext = os.path.splitext(os.path.basename(zip_name))
+                    if not root:
+                        message_list.append("Enter a file name before the extension. (eg. file.zip)")
+                    if not ext:
+                        message_list.append("The zip file needs an extenstion! (eg. file.zip)")
+                else:
+                    message_list.append("The zip file needs to be created in an existing folder.")
+            else:
+                message_list.append("Please enter a zip file name.")
+            
+            if message_list:
+                zip_n_send_window.show_errors(message_list)
+            else:
+                zip_n_send_window.hide_errors()
+                zip_n_send_window.destroy()
+                print(zip_name, include_amount)
+                self.set_status(f"Creating zip file: {zip_name}.", spin=True)
+                
+                def compress_func():
+                    complete = self.project.compress(zip_name, include_amount)
+                    if complete:
+                        if path_on_clipboard:
+                            win_zip_name = zip_name.replace("/", "\\")
+                            os.system(f"powershell Set-Clipboard -Path '{win_zip_name}'")
+                        
+                        self.set_status(f"Project compressed to {zip_name}.")
+                        
+                    else:
+                        self.set_status(f"Compressing project to {zip_name} failed."
+                                        " See console for details.")
+                
+                ScriptQueue.put(SuperToolMessage("compress", data=compress_func))
+                
+        
+        def cancel_command():
+            zip_n_send_window.destroy()
+        
+        zip_n_send_window.wrapup(ok_command, cancel_command)
 
     def show_about_popup(self):
         win = Popup(self, title="About")
