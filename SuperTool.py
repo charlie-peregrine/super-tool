@@ -14,6 +14,11 @@ try:
     print("Arguments:     ", " ".join(sys.argv))
     print("Command:       ", f'"{sys.executable}" "{filename}"{" " + " ".join(sys.argv[1:])}')
 
+    # useful to check for deadlock. use python -m pip install hanging_threads
+    # to install
+    # from hanging_threads import start_monitoring
+    # start_monitoring(seconds_frozen=10, test_interval=100)
+
     print("===== Initializing SuperTool =====")
     import supertool.SuperToolGUI as stgui
 
