@@ -12,6 +12,7 @@ import os
 import webbrowser
 import pathvalidate
 
+import supertool.supertooltools as supertooltools
 import supertool.consts as consts
 from supertool.SuperToolFrames import BaseOkPopup, StatusBar, Popup
 import supertool.SuperToolProject.Project as stproject
@@ -46,6 +47,9 @@ class SuperToolGUI(tk.Tk):
         self.main_loop_running = True
         self.listener = ScriptListener.ScriptListener(self)
         self.listener.start()
+        
+        # list of processes started by supertooltools
+        self.tool_processes = []
         
         # run the helper methods to set up widgets and full window keybinds
         self.styles()
@@ -144,9 +148,9 @@ class SuperToolGUI(tk.Tk):
         view_menu = tk.Menu(self.menubar)
         self.run_menu = tk.Menu(self.menubar)
         self.graph_menu = tk.Menu(self.menubar)
+        tools_menu = tk.Menu(self.menubar)
         help_menu = tk.Menu(self.menubar)
         
-
         # add options to the file menu
         # accelerators don't actually do anything, they need to be set
         # in the keybinds method
@@ -183,7 +187,14 @@ class SuperToolGUI(tk.Tk):
         self.graph_menu.add_command(label="Graph Without Saving",
             command=lambda: self.param_frame.graph(save_on_graph=False))
 
-        # add options to the about menu
+        # add options to the tool menu
+        def tool_command(func):
+            return lambda: self.tool_processes.append(func())
+        tools_menu.add_command(label="CSV Time Convert",
+                command=tool_command(supertooltools.run_csv_time_convert)
+        )
+
+        # add options to the help menu
         help_menu.add_command(label="About", command=self.show_about_popup)
         help_menu.add_command(label="Check For Updates",
             command=lambda: ScriptQueue.put(SuperToolMessage('check4update')))
@@ -193,6 +204,7 @@ class SuperToolGUI(tk.Tk):
         self.menubar.add_cascade(label="View", menu=view_menu)
         self.menubar.add_cascade(label="Run", menu=self.run_menu)
         self.menubar.add_cascade(label="Graph", menu=self.graph_menu)
+        self.menubar.add_cascade(label="Tools", menu=tools_menu)
         self.menubar.add_cascade(label="Help", menu=help_menu)
     
     # method to call when the program exits
@@ -209,6 +221,12 @@ class SuperToolGUI(tk.Tk):
             # listener.join causes a program freeze
             ScriptQueue.join()
             print("===== ScriptListener has finished  =====", end='')
+            
+            # close tool windows
+            print("===== Closing Tools =====")
+            for p in self.tool_processes:
+                p.kill()
+            print("===== Tools Closed =====")
             
             # close the window
             self.destroy()
