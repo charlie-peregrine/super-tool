@@ -15,7 +15,7 @@ import pandas as pd
 dir_path = os.path.dirname(os.path.realpath(__file__))
 conf_geometry = "geometry.conf"
 conf_geometry = os.path.join(dir_path,conf_geometry)
-csv_filename = ""
+# csv_filename = ""
 
 Header_Row = "Header_Row"
 Timestamp_Column = "Timestamp_Column"
@@ -126,27 +126,31 @@ def on_closing():
         conf.write(window.geometry())
     window.destroy()
 
+def read_file():
+    pass
+
     
 # initialize tkinter elements
 window = tk.Tk()
-button1 = tk.Button(window,text='Batch select csv files',command=App.select_file)
-button2 = tk.Button(window,text='Read the csv file',command=App.read_file)
+button1 = ttk.Button(window, text='Batch select csv files', command=select_file)
+button2 = ttk.Button(window, text='Read the csv file', command=read_file)
 button1.grid(row=0, column=0,padx=2)
 button2.grid(row=1, column=0, padx=2)
 
-entry1 = tk.Entry(window)
+entry1 = ttk.Entry(window)
 entry1.insert(0,'CSV path and filename')
 entry1.grid(row=0, column=1, padx=2, pady=5, rowspan=1,columnspan=3,ipadx=200,ipady=4)
 entry1.configure(state="disabled")
 
-entry2 = tk.Entry(window)
+entry2 = ttk.Entry(window)
 entry2.insert(0,'')
 entry2.grid(row=1, column=1, padx=2, pady=5, rowspan=1,columnspan=3,ipadx=200,ipady=4)
 entry2.configure(state="disabled")
 
 # window attributes
-window.protocol("WM_DELETE_WINDOW", App.on_closing)
+window.protocol("WM_DELETE_WINDOW", on_closing)
 window.wm_title("CSV Time Convert Tool")
+
 try:
     with open(conf_geometry, "r", encoding='utf-8') as conf: 
         window.geometry(conf.read())
