@@ -8,6 +8,7 @@ import threading
 import traceback
 import queue
 import re
+import os
 
 from urllib.error import URLError
 from urllib.request import urlopen
@@ -51,7 +52,8 @@ class ScriptListener(threading.Thread):
                     self.status(message.data)
                     self.root.after(5, message.done)
                 elif message.type == 'compress':
-                    message.data() # data is a function
+                    # data is a tuple containing the arguments for compress
+                    self.compress(*message.data)
                     
                 else:
                     raise TypeError("SuperToolMessage " + message
@@ -88,7 +90,6 @@ class ScriptListener(threading.Thread):
                     else:
                         text = f"Super Tool Version: {consts.VERSION}, Up to date"
                     self.status(text)
-                    # self.root.set_status(text)
                     print(text)
                 else: # request failed, printout update checker failed
                     self.status("Update Check Failed.")
@@ -98,6 +99,21 @@ class ScriptListener(threading.Thread):
         except (URLError, TimeoutError):
             self.status("Update Check Failed.")
     
+    def compress(self, zip_name, include_amount, path_on_clipboard):
+        complete = self.root.project.compress(zip_name, include_amount)
+        if complete:
+            if path_on_clipboard:
+                win_zip_name = zip_name.replace("/", "\\")
+                os.system(f"powershell Set-Clipboard -Path '{win_zip_name}'")
+            
+            self.status(f"Project compressed to {zip_name}.")
+            
+        else:
+            self.status(f"Compressing project to {zip_name} failed."
+                            " See console for details.")
+    
+    # helper method wrapper for root.set_status, not updating the status
+    # bar if the main loop is blocking for the script queue to finish
     def status(self, *args, **kwargs):
         if self.root.main_loop_running:
             self.root.set_status(*args, **kwargs)

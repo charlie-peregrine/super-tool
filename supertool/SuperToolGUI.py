@@ -844,20 +844,9 @@ class SuperToolGUI(tk.Tk):
                 print(zip_name, include_amount)
                 self.set_status(f"Creating zip file: {zip_name}.", spin=True)
                 
-                def compress_func():
-                    complete = self.project.compress(zip_name, include_amount)
-                    if complete:
-                        if path_on_clipboard:
-                            win_zip_name = zip_name.replace("/", "\\")
-                            os.system(f"powershell Set-Clipboard -Path '{win_zip_name}'")
-                        
-                        self.set_status(f"Project compressed to {zip_name}.")
-                        
-                    else:
-                        self.set_status(f"Compressing project to {zip_name} failed."
-                                        " See console for details.")
-                
-                ScriptQueue.put(SuperToolMessage("compress", data=compress_func))
+                compress_message = SuperToolMessage("compress",
+                        data=(zip_name, include_amount, path_on_clipboard))
+                ScriptQueue.put(compress_message)
                 
         
         def cancel_command():
