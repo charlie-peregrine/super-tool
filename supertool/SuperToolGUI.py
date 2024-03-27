@@ -43,7 +43,7 @@ class SuperToolGUI(tk.Tk):
         self.set_window_title()
         
         # setup backend listener script and its boolean signal flag
-        self.running = True
+        self.main_loop_running = True
         self.listener = ScriptListener.ScriptListener(self)
         self.listener.start()
         
@@ -198,8 +198,9 @@ class SuperToolGUI(tk.Tk):
     # method to call when the program exits
     def on_quit(self):
         def close():
-            # set running to false, indicating that the listener thread should stop
-            self.running = False
+            # set main_loop_running to false, indicating that the listener
+            # thread should not attempt any more GUI updates
+            self.main_loop_running = False
             print("===== Waiting for ScriptListener to finish =====")
             stop_message = SuperToolMessage("stopscriptlistener")
             ScriptQueue.put(stop_message)
