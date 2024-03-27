@@ -22,10 +22,9 @@ Timestamp_Column = "Timestamp_Column"
 
 
 def select_file():
-    #globals()[Header_Row] = ""
     filetypes   = (('csv files', '*.csv'),('All files', '*.*'))
     csv_filenames = fd.askopenfilenames(parent=window, title='Select multiple files',initialdir="",filetypes=filetypes)
-    csv_filenames = list(csv_filenames)
+    # csv_filenames = list(csv_filenames) # unnecessary? askopen... returns a list
     print("csv_filenames: ",csv_filenames)
     
     for csv_filename in csv_filenames:
@@ -38,13 +37,12 @@ def select_file():
         ##----------- Reads csv file into pandas dataframe -----------##
         df = pd.read_csv(csv_filename, sep=',', low_memory=True)
         print("df:\n",df)
-        #globals()[Header_Row] = list(df.columns) # sets the header row as a dynamic global variable
         Header_Row=list(df.columns)
         #print("Header_Row: \n", Header_Row)
 
         entry2.configure(state="normal")
         entry2.delete(0,'end')
-        entry2.insert(0,Header_Row)
+        entry2.insert(0, str(Header_Row))
         entry2.configure(state="disabled")
 
         ##------------- Inserts new column at index 1 ----------------##
@@ -63,8 +61,9 @@ def select_file():
                 #print("    column:",column)
                 value=df.iloc[row,column]
                 try:
-                    if pd.isnull(value): raise ValueError('Null Character Found')
-                    float(value)
+                    if pd.isnull(value):
+                        raise ValueError('Null Character Found')
+                    # float(value)
                     isNumber=True
                     firstRowIndex=row
                     #print("  isaNumber! ", value)
@@ -92,7 +91,8 @@ def select_file():
             except:
                 #print("  not Timestamp")
                 pass
-            if timestampFound: break
+            if timestampFound:
+                break
         if not timestampFound:
             print("no Timestamps found in this file.")
             raise ValueError('No Timestamps Found in this file.')
@@ -121,7 +121,6 @@ def select_file():
 
 
 def on_closing():
-    #if messagebox.askokcancel("Quit", "Do you want to quit?"):
     with open(conf_geometry, "w", encoding='utf-8') as conf:
         conf.write(window.geometry())
     window.destroy()
